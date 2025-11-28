@@ -1,0 +1,10 @@
+.dev.vars
+
+# Environment files
+.dev.vars
+.env
+.env.local
+
+# Wrangler
+.wrangler/
+wrangler.toml.bak

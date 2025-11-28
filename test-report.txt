@@ -1,0 +1,4 @@
+Patient: Mohammed Kutty P K
+Age: 68
+Diagnosis: Gastric Adenocarcinoma Stage IIIC
+Date: 2025-09-22

@@ -2,24 +2,73 @@ name = "saarthi-clinical"
 main = "src/index.js"
 compatibility_date = "2025-11-28"
 
-# Development environment
-[env.development]
-vars = { ENVIRONMENT = "development", LOG_LEVEL = "debug" }
+# ===================================
+# DEVELOPMENT ENVIRONMENT (Default)
+# ===================================
 
-# You'll fill these in after creating resources
-# [[env.development.d1_databases]]
-# binding = "DB"
-# database_name = "saarthi-clinical-dev"
-# database_id = "YOUR_DATABASE_ID"
+# Development D1 Database
+[[d1_databases]]
+binding = "DB"
+database_name = "saarthi-clinical-dev"
+database_id = "94fd958a-4b90-4a4b-a2c6-54b490d6eb6f"
 
-# [[env.development.r2_buckets]]
-# binding = "DOCUMENTS"
-# bucket_name = "saarthi-documents-dev"
+# Development R2 Bucket
+[[r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "saarthi-documents-dev"
 
-# [[env.development.kv_namespaces]]
-# binding = "CACHE"
-# id = "YOUR_KV_CACHE_ID"
+# Development KV Namespace
+[[kv_namespaces]]
+binding = "CACHE"
+id = "66432efaadd945a9939efc2c5baed1c8"
+preview_id = "e759848fc16d4c1b813fd1d21f3c592f"
 
-# [[env.development.kv_namespaces]]
-# binding = "EVENTS"
-# id = "YOUR_KV_EVENTS_ID"
+[vars]
+ENVIRONMENT = "development"
+LOG_LEVEL = "debug"
+
+# ===================================
+# PRODUCTION ENVIRONMENT
+# ===================================
+[env.production]
+name = "saarthi-clinical-prod"
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "saarthi-clinical-prod"
+database_id = "0d4a52a9-cc73-49d6-9410-424d018f80f2"
+
+[[env.production.r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "saarthi-documents-prod"
+
+[[env.production.kv_namespaces]]
+binding = "CACHE"
+id = "7c080d431a714bde813d1b63464fd1d8"
+
+[env.production.vars]
+ENVIRONMENT = "production"
+LOG_LEVEL = "warn"
+
+# ===================================
+# STAGING ENVIRONMENT
+# ===================================
+[env.staging]
+name = "saarthi-clinical-staging"
+
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "saarthi-clinical-dev"
+database_id = "94fd958a-4b90-4a4b-a2c6-54b490d6eb6f"
+
+[[env.staging.r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "saarthi-documents-dev"
+
+[[env.staging.kv_namespaces]]
+binding = "CACHE"
+id = "66432efaadd945a9939efc2c5baed1c8"
+
+[env.staging.vars]
+ENVIRONMENT = "staging"
+LOG_LEVEL = "info"
