@@ -1,0 +1,25 @@
+name = "saarthi-clinical"
+main = "src/index.js"
+compatibility_date = "2025-11-28"
+
+# Development environment
+[env.development]
+vars = { ENVIRONMENT = "development", LOG_LEVEL = "debug" }
+
+# You'll fill these in after creating resources
+# [[env.development.d1_databases]]
+# binding = "DB"
+# database_name = "saarthi-clinical-dev"
+# database_id = "YOUR_DATABASE_ID"
+
+# [[env.development.r2_buckets]]
+# binding = "DOCUMENTS"
+# bucket_name = "saarthi-documents-dev"
+
+# [[env.development.kv_namespaces]]
+# binding = "CACHE"
+# id = "YOUR_KV_CACHE_ID"
+
+# [[env.development.kv_namespaces]]
+# binding = "EVENTS"
+# id = "YOUR_KV_EVENTS_ID"

@@ -1,0 +1,28 @@
+{
+  "name": "saarthi-clinical",
+  "version": "1.0.0",
+  "description": "Saarthi Clinical Platform - AI-powered patient clinical dashboard",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:staging": "wrangler deploy --env staging",
+    "deploy:production": "wrangler deploy --env production",
+    "test": "vitest",
+    "d1:init": "wrangler d1 execute DB --file=./schema.sql",
+    "d1:migrations": "wrangler d1 migrations list DB"
+  },
+  "dependencies": {
+    "hono": "^4.10.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20251128.0",
+    "@vitest/ui": "^1.0.0",
+    "vitest": "^1.0.0",
+    "wrangler": "^3.114.15"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
