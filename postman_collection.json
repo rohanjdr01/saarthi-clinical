@@ -1,15 +1,22 @@
 {
   "info": {
     "name": "Saarthi Clinical API",
-    "description": "Complete API collection for Saarthi Clinical Platform with multi-document upload and case-packs",
+    "description": "Complete API collection for Saarthi Clinical Platform - Medical document processing with Gemini 3 & OpenAI",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "saarthi-clinical-v1"
+    "_exporter_id": "saarthi-clinical-v2"
   },
   "variable": [
     {
       "key": "baseUrl",
+      "value": "https://process.saarthihq.com/api/v1",
+      "type": "string",
+      "description": "Production URL"
+    },
+    {
+      "key": "localUrl",
       "value": "http://localhost:8787/api/v1",
-      "type": "string"
+      "type": "string",
+      "description": "Local development URL"
     },
     {
       "key": "patientId",
@@ -51,10 +58,10 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (pm.response.code === 200) {",
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
                   "    const response = pm.response.json();",
-                  "    pm.collectionVariables.set('patientId', response.data.id);",
-                  "    console.log('Patient ID saved:', response.data.id);",
+                  "    pm.collectionVariables.set('patientId', response.data.id || response.patient_id);",
+                  "    console.log('Patient ID saved:', response.data.id || response.patient_id);",
                   "}"
                 ]
               }
@@ -70,13 +77,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Test Patient\",\n  \"age\": 65,\n  \"gender\": \"male\",\n  \"caregiver\": {\n    \"name\": \"Test Caregiver\",\n    \"relation\": \"daughter\",\n    \"contact\": \"+91-9999999999\"\n  }\n}"
+              "raw": "{\n  \"name\": \"Mohammed Kutty\",\n  \"age\": 68,\n  \"gender\": \"male\",\n  \"caregiver\": {\n    \"name\": \"Fatima Kutty\",\n    \"relation\": \"daughter\",\n    \"contact\": \"+91-9999999999\"\n  }\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/patients",
               "host": ["{{baseUrl}}"],
               "path": ["patients"]
-            }
+            },
+            "description": "Create a new patient record"
           }
         },
         {
@@ -85,14 +93,25 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/patients",
+              "raw": "{{baseUrl}}/patients?limit=20&status=active",
               "host": ["{{baseUrl}}"],
-              "path": ["patients"]
-            }
+              "path": ["patients"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "status",
+                  "value": "active"
+                }
+              ]
+            },
+            "description": "List all patients with pagination"
           }
         },
         {
-          "name": "Get Patient",
+          "name": "Get Patient by ID",
           "request": {
             "method": "GET",
             "header": [],
@@ -100,7 +119,8 @@
               "raw": "{{baseUrl}}/patients/{{patientId}}",
               "host": ["{{baseUrl}}"],
               "path": ["patients", "{{patientId}}"]
-            }
+            },
+            "description": "Get a specific patient by ID"
           }
         },
         {
@@ -115,17 +135,18 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Updated Name\",\n  \"age\": 66\n}"
+              "raw": "{\n  \"age\": 69,\n  \"caregiver\": {\n    \"contact\": \"+91-8888888888\"\n  }\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}",
               "host": ["{{baseUrl}}"],
               "path": ["patients", "{{patientId}}"]
-            }
+            },
+            "description": "Update patient details (partial update with PATCH)"
           }
         },
         {
-          "name": "Delete Patient",
+          "name": "Delete Patient (Archive)",
           "request": {
             "method": "DELETE",
             "header": [],
@@ -133,7 +154,8 @@
               "raw": "{{baseUrl}}/patients/{{patientId}}",
               "host": ["{{baseUrl}}"],
               "path": ["patients", "{{patientId}}"]
-            }
+            },
+            "description": "Soft delete (archive) a patient"
           }
         }
       ]
@@ -142,15 +164,15 @@
       "name": "Documents",
       "item": [
         {
-          "name": "Upload Multiple Documents",
+          "name": "Upload Documents",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (pm.response.code === 202) {",
+                  "if (pm.response.code === 202 || pm.response.code === 200) {",
                   "    const response = pm.response.json();",
-                  "    if (response.data.documents && response.data.documents.length > 0) {",
+                  "    if (response.data && response.data.documents && response.data.documents.length > 0) {",
                   "        pm.collectionVariables.set('documentId', response.data.documents[0].id);",
                   "        console.log('Document ID saved:', response.data.documents[0].id);",
                   "    }",
@@ -169,17 +191,19 @@
                   "key": "files",
                   "type": "file",
                   "src": [],
-                  "description": "Select multiple files"
+                  "description": "Select PDF/image files to upload"
                 },
                 {
                   "key": "document_type",
                   "value": "pathology",
-                  "type": "text"
+                  "type": "text",
+                  "description": "Options: pathology, imaging, lab, consultation"
                 },
                 {
                   "key": "process_immediately",
-                  "value": "true",
-                  "type": "text"
+                  "value": "false",
+                  "type": "text",
+                  "description": "Set to true to process with AI immediately"
                 }
               ]
             },
@@ -188,7 +212,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["patients", "{{patientId}}", "documents"]
             },
-            "description": "Upload multiple documents at once with optional immediate processing"
+            "description": "Upload one or more medical documents"
           }
         },
         {
@@ -200,7 +224,8 @@
               "raw": "{{baseUrl}}/patients/{{patientId}}/documents",
               "host": ["{{baseUrl}}"],
               "path": ["patients", "{{patientId}}", "documents"]
-            }
+            },
+            "description": "List all documents for a patient"
           }
         },
         {
@@ -212,7 +237,8 @@
               "raw": "{{baseUrl}}/patients/{{patientId}}/documents/{{documentId}}",
               "host": ["{{baseUrl}}"],
               "path": ["patients", "{{patientId}}", "documents", "{{documentId}}"]
-            }
+            },
+            "description": "Get document details including extracted data"
           }
         },
         {
@@ -224,7 +250,8 @@
               "raw": "{{baseUrl}}/patients/{{patientId}}/documents/{{documentId}}/download",
               "host": ["{{baseUrl}}"],
               "path": ["patients", "{{patientId}}", "documents", "{{documentId}}", "download"]
-            }
+            },
+            "description": "Download the original document file"
           }
         },
         {
@@ -236,7 +263,103 @@
               "raw": "{{baseUrl}}/patients/{{patientId}}/documents/{{documentId}}",
               "host": ["{{baseUrl}}"],
               "path": ["patients", "{{patientId}}", "documents", "{{documentId}}"]
-            }
+            },
+            "description": "Delete a document from storage"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Processing",
+      "item": [
+        {
+          "name": "Process Document (Gemini)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mode\": \"incremental\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/processing/documents/{{documentId}}/process?provider=gemini",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "processing", "documents", "{{documentId}}", "process"],
+              "query": [
+                {
+                  "key": "provider",
+                  "value": "gemini",
+                  "description": "AI provider: gemini (default) or openai"
+                }
+              ]
+            },
+            "description": "Process document with Gemini 3 Pro"
+          }
+        },
+        {
+          "name": "Process Document (OpenAI)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mode\": \"incremental\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/processing/documents/{{documentId}}/process?provider=openai",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "processing", "documents", "{{documentId}}", "process"],
+              "query": [
+                {
+                  "key": "provider",
+                  "value": "openai",
+                  "description": "AI provider: gemini (default) or openai"
+                }
+              ]
+            },
+            "description": "Process document with OpenAI GPT-4o"
+          }
+        },
+        {
+          "name": "Get Processing Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/processing/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "processing", "status"]
+            },
+            "description": "Get processing status for all patient documents"
+          }
+        },
+        {
+          "name": "Get Processing Log",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/processing/log?limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "processing", "log"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Get processing history with token usage"
           }
         }
       ]
@@ -258,7 +381,7 @@
           }
         },
         {
-          "name": "Update Case-Pack",
+          "name": "Update Case-Pack Metadata",
           "request": {
             "method": "PUT",
             "header": [
@@ -269,13 +392,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Lung Cancer Case - Jan 2025\",\n  \"description\": \"Complete diagnostic workup\"\n}"
+              "raw": "{\n  \"title\": \"Gastric Cancer Case - Nov 2025\",\n  \"description\": \"Complete diagnostic workup for carcinoma stomach\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}/case-pack",
               "host": ["{{baseUrl}}"],
               "path": ["patients", "{{patientId}}", "case-pack"]
-            }
+            },
+            "description": "Update case-pack title and description"
           }
         },
         {
@@ -287,7 +411,8 @@
               "raw": "{{baseUrl}}/patients/{{patientId}}/case-pack/{{documentId}}",
               "host": ["{{baseUrl}}"],
               "path": ["patients", "{{patientId}}", "case-pack", "{{documentId}}"]
-            }
+            },
+            "description": "Remove a document from the case-pack"
           }
         },
         {
@@ -302,69 +427,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"document_ids\": [\"doc_123\", \"doc_456\", \"doc_789\"]\n}"
+              "raw": "{\n  \"document_ids\": [\"{{documentId}}\"]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}/case-pack/reorder",
               "host": ["{{baseUrl}}"],
               "path": ["patients", "{{patientId}}", "case-pack", "reorder"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Processing",
-      "item": [
-        {
-          "name": "Process Document",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"mode\": \"incremental\"\n}"
             },
-            "url": {
-              "raw": "{{baseUrl}}/patients/{{patientId}}/processing/documents/{{documentId}}/process",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}", "processing", "documents", "{{documentId}}", "process"]
-            }
-          }
-        },
-        {
-          "name": "Get Processing Status",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/patients/{{patientId}}/processing/status",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}", "processing", "status"]
-            }
-          }
-        },
-        {
-          "name": "Get Processing Log",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/patients/{{patientId}}/processing/log?limit=10",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}", "processing", "log"],
-              "query": [
-                {
-                  "key": "limit",
-                  "value": "10"
-                }
-              ]
-            }
+            "description": "Reorder documents in the case-pack"
           }
         }
       ]
@@ -373,7 +443,7 @@
       "name": "Views",
       "item": [
         {
-          "name": "Get Summary",
+          "name": "Get Patient Summary",
           "request": {
             "method": "GET",
             "header": [],
@@ -381,11 +451,12 @@
               "raw": "{{baseUrl}}/patients/{{patientId}}/summary",
               "host": ["{{baseUrl}}"],
               "path": ["patients", "{{patientId}}", "summary"]
-            }
+            },
+            "description": "Get aggregated patient summary from all processed documents"
           }
         },
         {
-          "name": "Get Detailed Section",
+          "name": "Get Diagnosis & Staging",
           "request": {
             "method": "GET",
             "header": [],
@@ -393,7 +464,34 @@
               "raw": "{{baseUrl}}/patients/{{patientId}}/detailed/diagnosis_staging",
               "host": ["{{baseUrl}}"],
               "path": ["patients", "{{patientId}}", "detailed", "diagnosis_staging"]
-            }
+            },
+            "description": "Get detailed diagnosis and staging information"
+          }
+        },
+        {
+          "name": "Get Imaging Findings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/detailed/imaging_findings",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "detailed", "imaging_findings"]
+            },
+            "description": "Get detailed imaging findings"
+          }
+        },
+        {
+          "name": "Get Lab Results",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/detailed/lab_results",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "detailed", "lab_results"]
+            },
+            "description": "Get detailed lab results"
           }
         }
       ]
@@ -410,7 +508,8 @@
               "raw": "{{baseUrl}}/patients/{{patientId}}/timeline",
               "host": ["{{baseUrl}}"],
               "path": ["patients", "{{patientId}}", "timeline"]
-            }
+            },
+            "description": "Get chronological timeline of all medical events"
           }
         },
         {
@@ -422,7 +521,8 @@
               "raw": "{{baseUrl}}/patients/{{patientId}}/timeline/tracks",
               "host": ["{{baseUrl}}"],
               "path": ["patients", "{{patientId}}", "timeline", "tracks"]
-            }
+            },
+            "description": "Get timeline grouped by event type (tracks)"
           }
         }
       ]
@@ -437,10 +537,16 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (pm.response.code === 200) {",
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
                   "    const response = pm.response.json();",
-                  "    pm.collectionVariables.set('patientId', response.data.patient.id);",
-                  "    console.log('Patient ID saved:', response.data.patient.id);",
+                  "    if (response.data && response.data.patient) {",
+                  "        pm.collectionVariables.set('patientId', response.data.patient.id);",
+                  "        console.log('Patient ID saved:', response.data.patient.id);",
+                  "    }",
+                  "    if (response.data && response.data.documents && response.data.documents.length > 0) {",
+                  "        pm.collectionVariables.set('documentId', response.data.documents[0].id);",
+                  "        console.log('Document ID saved:', response.data.documents[0].id);",
+                  "    }",
                   "}"
                 ]
               }
@@ -456,16 +562,17 @@
                   "key": "files",
                   "type": "file",
                   "src": [],
-                  "description": "Select multiple document files"
+                  "description": "Upload medical documents (PDF, images)"
                 },
                 {
                   "key": "document_type",
                   "value": "pathology",
-                  "type": "text"
+                  "type": "text",
+                  "description": "Options: pathology, imaging, lab, consultation"
                 },
                 {
                   "key": "caregiver_name",
-                  "value": "Jane Doe",
+                  "value": "Fatima Kutty",
                   "type": "text"
                 },
                 {
@@ -485,7 +592,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["intake"]
             },
-            "description": "Create a new patient by uploading documents and extracting demographics"
+            "description": "One-step patient creation: Upload documents, AI extracts patient demographics, creates patient record"
           }
         }
       ]

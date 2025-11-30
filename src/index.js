@@ -16,9 +16,30 @@ app.use('/*', logger());
 
 // CORS middleware
 app.use('/*', cors({
-  origin: ['http://localhost:3000', 'http://localhost:5000', 'http://localhost:8000'],
+  origin: [
+    'http://localhost:3000', 
+    'http://localhost:5000', 
+    'http://localhost:8000',
+    'https://process.saarthihq.com',
+    'https://saarthi-clinical-prod.jdr-rohan.workers.dev'
+  ],
   credentials: true,
 }));
+
+// Root endpoint
+app.get('/', (c) => {
+  return c.json({
+    name: 'Saarthi Clinical Platform',
+    version: '1.0.0',
+    status: 'operational',
+    docs: '/api/v1/health',
+    endpoints: {
+      health: '/api/v1/health',
+      patients: '/api/v1/patients',
+      intake: '/api/v1/intake'
+    }
+  });
+});
 
 // Health check
 app.get('/api/v1/health', (c) => {
@@ -45,5 +66,23 @@ app.route('/api/v1/patients/:patientId/case-pack', casePacks);
 app.route('/api/v1/patients/:patientId/processing', processing);
 app.route('/api/v1/patients/:patientId/timeline', timeline);
 app.route('/api/v1/patients/:patientId', views);
+
+// Catch-all 404 handler
+app.all('*', (c) => {
+  return c.json({
+    success: false,
+    error: {
+      code: 'NOT_FOUND',
+      message: `Route ${c.req.method} ${c.req.path} not found`,
+      available_routes: [
+        'GET /',
+        'GET /api/v1/health',
+        'GET /api/v1/patients',
+        'POST /api/v1/patients',
+        'POST /api/v1/intake'
+      ]
+    }
+  }, 404);
+});
 
 export default app;
