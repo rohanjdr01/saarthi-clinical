@@ -8,8 +8,14 @@
     "deploy": "wrangler deploy",
     "deploy:staging": "wrangler deploy --env staging",
     "deploy:production": "wrangler deploy --env production",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:unit": "vitest run src/tests/unit",
+    "test:integration": "vitest run src/tests/api.test.js",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
     "d1:init": "wrangler d1 execute DB --file=./schema.sql",
+    "d1:migrate": "wrangler d1 execute DB --file=./migrations/001_add_case_packs_and_medical_highlights.sql",
     "d1:migrations": "wrangler d1 migrations list DB"
   },
   "dependencies": {

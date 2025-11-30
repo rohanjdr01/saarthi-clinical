@@ -8,6 +8,17 @@ const processing = new Hono();
 processing.post('/documents/:docId/process', async (c) => {
   try {
     const { patientId, docId } = c.req.param();
+    const providerFromQuery = c.req.query('provider');
+    let providerFromBody = null;
+
+    try {
+      const body = await c.req.json();
+      providerFromBody = body?.provider || body?.model_provider;
+    } catch (err) {
+      // No body sent; keep providerFromBody null
+    }
+
+    const provider = providerFromQuery || providerFromBody || undefined;
     
     // Verify document exists
     const doc = await c.env.DB.prepare(`
@@ -19,8 +30,8 @@ processing.post('/documents/:docId/process', async (c) => {
     }
     
     // Process document
-    const processor = new DocumentProcessor(c.env);
-    const result = await processor.processDocument(docId);
+    const processor = new DocumentProcessor(c.env, { provider });
+    const result = await processor.processDocument(docId, { provider });
     
     return c.json({
       success: true,

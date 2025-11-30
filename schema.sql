@@ -68,34 +68,62 @@ CREATE TABLE timeline_events (
 CREATE TABLE documents (
     id TEXT PRIMARY KEY,
     patient_id TEXT NOT NULL,
-    
+
     filename TEXT NOT NULL,
     file_type TEXT NOT NULL,
     document_type TEXT NOT NULL,
     document_subtype TEXT,
     document_date TEXT,
-    
+
     storage_key TEXT NOT NULL,
     file_size INTEGER,
     mime_type TEXT,
-    
+
     processing_status TEXT DEFAULT 'pending',
     processing_started_at INTEGER,
     processing_completed_at INTEGER,
     processing_error TEXT,
-    
+
     gemini_model TEXT,
     tokens_used INTEGER,
     thought_signature TEXT,
     extraction_confidence REAL,
-    
+
     extracted_text TEXT,
     extracted_data TEXT,
-    
+    medical_highlight TEXT,
+
     created_at INTEGER,
     updated_at INTEGER,
-    
+
     FOREIGN KEY (patient_id) REFERENCES patients(id)
+);
+
+-- Case packs (catalog of documents for a case)
+CREATE TABLE case_packs (
+    id TEXT PRIMARY KEY,
+    patient_id TEXT NOT NULL,
+
+    title TEXT,
+    description TEXT,
+
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+
+    FOREIGN KEY (patient_id) REFERENCES patients(id)
+);
+
+-- Case pack documents (many-to-many relationship)
+CREATE TABLE case_pack_documents (
+    case_pack_id TEXT NOT NULL,
+    document_id TEXT NOT NULL,
+
+    display_order INTEGER DEFAULT 0,
+    added_at INTEGER NOT NULL,
+
+    PRIMARY KEY (case_pack_id, document_id),
+    FOREIGN KEY (case_pack_id) REFERENCES case_packs(id) ON DELETE CASCADE,
+    FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE
 );
 
 -- Processing audit log
@@ -143,4 +171,7 @@ CREATE INDEX idx_timeline_date ON timeline_events(event_date);
 CREATE INDEX idx_timeline_type ON timeline_events(event_type);
 CREATE INDEX idx_documents_patient ON documents(patient_id);
 CREATE INDEX idx_documents_status ON documents(processing_status);
+CREATE INDEX idx_case_packs_patient ON case_packs(patient_id);
+CREATE INDEX idx_case_pack_docs_pack ON case_pack_documents(case_pack_id);
+CREATE INDEX idx_case_pack_docs_doc ON case_pack_documents(document_id);
 CREATE INDEX idx_processing_patient ON processing_log(patient_id);

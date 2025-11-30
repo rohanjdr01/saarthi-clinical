@@ -1,0 +1,6 @@
+# Stop the current dev server (Ctrl+C in that terminal)
+# Then restart it:
+
+npm run dev
+
+# The multi-document upload should now work!

@@ -27,7 +27,8 @@ export class Document {
     
     this.extracted_text = data.extracted_text || null;
     this.extracted_data = data.extracted_data || null;
-    
+    this.medical_highlight = data.medical_highlight || null;
+
     this.created_at = data.created_at || getCurrentTimestamp();
     this.updated_at = data.updated_at || getCurrentTimestamp();
   }
@@ -68,6 +69,7 @@ export class Document {
       file_size: this.file_size,
       mime_type: this.mime_type,
       processing_status: this.processing_status,
+      medical_highlight: this.medical_highlight,
       created_at: this.created_at,
       updated_at: this.updated_at
     };

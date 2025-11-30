@@ -1,94 +1,162 @@
 import { Hono } from 'hono';
 import { Document } from '../models/document.js';
+import { CasePack } from '../models/case-pack.js';
+import { DocumentProcessor } from '../services/processing/processor.js';
 import { NotFoundError, ValidationError, errorResponse } from '../utils/errors.js';
 import { getCurrentTimestamp } from '../utils/helpers.js';
 
 const documents = new Hono();
 
-// Upload document
+// Upload documents (supports multiple files)
 documents.post('/', async (c) => {
   try {
     const { patientId } = c.req.param();
-    
+
     // Check if patient exists
     const patient = await c.env.DB.prepare('SELECT id FROM patients WHERE id = ?')
       .bind(patientId).first();
-    
+
     if (!patient) {
       throw new NotFoundError('Patient');
     }
-    
+
     // Get form data
     const formData = await c.req.formData();
-    const file = formData.get('file');
+    const files = formData.getAll('files');
     const documentType = formData.get('document_type');
     const documentDate = formData.get('document_date');
-    const notes = formData.get('notes');
-    
-    if (!file) {
-      throw new ValidationError('File is required');
+    const processImmediately = formData.get('process_immediately') === 'true';
+
+    if (!files || files.length === 0) {
+      throw new ValidationError('At least one file is required');
     }
-    
-    // Create document metadata
-    const documentData = {
-      patient_id: patientId,
-      filename: file.name,
-      file_type: file.name.split('.').pop().toLowerCase(),
-      document_type: documentType,
-      document_date: documentDate,
-      file_size: file.size,
-      mime_type: file.type
-    };
-    
-    // Validate
-    const errors = Document.validate(documentData);
-    if (errors.length > 0) {
-      throw new ValidationError(errors.join(', '));
-    }
-    
-    const document = new Document(documentData);
-    
-    // Upload to R2
-    const fileBuffer = await file.arrayBuffer();
-    await c.env.DOCUMENTS.put(document.storage_key, fileBuffer, {
-      httpMetadata: {
-        contentType: file.type
-      },
-      customMetadata: {
+
+    // Get or create case-pack for this patient
+    let casePack = await c.env.DB.prepare(
+      'SELECT * FROM case_packs WHERE patient_id = ? LIMIT 1'
+    ).bind(patientId).first();
+
+    if (!casePack) {
+      // Auto-create case-pack for patient
+      const newCasePack = new CasePack({
         patient_id: patientId,
-        document_type: documentType,
-        uploaded_at: new Date().toISOString()
+        title: `${patient.id} - Case Documents`,
+        description: 'Auto-generated case pack for patient documents'
+      });
+
+      await c.env.DB.prepare(`
+        INSERT INTO case_packs (id, patient_id, title, description, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `).bind(
+        newCasePack.id, newCasePack.patient_id, newCasePack.title,
+        newCasePack.description, newCasePack.created_at, newCasePack.updated_at
+      ).run();
+
+      casePack = { id: newCasePack.id };
+    }
+
+    // Process each file
+    const uploadedDocuments = [];
+    const processingTasks = [];
+
+    for (const file of files) {
+      // Create document metadata
+      const documentData = {
+        patient_id: patientId,
+        filename: file.name,
+        file_type: file.name.split('.').pop().toLowerCase(),
+        document_type: documentType || 'other',
+        document_date: documentDate,
+        file_size: file.size,
+        mime_type: file.type
+      };
+
+      // Validate
+      const errors = Document.validate(documentData);
+      if (errors.length > 0) {
+        throw new ValidationError(`File ${file.name}: ${errors.join(', ')}`);
       }
-    });
-    
-    // Save metadata to D1
-    const stmt = c.env.DB.prepare(`
-      INSERT INTO documents (
-        id, patient_id, filename, file_type, document_type, document_subtype,
-        document_date, storage_key, file_size, mime_type, processing_status,
-        created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-    
-    await stmt.bind(
-      document.id, document.patient_id, document.filename, document.file_type,
-      document.document_type, document.document_subtype, document.document_date,
-      document.storage_key, document.file_size, document.mime_type,
-      document.processing_status, document.created_at, document.updated_at
-    ).run();
-    
-    // TODO: Trigger processing pipeline (next phase)
-    
+
+      const document = new Document(documentData);
+
+      // Upload to R2
+      const fileBuffer = await file.arrayBuffer();
+      await c.env.DOCUMENTS.put(document.storage_key, fileBuffer, {
+        httpMetadata: {
+          contentType: file.type
+        },
+        customMetadata: {
+          patient_id: patientId,
+          document_type: documentType || 'other',
+          uploaded_at: new Date().toISOString()
+        }
+      });
+
+      // Save metadata to D1
+      await c.env.DB.prepare(`
+        INSERT INTO documents (
+          id, patient_id, filename, file_type, document_type, document_subtype,
+          document_date, storage_key, file_size, mime_type, processing_status,
+          created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        document.id, document.patient_id, document.filename, document.file_type,
+        document.document_type, document.document_subtype, document.document_date,
+        document.storage_key, document.file_size, document.mime_type,
+        document.processing_status, document.created_at, document.updated_at
+      ).run();
+
+      // Add to case-pack
+      await c.env.DB.prepare(`
+        INSERT INTO case_pack_documents (case_pack_id, document_id, added_at)
+        VALUES (?, ?, ?)
+      `).bind(casePack.id, document.id, getCurrentTimestamp()).run();
+
+      uploadedDocuments.push(document.toJSON());
+
+      // Queue processing if requested
+      if (processImmediately) {
+        processingTasks.push(document.id);
+      }
+    }
+
+    // Trigger processing in background if requested
+    // Process each document independently to avoid sequential blocking
+    if (processImmediately && processingTasks.length > 0) {
+      for (const docId of processingTasks) {
+        c.executionCtx.waitUntil(
+          (async () => {
+            try {
+              const processor = new DocumentProcessor(c.env);
+              await processor.processDocument(docId, 'incremental');
+            } catch (error) {
+              console.error(`Error processing document ${docId}:`, error);
+              // Update document status to failed
+              await c.env.DB.prepare(`
+                UPDATE documents
+                SET processing_status = ?, processing_error = ?
+                WHERE id = ?
+              `).bind('failed', error.message, docId).run();
+            }
+          })()
+        );
+      }
+    }
+
     return c.json({
       success: true,
-      document_id: document.id,
-      processing_status: 'pending',
-      message: 'Document uploaded successfully. Processing will begin shortly.',
-      data: document.toJSON()
+      case_pack_id: casePack.id,
+      documents_uploaded: uploadedDocuments.length,
+      processing_status: processImmediately ? 'processing' : 'pending',
+      message: `${uploadedDocuments.length} document(s) uploaded successfully.${processImmediately ? ' Processing started.' : ''}`,
+      data: {
+        case_pack_id: casePack.id,
+        documents: uploadedDocuments
+      }
     }, 202);
-    
+
   } catch (error) {
-    console.error('Error uploading document:', error);
+    console.error('Error uploading documents:', error);
     return c.json(errorResponse(error), error.statusCode || 500);
   }
 });

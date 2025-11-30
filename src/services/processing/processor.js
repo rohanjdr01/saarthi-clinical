@@ -1,15 +1,61 @@
+/**
+ * Document Processor
+ * 
+ * Simple, clean document processing using:
+ * - Gemini 3 Pro (https://ai.google.dev/gemini-api/docs/gemini-3)
+ * - OpenAI GPT-4o / o3-mini
+ * 
+ * No text extraction needed - models handle documents natively.
+ */
+
 import { GeminiService } from '../gemini/client.js';
+import { OpenAIService } from '../openai/client.js';
 import { getCurrentTimestamp } from '../../utils/helpers.js';
 
 export class DocumentProcessor {
-  constructor(env) {
+  constructor(env, options = {}) {
     this.env = env;
-    this.gemini = new GeminiService(env.GEMINI_API_KEY);
+    this.provider = options.provider || 'gemini';
+
+    this.services = {};
+
+    if (env.GEMINI_API_KEY) {
+      this.services.gemini = new GeminiService(env.GEMINI_API_KEY);
+    }
+
+    if (env.OPENAI_API_KEY) {
+      this.services.openai = new OpenAIService(env.OPENAI_API_KEY);
+    }
   }
 
-  async processDocument(documentId, mode = 'incremental') {
-    const startTime = Date.now();
+  getService(providerOverride) {
+    const provider = (providerOverride || this.provider || 'gemini').toLowerCase();
     
+    if (this.services[provider]) {
+      return { provider, service: this.services[provider] };
+    }
+
+    // If user explicitly requested a provider that's not configured, throw error
+    if (providerOverride) {
+      throw new Error(`Provider '${provider}' not configured. Add ${provider.toUpperCase()}_API_KEY.`);
+    }
+
+    // Fallback to any available provider only if no specific provider was requested
+    const available = Object.keys(this.services)[0];
+    if (!available) {
+      throw new Error('No AI provider configured. Add GEMINI_API_KEY or OPENAI_API_KEY.');
+    }
+
+    console.log(`ℹ️  Default provider gemini unavailable, using ${available}`);
+    return { provider: available, service: this.services[available] };
+  }
+
+  async processDocument(documentId, options = {}) {
+    const opts = typeof options === 'string' ? { mode: options } : options;
+    const { provider: requestedProvider } = opts;
+    const { provider, service } = this.getService(requestedProvider);
+    const startTime = Date.now();
+
     try {
       // 1. Get document metadata
       const doc = await this.env.DB.prepare(
@@ -20,228 +66,194 @@ export class DocumentProcessor {
         throw new Error('Document not found');
       }
 
-      // Update status to processing
-      await this.updateDocumentStatus(documentId, 'processing');
+      await this.updateStatus(documentId, 'processing');
 
       // 2. Get file from R2
       const object = await this.env.DOCUMENTS.get(doc.storage_key);
-      
       if (!object) {
         throw new Error('Document file not found in storage');
       }
 
-      // 3. Extract text
-      const documentText = await object.text();
+      // 3. Read file buffer once
+      const fileBuffer = await object.arrayBuffer();
+      const mimeType = doc.mime_type || 'application/pdf';
 
-      // 4. Determine thinking level based on mode
-      const thinkingLevel = mode === 'initial' ? 'high' : 'medium';
+      console.log(`📄 Processing ${doc.filename} (${mimeType}) with ${provider}`);
 
-      // 5. Extract structured data using Gemini with specialized prompts
-      const extractionResult = await this.gemini.extractFromDocument({
-        documentText,
+      // 4. Extract medical highlight
+      const highlightResult = await service.extractMedicalHighlight({
+        fileBuffer,
+        mimeType,
+        documentType: doc.document_type
+      });
+      const medicalHighlight = highlightResult.text;
+      console.log(`💡 Highlight: ${medicalHighlight}`);
+
+      // 5. Process document with AI
+      const extractionResult = await service.processDocument({
+        fileBuffer,
+        mimeType,
         documentType: doc.document_type,
-        thinkingLevel
+        thinkingLevel: 'low' // For Gemini 3
       });
 
-      let extractedData = null;
+      // 6. Parse response
+      let extractedData;
       try {
         extractedData = JSON.parse(extractionResult.text);
-      } catch (e) {
-        console.warn('Failed to parse extraction as JSON:', extractionResult.text);
-        extractedData = { 
-          raw_text: extractionResult.text,
-          parsing_error: e.message
-        };
+      } catch {
+        console.warn('Response not JSON, storing as raw text');
+        extractedData = { raw_response: extractionResult.text };
       }
 
-      // 6. Save extracted data
-      await this.saveExtractedData(
-        documentId,
-        documentText,
-        extractedData,
-        extractionResult.tokensUsed,
-        extractionResult.model,
-        extractionResult.thinking  // Save the thinking process
-      );
+      const tokensUsed = highlightResult.tokensUsed + extractionResult.tokensUsed;
 
-      // 7. Update clinical sections
+      // 7. Save extracted data
+      await this.saveExtractedData(documentId, extractedData, tokensUsed, extractionResult.model, medicalHighlight);
+
+      // 8. Update clinical sections
       await this.updateClinicalSections(doc.patient_id, extractedData, doc.document_type);
 
-      // 8. Extract timeline events
-      await this.extractAndSaveTimelineEvents(doc.patient_id, extractedData, documentId);
+      // 9. Extract timeline events
+      await this.extractTimelineEvents(service, doc.patient_id, extractedData, documentId);
 
-      // 9. Mark as completed
+      // 10. Mark complete
       const processingTime = Date.now() - startTime;
-      await this.updateDocumentStatus(documentId, 'completed', null, processingTime);
+      await this.updateStatus(documentId, 'completed');
 
-      // 10. Log processing
-      await this.logProcessing(doc.patient_id, documentId, extractionResult.tokensUsed, processingTime, mode);
+      // 11. Log
+      await this.logProcessing(doc.patient_id, documentId, tokensUsed, processingTime, `${provider}:${extractionResult.model}`);
 
       return {
         success: true,
         document_id: documentId,
         extracted_data: extractedData,
-        thinking_process: extractionResult.thinking,
-        tokens_used: extractionResult.tokensUsed,
-        processing_time_ms: processingTime
+        medical_highlight: medicalHighlight,
+        tokens_used: tokensUsed,
+        processing_time_ms: processingTime,
+        provider,
+        model: extractionResult.model
       };
 
     } catch (error) {
-      console.error('Error processing document:', error);
-      await this.updateDocumentStatus(documentId, 'failed', error.message);
+      console.error('❌ Processing failed:', error.message);
+      await this.updateStatus(documentId, 'failed', error.message);
       throw error;
     }
   }
 
-  async updateDocumentStatus(documentId, status, error = null, processingTime = null) {
+  async updateStatus(documentId, status, error = null) {
     const now = getCurrentTimestamp();
     
-    let stmt;
     if (status === 'processing') {
-      stmt = this.env.DB.prepare(`
-        UPDATE documents 
-        SET processing_status = ?, processing_started_at = ?, updated_at = ?
-        WHERE id = ?
-      `);
-      await stmt.bind(status, now, now, documentId).run();
+      await this.env.DB.prepare(
+        'UPDATE documents SET processing_status = ?, processing_started_at = ?, updated_at = ? WHERE id = ?'
+      ).bind(status, now, now, documentId).run();
     } else if (status === 'completed') {
-      stmt = this.env.DB.prepare(`
-        UPDATE documents 
-        SET processing_status = ?, processing_completed_at = ?, updated_at = ?
-        WHERE id = ?
-      `);
-      await stmt.bind(status, now, now, documentId).run();
+      await this.env.DB.prepare(
+        'UPDATE documents SET processing_status = ?, processing_completed_at = ?, updated_at = ? WHERE id = ?'
+      ).bind(status, now, now, documentId).run();
     } else if (status === 'failed') {
-      stmt = this.env.DB.prepare(`
-        UPDATE documents 
-        SET processing_status = ?, processing_error = ?, updated_at = ?
-        WHERE id = ?
-      `);
-      await stmt.bind(status, error, now, documentId).run();
+      await this.env.DB.prepare(
+        'UPDATE documents SET processing_status = ?, processing_error = ?, updated_at = ? WHERE id = ?'
+      ).bind(status, error, now, documentId).run();
     }
   }
 
-  async saveExtractedData(documentId, extractedText, extractedData, tokensUsed, model, thinking) {
-    const stmt = this.env.DB.prepare(`
-      UPDATE documents 
-      SET extracted_text = ?, extracted_data = ?, tokens_used = ?, gemini_model = ?, thought_signature = ?, updated_at = ?
+  async saveExtractedData(documentId, extractedData, tokensUsed, model, medicalHighlight) {
+    await this.env.DB.prepare(`
+      UPDATE documents
+      SET extracted_data = ?, tokens_used = ?, gemini_model = ?, medical_highlight = ?, updated_at = ?
       WHERE id = ?
-    `);
-    
-    await stmt.bind(
-      extractedText,
+    `).bind(
       JSON.stringify(extractedData),
       tokensUsed,
       model,
-      thinking ? thinking.substring(0, 1000) : null,  // Store first 1000 chars of thinking
+      medicalHighlight,
       getCurrentTimestamp(),
       documentId
     ).run();
   }
 
   async updateClinicalSections(patientId, extractedData, documentType) {
-    // Map document types to section types
     const sectionMapping = {
-      'pathology': 'diagnosis_staging',
-      'imaging': 'imaging_findings',
-      'lab': 'lab_results',
-      'consultation': 'consultation_notes'
+      pathology: 'diagnosis_staging',
+      imaging: 'imaging_findings',
+      lab: 'lab_results',
+      consultation: 'consultation_notes'
     };
 
     const sectionType = sectionMapping[documentType] || 'general_findings';
 
-    // Generate summary based on extracted data
-    let summary = '';
-    if (extractedData.primary_diagnosis) {
-      summary = `${extractedData.primary_diagnosis.cancer_type || 'Diagnosis'} - ${extractedData.staging?.stage_group || 'Stage pending'}`;
-    } else if (extractedData.impression) {
-      summary = extractedData.impression;
-    } else if (extractedData.assessment) {
-      summary = extractedData.assessment;
-    } else {
-      summary = `${documentType} report processed`;
-    }
+    // Generate summary
+    let summary = extractedData.impression || 
+                  extractedData.primary_diagnosis?.cancer_type ||
+                  extractedData.assessment ||
+                  `${documentType} processed`;
 
-    const detailed = JSON.stringify(extractedData);
-
-    // Check if section exists
-    const existing = await this.env.DB.prepare(`
-      SELECT * FROM clinical_sections 
-      WHERE patient_id = ? AND section_type = ?
-    `).bind(patientId, sectionType).first();
+    const existing = await this.env.DB.prepare(
+      'SELECT id FROM clinical_sections WHERE patient_id = ? AND section_type = ?'
+    ).bind(patientId, sectionType).first();
 
     if (existing) {
-      // Update existing
       await this.env.DB.prepare(`
         UPDATE clinical_sections 
         SET summary_content = ?, detailed_content = ?, last_processed_at = ?, version = version + 1
         WHERE patient_id = ? AND section_type = ?
-      `).bind(summary, detailed, getCurrentTimestamp(), patientId, sectionType).run();
+      `).bind(summary, JSON.stringify(extractedData), getCurrentTimestamp(), patientId, sectionType).run();
     } else {
-      // Create new
       const sectionId = `sec_${Date.now().toString(36)}${Math.random().toString(36).substring(2, 9)}`;
       await this.env.DB.prepare(`
-        INSERT INTO clinical_sections 
-        (id, patient_id, section_type, summary_content, detailed_content, last_processed_at, version)
+        INSERT INTO clinical_sections (id, patient_id, section_type, summary_content, detailed_content, last_processed_at, version)
         VALUES (?, ?, ?, ?, ?, ?, 1)
-      `).bind(sectionId, patientId, sectionType, summary, detailed, getCurrentTimestamp()).run();
+      `).bind(sectionId, patientId, sectionType, summary, JSON.stringify(extractedData), getCurrentTimestamp()).run();
     }
   }
 
-  async extractAndSaveTimelineEvents(patientId, extractedData, sourceDocumentId) {
-    // Extract timeline events using Gemini
-    const result = await this.gemini.extractTimelineEvents({
-      extractedData,
-      thinkingLevel: 'medium'
-    });
-
-    let events = [];
+  async extractTimelineEvents(service, patientId, extractedData, sourceDocumentId) {
     try {
-      events = JSON.parse(result.text);
-    } catch (e) {
-      console.warn('Failed to parse timeline events:', e);
-      return;
-    }
+      const prompt = `Extract timeline events from this medical data. Return JSON array:
+[{"date": "YYYY-MM-DD", "event_type": "diagnosis|procedure|treatment|imaging|lab", "title": "", "description": ""}]
 
-    // Save each event
-    for (const event of events) {
-      const eventId = `evt_${Date.now().toString(36)}${Math.random().toString(36).substring(2, 9)}`;
-      
-      await this.env.DB.prepare(`
-        INSERT INTO timeline_events 
-        (id, patient_id, event_date, event_type, event_category, title, description, details, source_document_id, confidence_score, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).bind(
-        eventId,
-        patientId,
-        event.date,
-        event.event_type,
-        event.event_category,
-        event.title,
-        event.description,
-        JSON.stringify({ clinical_significance: event.clinical_significance }),
-        sourceDocumentId,
-        0.9,  // High confidence from AI extraction
-        getCurrentTimestamp()
-      ).run();
+Data: ${JSON.stringify(extractedData)}`;
+
+      const result = await service.generateContent({ prompt, temperature: 0.1 });
+
+      let events = [];
+      try {
+        events = JSON.parse(result.text);
+      } catch {
+        return;
+      }
+
+      if (!Array.isArray(events)) return;
+
+      for (const event of events) {
+        const eventId = `evt_${Date.now().toString(36)}${Math.random().toString(36).substring(2, 9)}`;
+        await this.env.DB.prepare(`
+          INSERT INTO timeline_events (id, patient_id, event_date, event_type, title, description, source_document_id, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `).bind(
+          eventId,
+          patientId,
+          event.date || new Date().toISOString().split('T')[0],
+          event.event_type || 'other',
+          event.title || 'Event',
+          event.description || '',
+          sourceDocumentId,
+          getCurrentTimestamp()
+        ).run();
+      }
+    } catch (error) {
+      console.warn('Timeline extraction failed:', error.message);
     }
   }
 
-  async logProcessing(patientId, documentId, tokensUsed, processingTime, mode) {
+  async logProcessing(patientId, documentId, tokensUsed, processingTime, model) {
     const logId = `log_${Date.now().toString(36)}${Math.random().toString(36).substring(2, 9)}`;
-    
     await this.env.DB.prepare(`
-      INSERT INTO processing_log 
-      (id, patient_id, action, documents_processed, tokens_used, processing_time_ms, status, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, 'success', ?)
-    `).bind(
-      logId,
-      patientId,
-      `document_processing_${mode}`,
-      JSON.stringify([documentId]),
-      tokensUsed,
-      processingTime,
-      getCurrentTimestamp()
-    ).run();
+      INSERT INTO processing_log (id, patient_id, action, documents_processed, gemini_model, tokens_used, processing_time_ms, status, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, 'success', ?)
+    `).bind(logId, patientId, 'document_processing', JSON.stringify([documentId]), model, tokensUsed, processingTime, getCurrentTimestamp()).run();
   }
 }

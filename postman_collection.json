@@ -1,0 +1,494 @@
+{
+  "info": {
+    "name": "Saarthi Clinical API",
+    "description": "Complete API collection for Saarthi Clinical Platform with multi-document upload and case-packs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "saarthi-clinical-v1"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8787/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "patientId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "documentId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Check if API is running and all services are available"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Patients",
+      "item": [
+        {
+          "name": "Create Patient",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('patientId', response.data.id);",
+                  "    console.log('Patient ID saved:', response.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Patient\",\n  \"age\": 65,\n  \"gender\": \"male\",\n  \"caregiver\": {\n    \"name\": \"Test Caregiver\",\n    \"relation\": \"daughter\",\n    \"contact\": \"+91-9999999999\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients"]
+            }
+          }
+        },
+        {
+          "name": "List Patients",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients"]
+            }
+          }
+        },
+        {
+          "name": "Get Patient",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Patient",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"age\": 66\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Patient",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Documents",
+      "item": [
+        {
+          "name": "Upload Multiple Documents",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 202) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data.documents && response.data.documents.length > 0) {",
+                  "        pm.collectionVariables.set('documentId', response.data.documents[0].id);",
+                  "        console.log('Document ID saved:', response.data.documents[0].id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "files",
+                  "type": "file",
+                  "src": [],
+                  "description": "Select multiple files"
+                },
+                {
+                  "key": "document_type",
+                  "value": "pathology",
+                  "type": "text"
+                },
+                {
+                  "key": "process_immediately",
+                  "value": "true",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/documents",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "documents"]
+            },
+            "description": "Upload multiple documents at once with optional immediate processing"
+          }
+        },
+        {
+          "name": "List Documents",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/documents",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "documents"]
+            }
+          }
+        },
+        {
+          "name": "Get Document",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/documents/{{documentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "documents", "{{documentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Download Document",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/documents/{{documentId}}/download",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "documents", "{{documentId}}", "download"]
+            }
+          }
+        },
+        {
+          "name": "Delete Document",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/documents/{{documentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "documents", "{{documentId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Case-Packs",
+      "item": [
+        {
+          "name": "Get Case-Pack",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/case-pack",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "case-pack"]
+            },
+            "description": "Get case-pack with all documents and medical highlights"
+          }
+        },
+        {
+          "name": "Update Case-Pack",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Lung Cancer Case - Jan 2025\",\n  \"description\": \"Complete diagnostic workup\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/case-pack",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "case-pack"]
+            }
+          }
+        },
+        {
+          "name": "Remove Document from Case-Pack",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/case-pack/{{documentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "case-pack", "{{documentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Reorder Documents",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"document_ids\": [\"doc_123\", \"doc_456\", \"doc_789\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/case-pack/reorder",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "case-pack", "reorder"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Processing",
+      "item": [
+        {
+          "name": "Process Document",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mode\": \"incremental\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/processing/documents/{{documentId}}/process",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "processing", "documents", "{{documentId}}", "process"]
+            }
+          }
+        },
+        {
+          "name": "Get Processing Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/processing/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "processing", "status"]
+            }
+          }
+        },
+        {
+          "name": "Get Processing Log",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/processing/log?limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "processing", "log"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Views",
+      "item": [
+        {
+          "name": "Get Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "summary"]
+            }
+          }
+        },
+        {
+          "name": "Get Detailed Section",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/detailed/diagnosis_staging",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "detailed", "diagnosis_staging"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Timeline",
+      "item": [
+        {
+          "name": "Get Timeline",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/timeline",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "timeline"]
+            }
+          }
+        },
+        {
+          "name": "Get Timeline Tracks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/timeline/tracks",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "timeline", "tracks"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Intake",
+      "item": [
+        {
+          "name": "Create Patient from Documents",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('patientId', response.data.patient.id);",
+                  "    console.log('Patient ID saved:', response.data.patient.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "files",
+                  "type": "file",
+                  "src": [],
+                  "description": "Select multiple document files"
+                },
+                {
+                  "key": "document_type",
+                  "value": "pathology",
+                  "type": "text"
+                },
+                {
+                  "key": "caregiver_name",
+                  "value": "Jane Doe",
+                  "type": "text"
+                },
+                {
+                  "key": "caregiver_relation",
+                  "value": "daughter",
+                  "type": "text"
+                },
+                {
+                  "key": "caregiver_contact",
+                  "value": "+91-9999999999",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/intake",
+              "host": ["{{baseUrl}}"],
+              "path": ["intake"]
+            },
+            "description": "Create a new patient by uploading documents and extracting demographics"
+          }
+        }
+      ]
+    }
+  ]
+}
