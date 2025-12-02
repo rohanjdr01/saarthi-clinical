@@ -27,6 +27,15 @@ preview_id = "e759848fc16d4c1b813fd1d21f3c592f"
 ENVIRONMENT = "development"
 LOG_LEVEL = "debug"
 
+# Workers AI binding (for embeddings)
+[ai]
+binding = "AI"
+
+# Vectorize binding (development/local)
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "medical-documents"
+
 # ===================================
 # PRODUCTION ENVIRONMENT
 # ===================================
@@ -45,6 +54,13 @@ bucket_name = "saarthi-documents-prod"
 [[env.production.kv_namespaces]]
 binding = "CACHE"
 id = "7c080d431a714bde813d1b63464fd1d8"
+
+[[env.production.vectorize]]
+binding = "VECTORIZE"
+index_name = "medical-documents"
+
+[env.production.ai]
+binding = "AI"
 
 [env.production.vars]
 ENVIRONMENT = "production"
@@ -73,6 +89,13 @@ bucket_name = "saarthi-documents-dev"
 [[env.staging.kv_namespaces]]
 binding = "CACHE"
 id = "66432efaadd945a9939efc2c5baed1c8"
+
+[[env.staging.vectorize]]
+binding = "VECTORIZE"
+index_name = "medical-documents"
+
+[env.staging.ai]
+binding = "AI"
 
 [env.staging.vars]
 ENVIRONMENT = "staging"

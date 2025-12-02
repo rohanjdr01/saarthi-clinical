@@ -1,9 +1,9 @@
 {
   "info": {
-    "name": "Saarthi Clinical API",
-    "description": "Complete API collection for Saarthi Clinical Platform - Medical document processing with Gemini 3 & OpenAI",
+    "name": "Saarthi Clinical API (Complete - Phase 2-3)",
+    "description": "Complete API collection for Saarthi Clinical Platform - Medical document processing with AI\n\n## Phase 2-3 Updates\n- \u2705 Diagnosis & Staging endpoints with version history\n- \u2705 Treatment & Cycles management\n- \u2705 Document vectorization & semantic search (RAG)\n- \u2705 Field-level source tracking\n- \u2705 Admin editing with version history\n\n## Authentication\n\n### Option 1: Phone OTP (Backend Endpoints)\n1. Send OTP: `POST /api/v1/auth/phone/send` with `{phoneNumber: \"+1234567890\"}`\n2. Verify OTP: `POST /api/v1/auth/phone/verify` with `{sessionInfo, code}`\n3. Token is automatically saved to `firebaseToken` variable\n\n### Option 2: Generate Token (For Testing)\n1. Generate a Firebase ID token using:\n   ```bash\n   FIREBASE_API_KEY=your-key node scripts/generate-firebase-token.js test@example.com\n   ```\n2. Set the `firebaseToken` variable in this collection with the generated token\n\n### Using Token\nUse the token in the `Authorization: Bearer <token>` header for protected endpoints\n\n## Endpoints\n\n- **Auth**: `/api/v1/auth/*` - Authentication endpoints\n- **Health**: `/api/v1/health` - Health check\n- **Patients**: `/api/v1/patients/*` - Patient management (with extended fields)\n- **Documents**: `/api/v1/patients/:id/documents/*` - Document upload, vectorization, search\n- **Diagnosis & Staging**: `/api/v1/patients/:id/diagnosis` & `/staging` - Clinical data with version history\n- **Treatment**: `/api/v1/patients/:id/treatment/*` - Treatment regimens & cycles\n- **Processing**: `/api/v1/patients/:id/processing/*` - AI document processing\n- **Timeline**: `/api/v1/patients/:id/timeline/*` - Medical timeline\n- **Intake**: `/api/v1/intake` - One-step patient creation from documents",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "saarthi-clinical-v2"
+    "_exporter_id": "saarthi-clinical-v3"
   },
   "variable": [
     {
@@ -27,9 +27,180 @@
       "key": "documentId",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "firebaseToken",
+      "value": "",
+      "type": "string",
+      "description": "Firebase ID token for authentication (get from token generation script)"
     }
   ],
   "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Send Phone OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phoneNumber\": \"+1234567890\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/phone/send",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "phone",
+                "send"
+              ]
+            },
+            "description": "Send OTP to phone number. Requires FIREBASE_API_KEY in env.\n\n\u26a0\ufe0f Note: For production, OTP sending should happen on the client side using Firebase SDK with reCAPTCHA.\n\nPhone number must be in E.164 format: +[country code][number]\nExample: +919876543210 for India"
+          }
+        },
+        {
+          "name": "Verify Phone OTP",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.idToken) {",
+                  "        pm.collectionVariables.set('firebaseToken', response.data.idToken);",
+                  "        console.log('Firebase token saved:', response.data.idToken.substring(0, 50) + '...');",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionInfo\": \"session-info-from-send-otp-response\",\n  \"code\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/phone/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "phone",
+                "verify"
+              ]
+            },
+            "description": "Verify OTP code and get Firebase ID token. Requires sessionInfo from /phone/send response.\n\n\u26a0\ufe0f Note: For production, OTP verification should happen on the client side using Firebase SDK.\n\nAfter successful verification, the idToken is automatically saved to firebaseToken variable."
+          }
+        },
+        {
+          "name": "Verify Firebase Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    console.log('User verified:', response.data.user);",
+                  "    console.log('Firebase UID:', response.data.firebase_uid);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idToken\": \"{{firebaseToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "verify"
+              ]
+            },
+            "description": "Verify Firebase ID token and create/update user in D1 database. Get token using: `FIREBASE_API_KEY=your-key node scripts/generate-firebase-token.js test@example.com`"
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{firebaseToken}}",
+                "description": "Firebase ID token"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Get current authenticated user information. Requires Firebase token in Authorization header."
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{firebaseToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Logout (client-side token removal). Firebase tokens are stateless, so this is mainly for logging purposes."
+          }
+        }
+      ]
+    },
     {
       "name": "Health",
       "item": [
@@ -40,8 +211,12 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["health"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
             },
             "description": "Check if API is running and all services are available"
           }
@@ -81,8 +256,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/patients",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients"
+              ]
             },
             "description": "Create a new patient record"
           }
@@ -94,8 +273,12 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/patients?limit=20&status=active",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients"
+              ],
               "query": [
                 {
                   "key": "limit",
@@ -117,8 +300,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}"
+              ]
             },
             "description": "Get a specific patient by ID"
           }
@@ -139,8 +327,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}"
+              ]
             },
             "description": "Update patient details (partial update with PATCH)"
           }
@@ -152,8 +345,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}"
+              ]
             },
             "description": "Soft delete (archive) a patient"
           }
@@ -209,8 +407,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}/documents",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}", "documents"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "documents"
+              ]
             },
             "description": "Upload one or more medical documents"
           }
@@ -222,8 +426,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}/documents",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}", "documents"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "documents"
+              ]
             },
             "description": "List all documents for a patient"
           }
@@ -235,8 +445,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}/documents/{{documentId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}", "documents", "{{documentId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "documents",
+                "{{documentId}}"
+              ]
             },
             "description": "Get document details including extracted data"
           }
@@ -248,8 +465,16 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}/documents/{{documentId}}/download",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}", "documents", "{{documentId}}", "download"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "documents",
+                "{{documentId}}",
+                "download"
+              ]
             },
             "description": "Download the original document file"
           }
@@ -261,10 +486,119 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}/documents/{{documentId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}", "documents", "{{documentId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "documents",
+                "{{documentId}}"
+              ]
             },
             "description": "Delete a document from storage"
+          }
+        },
+        {
+          "name": "Vectorize Document",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/documents/{{documentId}}/vectorize",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "documents",
+                "{{documentId}}",
+                "vectorize"
+              ]
+            },
+            "description": "Manually trigger vectorization for a document. Returns status 'skipped' when VECTORIZE is not configured."
+          },
+          "description": "Manually trigger vectorization for a document (Phase 3: Workers AI embeddings)"
+        },
+        {
+          "name": "Semantic Search",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"What are the tumor markers?\",\n  \"top_k\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/documents/search",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "documents",
+                "search"
+              ]
+            },
+            "description": "Semantic search over document chunks (Vectorize). Returns 501 if VECTORIZE is not configured."
+          },
+          "description": "Semantic search over document chunks using Vectorize + Workers AI (Phase 3)"
+        },
+        {
+          "name": "Reorder Case-Pack Documents",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"document_orders\": [\n    {\"document_id\": \"doc_123\", \"order\": 1},\n    {\"document_id\": \"doc_456\", \"order\": 2}\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/documents/reorder",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "documents",
+                "reorder"
+              ]
+            },
+            "description": "Reorder documents in case-pack (Phase 2: merged functionality)"
+          }
+        },
+        {
+          "name": "Reprocess Document",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/documents/{{documentId}}/reprocess",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "documents",
+                "{{documentId}}",
+                "reprocess"
+              ]
+            },
+            "description": "Trigger reprocessing of a document with AI (Phase 2)"
           }
         }
       ]
@@ -288,8 +622,17 @@
             },
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}/processing/documents/{{documentId}}/process?provider=gemini",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}", "processing", "documents", "{{documentId}}", "process"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "processing",
+                "documents",
+                "{{documentId}}",
+                "process"
+              ],
               "query": [
                 {
                   "key": "provider",
@@ -317,8 +660,17 @@
             },
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}/processing/documents/{{documentId}}/process?provider=openai",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}", "processing", "documents", "{{documentId}}", "process"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "processing",
+                "documents",
+                "{{documentId}}",
+                "process"
+              ],
               "query": [
                 {
                   "key": "provider",
@@ -337,8 +689,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}/processing/status",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}", "processing", "status"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "processing",
+                "status"
+              ]
             },
             "description": "Get processing status for all patient documents"
           }
@@ -350,8 +709,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}/processing/log?limit=10",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}", "processing", "log"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "processing",
+                "log"
+              ],
               "query": [
                 {
                   "key": "limit",
@@ -360,6 +726,362 @@
               ]
             },
             "description": "Get processing history with token usage"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Diagnosis & Staging",
+      "item": [
+        {
+          "name": "Get Diagnosis",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/diagnosis",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "diagnosis"
+              ]
+            },
+            "description": "Get diagnosis information with field-level source tracking"
+          }
+        },
+        {
+          "name": "Create/Update Diagnosis",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"primary_cancer_type\": \"Breast Cancer\",\n  \"primary_cancer_subtype\": \"Invasive Ductal Carcinoma\",\n  \"diagnosis_date\": \"2024-01-15\",\n  \"tumor_location\": \"Upper outer quadrant, left breast\",\n  \"tumor_laterality\": \"left\",\n  \"tumor_size_cm\": 2.5,\n  \"tumor_grade\": \"G2\",\n  \"histology\": \"Ductal carcinoma\",\n  \"biomarkers\": {\n    \"ER\": \"positive\",\n    \"PR\": \"positive\",\n    \"HER2\": \"negative\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/diagnosis",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "diagnosis"
+              ]
+            },
+            "description": "Create or update diagnosis (admin only, creates version history)"
+          }
+        },
+        {
+          "name": "Get Staging",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/staging",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "staging"
+              ]
+            },
+            "description": "Get TNM staging information"
+          }
+        },
+        {
+          "name": "Create/Update Staging",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clinical_t\": \"cT2\",\n  \"clinical_n\": \"cN1\",\n  \"clinical_m\": \"cM0\",\n  \"pathological_t\": \"pT2\",\n  \"pathological_n\": \"pN1\",\n  \"pathological_m\": \"pM0\",\n  \"clinical_stage\": \"IIB\",\n  \"pathological_stage\": \"IIB\",\n  \"staging_system\": \"AJCC 8th\",\n  \"staging_date\": \"2024-01-20\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/staging",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "staging"
+              ]
+            },
+            "description": "Create or update staging (admin only)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Treatment",
+      "item": [
+        {
+          "name": "Get Treatment",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/treatment",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "treatment"
+              ]
+            },
+            "description": "Get current treatment regimen"
+          }
+        },
+        {
+          "name": "Create/Update Treatment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"regimen_name\": \"AC-T\",\n  \"treatment_intent\": \"adjuvant\",\n  \"treatment_line\": \"first-line\",\n  \"protocol\": \"AC-T Protocol\",\n  \"drugs\": [\"Doxorubicin\", \"Cyclophosphamide\", \"Paclitaxel\"],\n  \"start_date\": \"2024-02-01\",\n  \"total_planned_cycles\": 8,\n  \"treatment_status\": \"active\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/treatment",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "treatment"
+              ]
+            },
+            "description": "Create or update treatment regimen (admin only)"
+          }
+        },
+        {
+          "name": "Get All Treatment Cycles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/treatment/cycles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "treatment",
+                "cycles"
+              ]
+            },
+            "description": "Get all treatment cycles"
+          }
+        },
+        {
+          "name": "Get Specific Cycle",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/treatment/cycles/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "treatment",
+                "cycles",
+                "1"
+              ]
+            },
+            "description": "Get a specific treatment cycle by number"
+          }
+        },
+        {
+          "name": "Add Treatment Cycle",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cycle_number\": 1,\n  \"planned_date\": \"2024-02-01\",\n  \"actual_date\": \"2024-02-01\",\n  \"drugs_administered\": [\n    {\"drug\": \"Doxorubicin\", \"dose\": 60, \"unit\": \"mg/m2\", \"route\": \"IV\"},\n    {\"drug\": \"Cyclophosphamide\", \"dose\": 600, \"unit\": \"mg/m2\", \"route\": \"IV\"}\n  ],\n  \"cycle_status\": \"completed\",\n  \"dose_percentage\": 100.0\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/treatment/cycles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "treatment",
+                "cycles"
+              ]
+            },
+            "description": "Add a new treatment cycle"
+          }
+        },
+        {
+          "name": "Update Treatment Cycle",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"adverse_events\": [\n    {\"event\": \"Nausea\", \"grade\": 2},\n    {\"event\": \"Fatigue\", \"grade\": 1}\n  ],\n  \"ctcae_grade\": 2\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/treatment/cycles/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "treatment",
+                "cycles",
+                "1"
+              ]
+            },
+            "description": "Update a treatment cycle"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Document Vectorization & Search",
+      "item": [
+        {
+          "name": "Vectorize Document",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/documents/{{documentId}}/vectorize",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "documents",
+                "{{documentId}}",
+                "vectorize"
+              ]
+            },
+            "description": "Manually trigger vectorization for a document"
+          }
+        },
+        {
+          "name": "Search Documents (RAG)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"breast cancer diagnosis\",\n  \"top_k\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/documents/search",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "documents",
+                "search"
+              ]
+            },
+            "description": "Semantic search across patient documents using RAG"
+          }
+        },
+        {
+          "name": "Reorder Case-Pack Documents",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"document_orders\": [\n    {\"document_id\": \"doc_123\", \"order\": 1},\n    {\"document_id\": \"doc_456\", \"order\": 2}\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/documents/reorder",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "documents",
+                "reorder"
+              ]
+            },
+            "description": "Reorder documents in case-pack (merged functionality)"
+          }
+        },
+        {
+          "name": "Reprocess Document",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/documents/{{documentId}}/reprocess",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "documents",
+                "{{documentId}}",
+                "reprocess"
+              ]
+            },
+            "description": "Trigger reprocessing of a document with AI"
           }
         }
       ]
@@ -374,8 +1096,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}/case-pack",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}", "case-pack"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "case-pack"
+              ]
             },
             "description": "Get case-pack with all documents and medical highlights"
           }
@@ -396,8 +1124,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}/case-pack",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}", "case-pack"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "case-pack"
+              ]
             },
             "description": "Update case-pack title and description"
           }
@@ -409,8 +1143,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}/case-pack/{{documentId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}", "case-pack", "{{documentId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "case-pack",
+                "{{documentId}}"
+              ]
             },
             "description": "Remove a document from the case-pack"
           }
@@ -431,8 +1172,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}/case-pack/reorder",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}", "case-pack", "reorder"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "case-pack",
+                "reorder"
+              ]
             },
             "description": "Reorder documents in the case-pack"
           }
@@ -449,8 +1197,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}/summary",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}", "summary"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "summary"
+              ]
             },
             "description": "Get aggregated patient summary from all processed documents"
           }
@@ -462,8 +1216,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}/detailed/diagnosis_staging",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}", "detailed", "diagnosis_staging"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "detailed",
+                "diagnosis_staging"
+              ]
             },
             "description": "Get detailed diagnosis and staging information"
           }
@@ -475,8 +1236,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}/detailed/imaging_findings",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}", "detailed", "imaging_findings"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "detailed",
+                "imaging_findings"
+              ]
             },
             "description": "Get detailed imaging findings"
           }
@@ -488,8 +1256,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}/detailed/lab_results",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}", "detailed", "lab_results"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "detailed",
+                "lab_results"
+              ]
             },
             "description": "Get detailed lab results"
           }
@@ -506,8 +1281,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}/timeline",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}", "timeline"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "timeline"
+              ]
             },
             "description": "Get chronological timeline of all medical events"
           }
@@ -519,8 +1300,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}/timeline/tracks",
-              "host": ["{{baseUrl}}"],
-              "path": ["patients", "{{patientId}}", "timeline", "tracks"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "timeline",
+                "tracks"
+              ]
             },
             "description": "Get timeline grouped by event type (tracks)"
           }
@@ -589,10 +1377,619 @@
             },
             "url": {
               "raw": "{{baseUrl}}/intake",
-              "host": ["{{baseUrl}}"],
-              "path": ["intake"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "intake"
+              ]
             },
             "description": "One-step patient creation: Upload documents, AI extracts patient demographics, creates patient record"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Medications",
+      "item": [
+        {
+          "name": "List Medications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/medications",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "medications"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create Medication",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/medications",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "medications"
+              ]
+            },
+            "description": "Admin only",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medication_name\": \"Cisplatin\",\n  \"dose\": 50,\n  \"dose_unit\": \"mg\",\n  \"frequency\": \"q3w\",\n  \"route\": \"IV\",\n  \"medication_status\": \"active\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Medication",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/medications/{{medicationId}}",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "medications",
+                "{{medicationId}}"
+              ]
+            },
+            "description": "Admin only",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medication_status\": \"discontinued\",\n  \"discontinuation_reason\": \"Completed regimen\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Medication",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/medications/{{medicationId}}",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "medications",
+                "{{medicationId}}"
+              ]
+            },
+            "description": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "Alerts",
+      "item": [
+        {
+          "name": "List Alerts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/alerts",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "alerts"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create Alert",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/alerts",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "alerts"
+              ]
+            },
+            "description": "Admin only",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alert_type\": \"clinical\",\n  \"severity\": \"high\",\n  \"title\": \"Neutropenia risk\",\n  \"description\": \"ANC trending down\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Alert",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/alerts/{{alertId}}",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "alerts",
+                "{{alertId}}"
+              ]
+            },
+            "description": "Admin only",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alert_status\": \"acknowledged\",\n  \"acknowledged_by\": \"usr_admin\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Alert",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/alerts/{{alertId}}",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "alerts",
+                "{{alertId}}"
+              ]
+            },
+            "description": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "Labs",
+      "item": [
+        {
+          "name": "List Lab Results",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/labs",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "labs"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create Lab Result",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/labs",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "labs"
+              ]
+            },
+            "description": "Admin only",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"test_name\": \"Hemoglobin\",\n  \"result_value\": 10.5,\n  \"result_unit\": \"g/dL\",\n  \"test_date\": \"2025-01-01\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Lab Result",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/labs/{{labId}}",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "labs",
+                "{{labId}}"
+              ]
+            },
+            "description": "Admin only",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"result_value\": 11.2,\n  \"is_abnormal\": false\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Lab Result",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/labs/{{labId}}",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "labs",
+                "{{labId}}"
+              ]
+            },
+            "description": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "History",
+      "item": [
+        {
+          "name": "List Medical History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/history/medical",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "history",
+                "medical"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Add Medical History",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/history/medical",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "history",
+                "medical"
+              ]
+            },
+            "description": "Admin only",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"condition\": \"Hypertension\",\n  \"diagnosis_date\": \"2010-01-01\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List Surgical History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/history/surgical",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "history",
+                "surgical"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Add Surgical History",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/history/surgical",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "history",
+                "surgical"
+              ]
+            },
+            "description": "Admin only",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"procedure_name\": \"Appendectomy\",\n  \"surgery_date\": \"2015-05-05\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List Family History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/history/family",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "history",
+                "family"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Add Family History",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/history/family",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "history",
+                "family"
+              ]
+            },
+            "description": "Admin only",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"relationship\": \"mother\",\n  \"condition\": \"Breast cancer\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List Social History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/history/social",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "history",
+                "social"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Add Social History",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/history/social",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "history",
+                "social"
+              ]
+            },
+            "description": "Admin only",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tobacco_use\": \"never\",\n  \"alcohol_use\": \"occasional\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clinical Decisions",
+      "item": [
+        {
+          "name": "List Decisions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/decisions",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "decisions"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Create Decision",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/decisions",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "decisions"
+              ]
+            },
+            "description": "Admin only",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision_type\": \"treatment_plan\",\n  \"clinical_question\": \"Next line therapy?\",\n  \"decision_made\": \"Start AC-T\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Decision",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/decisions/{{decisionId}}",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "decisions",
+                "{{decisionId}}"
+              ]
+            },
+            "description": "Admin only",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"implementation_status\": \"in_progress\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Decision",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{localUrl}}/patients/{{patientId}}/decisions/{{decisionId}}",
+              "host": [
+                "{{localUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "decisions",
+                "{{decisionId}}"
+              ]
+            },
+            "description": ""
           }
         }
       ]

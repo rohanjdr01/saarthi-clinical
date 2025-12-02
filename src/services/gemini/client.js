@@ -4,6 +4,8 @@
  * https://ai.google.dev/gemini-api/docs/gemini-3
  */
 
+import { generateExtractionPrompt } from '../processing/extraction-schema.js';
+
 export class GeminiService {
   constructor(apiKey) {
     this.apiKey = apiKey;
@@ -165,35 +167,7 @@ Return ONLY the highlight, nothing else.`;
   }
 
   getExtractionPrompt(documentType) {
-    const prompts = {
-      pathology: `Extract all clinical data from this pathology report. Return ONLY valid JSON (no other text):
-{
-  "patient_demographics": {"name": "", "age": "", "gender": "", "mrn": ""},
-  "primary_diagnosis": {"cancer_type": "", "histology": "", "grade": "", "location": ""},
-  "staging": {"stage": "", "tnm": {"T": "", "N": "", "M": ""}},
-  "molecular_markers": {},
-  "key_findings": [],
-  "recommendations": [],
-  "document_date": ""
-}`,
-      imaging: `Extract all data from this imaging report. Return ONLY valid JSON (no other text):
-{
-  "patient_demographics": {"name": "", "age": "", "gender": ""},
-  "study": {"type": "", "date": "", "contrast": ""},
-  "findings": [],
-  "impression": "",
-  "recommendations": []
-}`,
-      lab: `Extract all data from this lab report. Return ONLY valid JSON (no other text):
-{
-  "patient_demographics": {"name": "", "age": "", "gender": ""},
-  "collection_date": "",
-  "results": [{"test": "", "value": "", "unit": "", "range": "", "flag": ""}],
-  "interpretation": ""
-}`,
-      default: `Extract all clinical data from this medical document. Return ONLY valid JSON (no other text) with patient_demographics, key_findings, and any relevant clinical information.`
-    };
-    return prompts[documentType] || prompts.default;
+    return generateExtractionPrompt(documentType);
   }
 
   toBase64(buffer) {

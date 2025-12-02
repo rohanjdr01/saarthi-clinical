@@ -14,11 +14,12 @@ intake.post('/', async (c) => {
     const caregiverName = formData.get('caregiver_name');
     const caregiverRelation = formData.get('caregiver_relation');
     const caregiverContact = formData.get('caregiver_contact');
-    
+    const provider = formData.get('provider') || c.req.query('provider'); // Get provider from form or query
+
     if (!files || files.length === 0) {
       throw new ValidationError('At least one document is required');
     }
-    
+
     if (!caregiverName) {
       throw new ValidationError('Caregiver name is required');
     }
@@ -96,8 +97,8 @@ intake.post('/', async (c) => {
     }
     
     // STEP 3: Process first document
-    const processor = new DocumentProcessor(c.env);
-    const processingResult = await processor.processDocument(uploadedDocs[0].id, 'initial');
+    const processor = new DocumentProcessor(c.env, { provider });
+    const processingResult = await processor.processDocument(uploadedDocs[0].id, { mode: 'initial', provider });
     
     let extractedData = processingResult.extracted_data;
     
@@ -152,7 +153,7 @@ intake.post('/', async (c) => {
     // STEP 5: Process remaining documents in background
     if (uploadedDocs.length > 1) {
       for (let i = 1; i < uploadedDocs.length; i++) {
-        processor.processDocument(uploadedDocs[i].id, 'incremental').catch(err => {
+        processor.processDocument(uploadedDocs[i].id, { mode: 'incremental', provider }).catch(err => {
           console.error('Background processing error:', err);
         });
       }

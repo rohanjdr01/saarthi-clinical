@@ -16,7 +16,9 @@
     "test:coverage": "vitest run --coverage",
     "d1:init": "wrangler d1 execute DB --file=./schema.sql",
     "d1:migrate": "wrangler d1 execute DB --file=./migrations/001_add_case_packs_and_medical_highlights.sql",
-    "d1:migrations": "wrangler d1 migrations list DB"
+    "d1:migrations": "wrangler d1 migrations list DB",
+    "token:generate": "node scripts/generate-firebase-token.js",
+    "token:simple": "node scripts/generate-token-simple.js"
   },
   "dependencies": {
     "hono": "^4.10.7"
@@ -25,7 +27,7 @@
     "@cloudflare/workers-types": "^4.20251128.0",
     "@vitest/ui": "^1.0.0",
     "vitest": "^1.0.0",
-    "wrangler": "^3.114.15"
+    "wrangler": "^4.51.0"
   },
   "keywords": [],
   "author": "",

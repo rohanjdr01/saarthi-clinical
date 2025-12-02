@@ -4,6 +4,8 @@
  * https://platform.openai.com/docs/guides/vision
  */
 
+import { MEDICAL_EXTRACTION_SCHEMA, generateExtractionPrompt } from '../processing/extraction-schema.js';
+
 export class OpenAIService {
   constructor(apiKey) {
     this.apiKey = apiKey;
@@ -107,12 +109,28 @@ export class OpenAIService {
     const requestBody = useReasoning ? {
       model,
       messages: [{ role: 'user', content }],
-      reasoning_effort: 'high'
+      reasoning_effort: 'high',
+      response_format: {
+        type: 'json_schema',
+        json_schema: {
+          name: 'medical_extraction',
+          strict: true,
+          schema: MEDICAL_EXTRACTION_SCHEMA
+        }
+      }
     } : {
       model,
       messages: [{ role: 'user', content }],
       temperature: 0.2,
-      max_tokens: 16384
+      max_tokens: 16384,
+      response_format: {
+        type: 'json_schema',
+        json_schema: {
+          name: 'medical_extraction',
+          strict: true,
+          schema: MEDICAL_EXTRACTION_SCHEMA
+        }
+      }
     };
 
     console.log(`📄 OpenAI image processing (${model}, ${mimeType})...`);
@@ -307,35 +325,7 @@ Return ONLY the highlight, nothing else.`;
       return `Read this medical document and provide a single-line highlight (max 150 chars) summarizing the most significant clinical finding. Return ONLY the highlight.`;
     }
 
-    const prompts = {
-      pathology: `Extract all clinical data from this pathology report. Return ONLY valid JSON (no other text):
-{
-  "patient_demographics": {"name": "", "age": "", "gender": "", "mrn": ""},
-  "primary_diagnosis": {"cancer_type": "", "histology": "", "grade": "", "location": ""},
-  "staging": {"stage": "", "tnm": {"T": "", "N": "", "M": ""}},
-  "molecular_markers": {},
-  "key_findings": [],
-  "recommendations": [],
-  "document_date": ""
-}`,
-      imaging: `Extract all data from this imaging report. Return ONLY valid JSON (no other text):
-{
-  "patient_demographics": {"name": "", "age": "", "gender": ""},
-  "study": {"type": "", "date": "", "contrast": ""},
-  "findings": [],
-  "impression": "",
-  "recommendations": []
-}`,
-      lab: `Extract all data from this lab report. Return ONLY valid JSON (no other text):
-{
-  "patient_demographics": {"name": "", "age": "", "gender": ""},
-  "collection_date": "",
-  "results": [{"test": "", "value": "", "unit": "", "range": "", "flag": ""}],
-  "interpretation": ""
-}`,
-      default: `Extract all clinical data from this medical document. Return ONLY valid JSON (no other text) with patient_demographics, key_findings, and any relevant clinical information.`
-    };
-    return prompts[documentType] || prompts.default;
+    return generateExtractionPrompt(documentType);
   }
 
   toBase64(buffer) {
