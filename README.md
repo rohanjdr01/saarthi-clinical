@@ -9,7 +9,7 @@ Saarthi Clinical is a Cloudflare Workers-based platform that processes medical d
 ## Key Features
 
 - **Document Processing**: Upload and process medical documents (PDFs, images) with AI extraction
-- **Semantic Search (RAG)**: Natural language search across all patient documents using Cloudflare Vectorize
+- **Semantic Search (RAG)**: Natural language search across all patient documents using Gemini filesearch (fall back: Cloudflare Vectorize)
 - **Structured Data Extraction**: Automatically extract diagnosis, staging, treatment, medications, labs, and more
 - **Version History**: Track all manual edits with full audit trail
 - **Field-Level Source Tracking**: Know whether data came from documents or AI inference
