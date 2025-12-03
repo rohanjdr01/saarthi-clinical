@@ -7,7 +7,6 @@ import documents from './routes/documents.js';
 import processing from './routes/processing.js';
 import views from './routes/views.js';
 import timeline from './routes/timeline.js';
-import intake from './routes/intake.js';
 import medications from './routes/medications.js';
 import alerts from './routes/alerts.js';
 import labs from './routes/labs.js';
@@ -40,12 +39,11 @@ app.get('/', (c) => {
     version: '1.0.0',
     status: 'operational',
     docs: '/api/v1/health',
-    endpoints: {
-      health: '/api/v1/health',
-      auth: '/api/v1/auth',
-      patients: '/api/v1/patients',
-      intake: '/api/v1/intake'
-    }
+      endpoints: {
+        health: '/api/v1/health',
+        auth: '/api/v1/auth',
+        patients: '/api/v1/patients'
+      }
   });
 });
 
@@ -68,7 +66,6 @@ app.get('/api/v1/health', (c) => {
 
 // Mount routes
 app.route('/api/v1/auth', auth);
-app.route('/api/v1/intake', intake);
 app.route('/api/v1/patients', patients);
 app.route('/api/v1/patients/:patientId/documents', documents);
 app.route('/api/v1/patients/:patientId/processing', processing);
@@ -95,8 +92,7 @@ app.all('*', (c) => {
         'POST /api/v1/auth/verify',
         'GET /api/v1/auth/me',
         'GET /api/v1/patients',
-        'POST /api/v1/patients',
-        'POST /api/v1/intake'
+        'POST /api/v1/patients'
       ]
     }
   }, 404);

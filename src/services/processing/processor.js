@@ -270,6 +270,9 @@ export class DocumentProcessor {
       // 7. Save extracted data
       await this.saveExtractedData(documentId, extractedData, tokensUsed, extractionResult.model, medicalHighlight, extractionResult.text);
 
+      // 7.5. Auto-extract and update patient demographics if patient has placeholder data
+      await this.extractAndUpdatePatientDemographics(doc.patient_id, extractedData);
+
       // 8. Update clinical sections
       await this.updateClinicalSections(doc.patient_id, extractedData, doc.document_type);
 
@@ -410,6 +413,111 @@ export class DocumentProcessor {
       getCurrentTimestamp(),
       documentId
     ).run();
+  }
+
+  /**
+   * Extract and update patient demographics from extracted data
+   * Only updates if patient has placeholder/minimal data
+   */
+  async extractAndUpdatePatientDemographics(patientId, extractedData) {
+    try {
+      // Get current patient data
+      const patient = await this.env.DB.prepare(
+        'SELECT name, age, gender FROM patients WHERE id = ?'
+      ).bind(patientId).first();
+
+      if (!patient) {
+        console.warn(`Patient ${patientId} not found, skipping demographic extraction`);
+        return;
+      }
+
+      // Check if patient has placeholder/minimal data
+      const hasPlaceholderData = 
+        !patient.name || 
+        patient.name === 'Processing...' || 
+        patient.name === 'Unknown Patient' ||
+        (!patient.age && !patient.gender);
+
+      if (!hasPlaceholderData) {
+        console.log(`Patient ${patientId} already has demographics, skipping extraction`);
+        return;
+      }
+
+      // Extract demographics from extracted data
+      const demographics = extractedData.patient_demographics || {};
+      
+      // Extract name from various possible fields
+      let patientName = demographics.name || 
+                        extractedData.patient_name || 
+                        extractedData.name || 
+                        null;
+
+      // Only update if we found a name
+      if (patientName) {
+        patientName = patientName.trim();
+      }
+
+      // Extract age - handle string/number
+      let patientAge = null;
+      if (demographics.age) {
+        const ageStr = String(demographics.age).replace(/[^\d]/g, ''); // Remove non-digits
+        patientAge = ageStr ? parseInt(ageStr) : null;
+      }
+
+      // Extract gender - normalize
+      let patientGender = null;
+      if (demographics.gender || demographics.sex) {
+        const genderValue = demographics.gender || demographics.sex;
+        const genderLower = String(genderValue).toLowerCase().trim();
+        if (['male', 'female', 'other'].includes(genderLower)) {
+          patientGender = genderLower;
+        }
+      }
+
+      // Only update if we have at least one new piece of data
+      if (patientName || patientAge !== null || patientGender) {
+        const updates = [];
+        const bindings = [];
+
+        if (patientName) {
+          updates.push('name = ?');
+          bindings.push(patientName);
+        }
+
+        if (patientAge !== null) {
+          updates.push('age = ?');
+          bindings.push(patientAge);
+        }
+
+        if (patientGender) {
+          updates.push('gender = ?');
+          bindings.push(patientGender);
+        }
+
+        if (updates.length > 0) {
+          updates.push('updated_at = ?');
+          bindings.push(getCurrentTimestamp());
+          bindings.push(patientId);
+
+          await this.env.DB.prepare(`
+            UPDATE patients 
+            SET ${updates.join(', ')}
+            WHERE id = ?
+          `).bind(...bindings).run();
+
+          console.log(`✅ Updated patient ${patientId} demographics:`, {
+            name: patientName || '(unchanged)',
+            age: patientAge !== null ? patientAge : '(unchanged)',
+            gender: patientGender || '(unchanged)'
+          });
+        }
+      } else {
+        console.log(`No demographics found in extracted data for patient ${patientId}`);
+      }
+    } catch (error) {
+      console.error(`Error extracting demographics for patient ${patientId}:`, error);
+      // Don't throw - demographic extraction is optional
+    }
   }
 
   async updateClinicalSections(patientId, extractedData, documentType) {
