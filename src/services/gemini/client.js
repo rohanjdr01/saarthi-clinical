@@ -5,6 +5,7 @@
  */
 
 import { generateExtractionPrompt } from '../processing/extraction-schema.js';
+import { FileSearchService } from './file-search.js';
 
 export class GeminiService {
   constructor(apiKey) {
@@ -16,6 +17,9 @@ export class GeminiService {
     
     // Default thinking level: low, high (medium not supported)
     this.defaultThinkingLevel = 'low';
+
+    // File Search service
+    this.fileSearch = new FileSearchService(apiKey);
   }
 
   /**
@@ -41,7 +45,7 @@ export class GeminiService {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(requestBody)
-    }, 180000);
+    }, 300000); // 5 min for long-form responses
 
     if (!response.ok) {
       const error = await response.text();
@@ -96,7 +100,7 @@ export class GeminiService {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(requestBody)
-    }, 300000); // 5 min for large docs
+    }, 420000); // 7 min for large docs
 
     if (!response.ok) {
       const error = await response.text();
@@ -153,7 +157,7 @@ Return ONLY the highlight, nothing else.`;
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(requestBody)
-    }, 60000);
+    }, 180000); // allow more time for larger images/PDFs
 
     if (!response.ok) {
       const error = await response.text();
@@ -195,6 +199,17 @@ Return ONLY the highlight, nothing else.`;
       : Math.min(jsonStart, jsonArrayStart);
     
     return cleaned.substring(start);
+  }
+
+  /**
+   * Search documents using File Search tool
+   * @param {string} patientId - Patient ID to search within their File Search store
+   * @param {string} query - Search query
+   * @param {string} model - Model to use (default: gemini-2.5-flash)
+   * @returns {Promise<{text: string, citations: Array, tokensUsed: number}>}
+   */
+  async searchWithFileSearch(patientId, query, model = 'gemini-2.5-flash') {
+    return await this.fileSearch.searchDocuments(patientId, query, model);
   }
 
   async fetchWithTimeout(url, options, timeout) {

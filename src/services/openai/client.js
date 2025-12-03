@@ -46,7 +46,7 @@ export class OpenAIService {
         'Authorization': `Bearer ${this.apiKey}`
       },
       body: JSON.stringify(requestBody)
-    }, 180000);
+    }, 300000); // extend to 5 min
 
     if (!response.ok) {
       const error = await response.text();
@@ -180,7 +180,7 @@ export class OpenAIService {
         'Authorization': `Bearer ${this.apiKey}`
       },
       body: formData
-    }, 60000);
+    }, 180000); // allow longer for large PDFs
 
     if (!uploadResponse.ok) {
       const error = await uploadResponse.text();
@@ -214,7 +214,7 @@ export class OpenAIService {
         'Authorization': `Bearer ${this.apiKey}`
       },
       body: JSON.stringify(requestBody)
-    }, 300000);
+    }, 420000); // longer for PDF processing
 
     if (!response.ok) {
       const error = await response.text();
@@ -307,7 +307,7 @@ Return ONLY the highlight, nothing else.`;
         'Authorization': `Bearer ${this.apiKey}`
       },
       body: JSON.stringify(requestBody)
-    }, 60000);
+    }, 180000);
 
     if (!response.ok) {
       const error = await response.text();

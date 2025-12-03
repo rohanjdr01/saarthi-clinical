@@ -398,10 +398,10 @@
                   "description": "Options: pathology, imaging, lab, consultation"
                 },
                 {
-                  "key": "process_immediately",
-                  "value": "false",
+                  "key": "process_mode",
+                  "value": "fast",
                   "type": "text",
-                  "description": "Set to true to process with AI immediately"
+                  "description": "Processing mode: 'fast' (default - highlight + vectorize) or 'full' (complete extraction + patient profile sync)"
                 }
               ]
             },
@@ -500,28 +500,6 @@
           }
         },
         {
-          "name": "Vectorize Document",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/patients/{{patientId}}/documents/{{documentId}}/vectorize",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "patients",
-                "{{patientId}}",
-                "documents",
-                "{{documentId}}",
-                "vectorize"
-              ]
-            },
-            "description": "Manually trigger vectorization for a document. Returns status 'skipped' when VECTORIZE is not configured."
-          },
-          "description": "Manually trigger vectorization for a document (Phase 3: Workers AI embeddings)"
-        },
-        {
           "name": "Semantic Search",
           "request": {
             "method": "POST",
@@ -581,10 +559,48 @@
           }
         },
         {
+          "name": "Bulk Reprocess Documents",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"process_mode\": \"full\",\n  \"provider\": \"gemini\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/documents/reprocess",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "documents",
+                "reprocess"
+              ]
+            },
+            "description": "Reprocess all documents for a patient. process_mode: 'fast' (highlight + vectorize) or 'full' (complete extraction). Default: 'full'"
+          }
+        },
+        {
           "name": "Reprocess Document",
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"process_mode\": \"full\",\n  \"provider\": \"gemini\"\n}"
+            },
             "url": {
               "raw": "{{baseUrl}}/patients/{{patientId}}/documents/{{documentId}}/reprocess",
               "host": [
@@ -598,7 +614,7 @@
                 "reprocess"
               ]
             },
-            "description": "Trigger reprocessing of a document with AI (Phase 2)"
+            "description": "Reprocess a single document. process_mode: 'fast' (highlight + vectorize) or 'full' (complete extraction). Default: 'full'"
           }
         }
       ]
@@ -982,29 +998,8 @@
       ]
     },
     {
-      "name": "Document Vectorization & Search",
+      "name": "Document Search",
       "item": [
-        {
-          "name": "Vectorize Document",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/patients/{{patientId}}/documents/{{documentId}}/vectorize",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "patients",
-                "{{patientId}}",
-                "documents",
-                "{{documentId}}",
-                "vectorize"
-              ]
-            },
-            "description": "Manually trigger vectorization for a document"
-          }
-        },
         {
           "name": "Search Documents (RAG)",
           "request": {
@@ -1031,11 +1026,11 @@
                 "search"
               ]
             },
-            "description": "Semantic search across patient documents using RAG"
+            "description": "Semantic search across patient documents using RAG (File Search or Vectorize)"
           }
         },
         {
-          "name": "Reorder Case-Pack Documents",
+          "name": "Reorder Documents",
           "request": {
             "method": "POST",
             "header": [
@@ -1060,129 +1055,7 @@
                 "reorder"
               ]
             },
-            "description": "Reorder documents in case-pack (merged functionality)"
-          }
-        },
-        {
-          "name": "Reprocess Document",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/patients/{{patientId}}/documents/{{documentId}}/reprocess",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "patients",
-                "{{patientId}}",
-                "documents",
-                "{{documentId}}",
-                "reprocess"
-              ]
-            },
-            "description": "Trigger reprocessing of a document with AI"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Case-Packs",
-      "item": [
-        {
-          "name": "Get Case-Pack",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/patients/{{patientId}}/case-pack",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "patients",
-                "{{patientId}}",
-                "case-pack"
-              ]
-            },
-            "description": "Get case-pack with all documents and medical highlights"
-          }
-        },
-        {
-          "name": "Update Case-Pack Metadata",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"title\": \"Gastric Cancer Case - Nov 2025\",\n  \"description\": \"Complete diagnostic workup for carcinoma stomach\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/patients/{{patientId}}/case-pack",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "patients",
-                "{{patientId}}",
-                "case-pack"
-              ]
-            },
-            "description": "Update case-pack title and description"
-          }
-        },
-        {
-          "name": "Remove Document from Case-Pack",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/patients/{{patientId}}/case-pack/{{documentId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "patients",
-                "{{patientId}}",
-                "case-pack",
-                "{{documentId}}"
-              ]
-            },
-            "description": "Remove a document from the case-pack"
-          }
-        },
-        {
-          "name": "Reorder Documents",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"document_ids\": [\"{{documentId}}\"]\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/patients/{{patientId}}/case-pack/reorder",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "patients",
-                "{{patientId}}",
-                "case-pack",
-                "reorder"
-              ]
-            },
-            "description": "Reorder documents in the case-pack"
+            "description": "Reorder documents (updates case_pack_order)"
           }
         }
       ]

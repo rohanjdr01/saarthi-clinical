@@ -26,15 +26,18 @@ preview_id = "e759848fc16d4c1b813fd1d21f3c592f"
 [vars]
 ENVIRONMENT = "development"
 LOG_LEVEL = "debug"
+EMBEDDING_MODEL = "bge-large-en-v1.5"
+FILE_SEARCH_ENABLED = "true"
 
 # Workers AI binding (for embeddings)
 [ai]
 binding = "AI"
 
 # Vectorize binding (development/local)
+# Note: Create index with: npx wrangler vectorize create medical-documents-v2 --dimensions=1024 --metric=cosine
 [[vectorize]]
 binding = "VECTORIZE"
-index_name = "medical-documents"
+index_name = "medical-documents-v2"
 
 # ===================================
 # PRODUCTION ENVIRONMENT
@@ -57,7 +60,7 @@ id = "7c080d431a714bde813d1b63464fd1d8"
 
 [[env.production.vectorize]]
 binding = "VECTORIZE"
-index_name = "medical-documents"
+index_name = "medical-documents-v2"
 
 [env.production.ai]
 binding = "AI"
@@ -65,6 +68,8 @@ binding = "AI"
 [env.production.vars]
 ENVIRONMENT = "production"
 LOG_LEVEL = "warn"
+EMBEDDING_MODEL = "bge-large-en-v1.5"
+FILE_SEARCH_ENABLED = "true"
 
 # Custom domain route
 [[env.production.routes]]
@@ -92,7 +97,7 @@ id = "66432efaadd945a9939efc2c5baed1c8"
 
 [[env.staging.vectorize]]
 binding = "VECTORIZE"
-index_name = "medical-documents"
+index_name = "medical-documents-v2"
 
 [env.staging.ai]
 binding = "AI"
@@ -100,3 +105,5 @@ binding = "AI"
 [env.staging.vars]
 ENVIRONMENT = "staging"
 LOG_LEVEL = "info"
+EMBEDDING_MODEL = "bge-large-en-v1.5"
+FILE_SEARCH_ENABLED = "true"

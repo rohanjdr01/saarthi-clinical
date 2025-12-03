@@ -18,10 +18,25 @@ medications.get('/', async (c) => {
     const result = await c.env.DB.prepare(`
       SELECT * FROM medications
       WHERE patient_id = ?
-      ORDER BY created_at DESC
+      ORDER BY treatment_context, created_at DESC
     `).bind(patientId).all();
 
-    return c.json({ success: true, data: result.results });
+    // Group by treatment_context
+    const grouped = result.results.reduce((acc, med) => {
+      const context = med.treatment_context || 'Other Medications';
+      if (!acc[context]) {
+        acc[context] = [];
+      }
+      acc[context].push(med);
+      return acc;
+    }, {});
+
+    return c.json({ 
+      success: true, 
+      data: grouped,
+      // Also return flat list for backward compatibility
+      flat: result.results
+    });
   } catch (error) {
     console.error('Error listing medications:', error);
     return c.json(errorResponse(error), 500);
@@ -46,7 +61,7 @@ medications.post('/', requireAdmin(), async (c) => {
         dose, dose_unit, frequency, route,
         start_date, end_date,
         medication_status, discontinuation_reason,
-        indication, medication_type,
+        indication, medication_type, treatment_context,
         data_sources, created_at, updated_at
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
@@ -55,7 +70,7 @@ medications.post('/', requireAdmin(), async (c) => {
       body.dose || null, body.dose_unit || null, body.frequency || null, body.route || null,
       body.start_date || null, body.end_date || null,
       body.medication_status || 'active', body.discontinuation_reason || null,
-      body.indication || null, body.medication_type || null,
+      body.indication || null, body.medication_type || null, body.treatment_context || null,
       body.data_sources ? JSON.stringify(body.data_sources) : null,
       now, now
     ).run();
@@ -83,7 +98,7 @@ medications.put('/:medId', requireAdmin(), async (c) => {
       'dose', 'dose_unit', 'frequency', 'route',
       'start_date', 'end_date',
       'medication_status', 'discontinuation_reason',
-      'indication', 'medication_type', 'data_sources'
+      'indication', 'medication_type', 'treatment_context', 'data_sources'
     ];
 
     const updates = {};

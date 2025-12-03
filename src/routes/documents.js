@@ -7,7 +7,8 @@
 import { Hono } from 'hono';
 import { Document } from '../models/document.js';
 import { DocumentProcessor } from '../services/processing/processor.js';
-import { vectorizeDocument, searchDocuments } from '../services/vectorize/indexer.js';
+import { searchDocuments } from '../services/vectorize/indexer.js';
+import { GeminiService } from '../services/gemini/client.js';
 import { NotFoundError, ValidationError, errorResponse } from '../utils/errors.js';
 import { getCurrentTimestamp } from '../utils/helpers.js';
 
@@ -35,7 +36,7 @@ documents.post('/', async (c) => {
     const category = formData.get('category'); // Optional - will be inferred if not provided
     const subcategory = formData.get('subcategory'); // Optional
     const documentDate = formData.get('document_date');
-    const processImmediately = formData.get('process_immediately') === 'true';
+    const processMode = formData.get('process_mode') || 'fast'; // 'fast' (default) or 'full'
     const provider = formData.get('provider') || c.req.query('provider'); // Get provider from form or query
 
     if (!files || files.length === 0) {
@@ -102,21 +103,24 @@ documents.post('/', async (c) => {
 
       uploadedDocuments.push(document.toJSON());
 
-      // Queue processing if requested
-      if (processImmediately) {
-        processingTasks.push(document.id);
-      }
+      // Queue processing (always process in fast or full mode)
+      processingTasks.push({ id: document.id, mode: processMode });
     }
 
-    // Trigger processing in background if requested
-    // AI will infer category/subcategory during processing
-    if (processImmediately && processingTasks.length > 0) {
-      for (const docId of processingTasks) {
+    // Trigger processing in background
+    // Fast mode: highlight + vectorize only (makes searchable immediately)
+    // Full mode: complete extraction + patient profile sync
+    if (processingTasks.length > 0) {
+      for (const { id: docId, mode } of processingTasks) {
         c.executionCtx.waitUntil(
           (async () => {
             try {
               const processor = new DocumentProcessor(c.env, { provider });
-              await processor.processDocument(docId, { mode: 'incremental', provider });
+              if (mode === 'fast') {
+                await processor.processDocumentFast(docId, { provider });
+              } else {
+                await processor.processDocument(docId, { mode: 'incremental', provider });
+              }
             } catch (error) {
               console.error(`Error processing document ${docId}:`, error);
               // Update document status to failed
@@ -134,8 +138,9 @@ documents.post('/', async (c) => {
     return c.json({
       success: true,
       documents_uploaded: uploadedDocuments.length,
-      processing_status: processImmediately ? 'processing' : 'pending',
-      message: `${uploadedDocuments.length} document(s) uploaded successfully.${processImmediately ? ' Processing started.' : ''}`,
+      processing_mode: processMode,
+      processing_status: 'processing',
+      message: `${uploadedDocuments.length} document(s) uploaded successfully. Processing in ${processMode} mode.`,
       data: uploadedDocuments
     }, 202);
 
@@ -381,9 +386,32 @@ documents.delete('/:docId', async (c) => {
     // Delete from R2
     await c.env.DOCUMENTS.delete(document.storage_key);
 
-    // Delete associated vectors (if any)
+    // Delete from File Search if configured
+    if (document.file_search_document_name && c.env.GEMINI_API_KEY) {
+      try {
+        const { FileSearchService } = await import('../services/gemini/file-search.js');
+        const fileSearch = new FileSearchService(c.env.GEMINI_API_KEY);
+        await fileSearch.deleteDocumentFromFileSearch(document.file_search_document_name);
+        console.log(`✅ Deleted document from File Search: ${document.file_search_document_name}`);
+      } catch (error) {
+        console.error('Error deleting from File Search (non-fatal):', error);
+        // Continue with deletion even if File Search delete fails
+      }
+    }
+
+    // Delete vector chunks (Vectorize fallback)
     await c.env.DB.prepare('DELETE FROM document_vectors WHERE document_id = ?')
       .bind(docId).run();
+
+    // Delete from Vectorize if configured
+    if (c.env.VECTORIZE) {
+      try {
+        const { deleteDocumentVectors } = await import('../services/vectorize/indexer.js');
+        await deleteDocumentVectors(c.env, docId);
+      } catch (error) {
+        console.error('Error deleting from Vectorize (non-fatal):', error);
+      }
+    }
 
     // Delete from D1
     await c.env.DB.prepare('DELETE FROM documents WHERE id = ?')
@@ -447,34 +475,139 @@ documents.post('/search', async (c) => {
     const body = await c.req.json();
     const { query, top_k = 5 } = body || {};
 
+    console.log('Search request:', {
+      patientId,
+      query,
+      top_k,
+      hasFileSearch: !!c.env.GEMINI_API_KEY,
+      hasVectorize: !!c.env.VECTORIZE
+    });
+
     if (!query) {
       throw new ValidationError('Query is required');
     }
 
-    const result = await searchDocuments(c.env, {
-      patientId,
-      query,
-      topK: top_k
-    });
+    // Try File Search first if enabled
+    const fileSearchEnabled = c.env.FILE_SEARCH_ENABLED !== 'false' && c.env.GEMINI_API_KEY;
+    let result;
 
-    if (result.status === 'skipped') {
-      return c.json({
-        success: false,
-        error: {
-          code: 'NOT_CONFIGURED',
-          message: 'Vectorize binding not configured'
+    if (fileSearchEnabled) {
+      // Check if patient has any documents uploaded to File Search
+      const fileSearchDocCount = await c.env.DB.prepare(`
+        SELECT COUNT(*) as count 
+        FROM documents 
+        WHERE patient_id = ? 
+        AND file_search_document_name IS NOT NULL 
+        AND file_search_document_name != ''
+      `).bind(patientId).first();
+
+      const hasFileSearchDocs = fileSearchDocCount?.count > 0;
+      console.log(`File Search check: ${fileSearchDocCount?.count || 0} documents in File Search for patient ${patientId}`);
+
+      if (!hasFileSearchDocs) {
+        console.warn('⚠️  No documents in File Search, falling back to Vectorize');
+        // Fall through to Vectorize fallback
+      } else {
+        try {
+          console.log('🔍 Using File Search for query');
+          const geminiService = new GeminiService(c.env.GEMINI_API_KEY);
+          const fileSearchResult = await geminiService.searchWithFileSearch(patientId, query);
+
+          // Check if File Search store is empty
+          if (fileSearchResult.error) {
+            console.warn('File Search store empty, falling back to Vectorize');
+            // Fall through to Vectorize fallback
+          } else {
+            // Format File Search results to match existing API structure
+            // File Search returns an answer with citations, so we create result entries for each citation
+            const formattedResults = fileSearchResult.citations && fileSearchResult.citations.length > 0
+              ? fileSearchResult.citations.map((citation, idx) => ({
+                  id: citation.documentName || `file-search-${idx}`,
+                  score: citation.relevanceScore || 1.0,
+                  metadata: {
+                    document_name: citation.displayName || citation.documentName,
+                    document_id: citation.documentName,
+                    source: 'file_search'
+                  },
+                  text: fileSearchResult.text, // Include answer text in each result
+                  answer: fileSearchResult.text
+                }))
+              : fileSearchResult.text && fileSearchResult.text.length > 0
+              ? [{
+                  id: 'file-search-answer',
+                  score: 1.0,
+                  metadata: {
+                    source: 'file_search'
+                  },
+                  text: fileSearchResult.text,
+                  answer: fileSearchResult.text
+                }]
+              : [];
+
+            // If no results and no citations, check if we should fallback
+            if (formattedResults.length === 0 && fileSearchResult.citations.length === 0) {
+              console.warn('File Search returned empty results, falling back to Vectorize');
+              // Fall through to Vectorize fallback
+            } else {
+              return c.json({
+                success: true,
+                data: formattedResults.slice(0, top_k), // Limit to top_k
+                answer: fileSearchResult.text, // Include answer separately for convenience
+                citations: fileSearchResult.citations || [],
+                method: 'file_search'
+              });
+            }
+          }
+        } catch (fileSearchError) {
+          console.error('File Search failed, falling back to Vectorize:', fileSearchError);
+          // Fall through to Vectorize fallback
         }
-      }, 501);
+      }
     }
 
-    if (result.status === 'failed') {
-      throw new Error(result.error || 'Vectorize search failed');
+    // Fallback to Vectorize
+    if (c.env.VECTORIZE) {
+      console.log('🔄 Using Vectorize (fallback)');
+      result = await searchDocuments(c.env, {
+        patientId,
+        query,
+        topK: top_k
+      });
+
+      console.log('Search result status:', result.status, {
+        resultsCount: result.results?.length || 0,
+        error: result.error
+      });
+
+      if (result.status === 'skipped') {
+        return c.json({
+          success: false,
+          error: {
+            code: 'NOT_CONFIGURED',
+            message: 'Neither File Search nor Vectorize is configured'
+          }
+        }, 501);
+      }
+
+      if (result.status === 'failed') {
+        throw new Error(result.error || 'Vectorize search failed');
+      }
+
+      return c.json({
+        success: true,
+        data: result.results,
+        method: 'vectorize'
+      });
     }
 
+    // Neither File Search nor Vectorize available
     return c.json({
-      success: true,
-      data: result.results
-    });
+      success: false,
+      error: {
+        code: 'NOT_CONFIGURED',
+        message: 'No search method configured (File Search or Vectorize required)'
+      }
+    }, 501);
 
   } catch (error) {
     console.error('Error searching documents:', error);
@@ -483,62 +616,88 @@ documents.post('/search', async (c) => {
 });
 
 // ============================================================================
-// MANUAL VECTORIZATION TRIGGER
+// BULK REPROCESS ALL DOCUMENTS
 // ============================================================================
 
-documents.post('/:docId/vectorize', async (c) => {
+documents.post('/reprocess', async (c) => {
   try {
-    const { patientId, docId } = c.req.param();
+    const { patientId } = c.req.param();
+    const body = await c.req.json().catch(() => ({}));
+    const processMode = body.process_mode || c.req.query('process_mode') || 'full'; // 'fast' or 'full'
+    const provider = body.provider || c.req.query('provider');
 
-    const doc = await c.env.DB.prepare(`
-      SELECT * FROM documents WHERE id = ? AND patient_id = ?
-    `).bind(docId, patientId).first();
+    // Get all documents for patient
+    const documentsResult = await c.env.DB.prepare(`
+      SELECT id FROM documents WHERE patient_id = ?
+    `).bind(patientId).all();
 
-    if (!doc) {
-      throw new NotFoundError('Document');
+    if (!documentsResult.results || documentsResult.results.length === 0) {
+      return c.json({
+        success: true,
+        message: 'No documents found to reprocess',
+        documents_reprocessed: 0
+      });
     }
 
-    const vectorizeResult = await vectorizeDocument(c.env, {
-      documentId: docId,
-      patientId,
-      text: doc.extracted_text || doc.extracted_data || doc.summary || '',
-      metadata: {
-        document_type: doc.document_type,
-        category: doc.category,
-        subcategory: doc.subcategory
-      }
-    });
+    const documentIds = documentsResult.results.map(row => row.id);
 
+    // Reset processing status for all documents
     await c.env.DB.prepare(`
       UPDATE documents
-      SET vectorize_status = ?, vectorized_at = ?, updated_at = ?
-      WHERE id = ?
-    `).bind(
-      vectorizeResult.status,
-      getCurrentTimestamp(),
-      getCurrentTimestamp(),
-      docId
-    ).run();
+      SET processing_status = 'pending',
+          processing_error = NULL,
+          processing_started_at = NULL,
+          processing_completed_at = NULL,
+          updated_at = ?
+      WHERE patient_id = ?
+    `).bind(getCurrentTimestamp(), patientId).run();
+
+    // Trigger reprocessing in background for all documents
+    for (const docId of documentIds) {
+      c.executionCtx.waitUntil(
+        (async () => {
+          try {
+            const processor = new DocumentProcessor(c.env, { provider });
+            if (processMode === 'fast') {
+              await processor.processDocumentFast(docId, { provider });
+            } else {
+              await processor.processDocument(docId, { mode: 'full', provider });
+            }
+          } catch (error) {
+            console.error(`Error reprocessing document ${docId}:`, error);
+            await c.env.DB.prepare(`
+              UPDATE documents
+              SET processing_status = ?, processing_error = ?
+              WHERE id = ?
+            `).bind('failed', error.message, docId).run();
+          }
+        })()
+      );
+    }
 
     return c.json({
       success: true,
-      message: 'Vectorization executed',
-      data: vectorizeResult
-    });
+      message: `Bulk reprocessing started for ${documentIds.length} document(s) in ${processMode} mode`,
+      documents_count: documentIds.length,
+      process_mode: processMode
+    }, 202);
+
   } catch (error) {
-    console.error('Error vectorizing document:', error);
+    console.error('Error bulk reprocessing documents:', error);
     return c.json(errorResponse(error), error.statusCode || 500);
   }
 });
 
 // ============================================================================
-// REPROCESS DOCUMENT
+// REPROCESS SINGLE DOCUMENT
 // ============================================================================
 
 documents.post('/:docId/reprocess', async (c) => {
   try {
     const { patientId, docId } = c.req.param();
-    const provider = c.req.query('provider');
+    const body = await c.req.json().catch(() => ({}));
+    const processMode = body.process_mode || c.req.query('process_mode') || 'full'; // 'fast' or 'full'
+    const provider = body.provider || c.req.query('provider');
 
     // Get document
     const existing = await c.env.DB.prepare(`
@@ -565,7 +724,11 @@ documents.post('/:docId/reprocess', async (c) => {
       (async () => {
         try {
           const processor = new DocumentProcessor(c.env, { provider });
-          await processor.processDocument(docId, { mode: 'full', provider });
+          if (processMode === 'fast') {
+            await processor.processDocumentFast(docId, { provider });
+          } else {
+            await processor.processDocument(docId, { mode: 'full', provider });
+          }
         } catch (error) {
           console.error(`Error reprocessing document ${docId}:`, error);
           await c.env.DB.prepare(`
@@ -579,8 +742,9 @@ documents.post('/:docId/reprocess', async (c) => {
 
     return c.json({
       success: true,
-      message: 'Document reprocessing started',
-      document_id: docId
+      message: `Document reprocessing started in ${processMode} mode`,
+      document_id: docId,
+      process_mode: processMode
     }, 202);
 
   } catch (error) {

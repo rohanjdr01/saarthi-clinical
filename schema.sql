@@ -2,6 +2,50 @@
 -- Version 2.0 - Complete rewrite with field-level source tracking and version history
 
 -- ============================================================================
+-- AUTHENTICATION & USER MANAGEMENT
+-- ============================================================================
+
+-- Users table (Firebase-authenticated users)
+CREATE TABLE IF NOT EXISTS users (
+    id TEXT PRIMARY KEY,
+    firebase_uid TEXT UNIQUE NOT NULL,
+    email TEXT,
+    phone TEXT,
+    name TEXT NOT NULL,
+    role TEXT DEFAULT 'user' CHECK(role IN ('user', 'doctor', 'admin', 'case_manager')),
+    is_verified INTEGER DEFAULT 0,
+    profile_completed INTEGER DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+);
+
+CREATE INDEX idx_users_firebase_uid ON users(firebase_uid);
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_phone ON users(phone);
+CREATE INDEX idx_users_role ON users(role);
+
+-- Doctors table (healthcare provider profiles)
+CREATE TABLE IF NOT EXISTS doctors (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    specialization TEXT,
+    specializations TEXT, -- JSON array of specializations
+    hospital TEXT,
+    license_number TEXT,
+    years_of_experience INTEGER,
+    consultation_fee REAL,
+    is_verified INTEGER DEFAULT 0,
+    bio TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_doctors_user_id ON doctors(user_id);
+CREATE INDEX idx_doctors_specialization ON doctors(specialization);
+CREATE INDEX idx_doctors_is_verified ON doctors(is_verified);
+
+-- ============================================================================
 -- CORE PATIENT RECORD
 -- ============================================================================
 
@@ -85,9 +129,13 @@ CREATE TABLE documents (
     processing_completed_at INTEGER,
     processing_error TEXT,
 
-    -- Vectorization status
+    -- Vectorization status (also used for File Search)
     vectorize_status TEXT DEFAULT 'pending', -- pending, processing, completed, failed
     vectorized_at INTEGER,
+
+    -- File Search tracking
+    file_search_store_name TEXT, -- File Search store name for patient
+    file_search_document_name TEXT, -- Document name in File Search store
 
     -- Review status
     reviewed_status TEXT DEFAULT 'pending', -- pending, reviewed, flagged
@@ -328,6 +376,7 @@ CREATE TABLE medications (
     -- Purpose
     indication TEXT,
     medication_type TEXT, -- chemotherapy, supportive, comorbidity
+    treatment_context TEXT, -- e.g., "m.FOLFOX-6", "Salmonella Infection", "Anti-Epileptic Therapy"
 
     -- Field-level source tracking
     data_sources TEXT, -- JSON
