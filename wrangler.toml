@@ -1,4 +1,4 @@
-name = "saarthi-clinical"
+name = "saarthi-clinical-prod"
 main = "src/index.js"
 compatibility_date = "2025-11-28"
 
