@@ -260,6 +260,11 @@ export class DocumentProcessor {
       let extractedData;
       try {
         extractedData = JSON.parse(extractionResult.text);
+        console.log(`📊 Extracted data structure:`, {
+          hasPatientDemographics: !!extractedData.patient_demographics,
+          patientDemographicsKeys: extractedData.patient_demographics ? Object.keys(extractedData.patient_demographics) : [],
+          topLevelKeys: Object.keys(extractedData)
+        });
       } catch {
         console.warn('Response not JSON, storing as raw text');
         extractedData = { raw_response: extractionResult.text };
@@ -270,7 +275,7 @@ export class DocumentProcessor {
       // 7. Save extracted data
       await this.saveExtractedData(documentId, extractedData, tokensUsed, extractionResult.model, medicalHighlight, extractionResult.text);
 
-      // 7.5. Auto-extract and update patient demographics if patient has placeholder data
+      // 7.5. Auto-extract and update patient demographics (updates all missing/null fields)
       await this.extractAndUpdatePatientDemographics(doc.patient_id, extractedData);
 
       // 8. Update clinical sections
@@ -363,6 +368,33 @@ export class DocumentProcessor {
       // 15. Log
       await this.logProcessing(doc.patient_id, documentId, tokensUsed, processingTime, `${provider}:${extractionResult.model}`, vectorizeStatus);
 
+      // 16. Fetch updated patient demographics after sync
+      const updatedPatient = await this.env.DB.prepare(
+        'SELECT name, age, age_unit, sex, dob, external_mrn, patient_id_uhid, patient_id_ipd, blood_type, height_cm, weight_kg, bsa, ecog_status, language_preference FROM patients WHERE id = ?'
+      ).bind(doc.patient_id).first();
+
+      // Extract patient demographics from extracted data (for response)
+      const demographics = extractedData.patient_demographics || {};
+      const patientDemographics = {
+        // Use extracted values if available, otherwise use current patient values
+        name: demographics.name || updatedPatient?.name || null,
+        age: demographics.age || updatedPatient?.age || null,
+        age_unit: demographics.age_unit || updatedPatient?.age_unit || null,
+        sex: demographics.gender || demographics.sex || updatedPatient?.sex || null,
+        dob: demographics.dob || demographics.date_of_birth || updatedPatient?.dob || null,
+        mrn: demographics.mrn || updatedPatient?.external_mrn || null,
+        patient_id_uhid: demographics.patient_id_uhid || updatedPatient?.patient_id_uhid || null,
+        patient_id_ipd: demographics.patient_id_ipd || updatedPatient?.patient_id_ipd || null,
+        blood_type: demographics.blood_type || updatedPatient?.blood_type || null,
+        height_cm: demographics.height_cm || updatedPatient?.height_cm || null,
+        weight_kg: demographics.weight_kg || updatedPatient?.weight_kg || null,
+        bsa: demographics.bsa || updatedPatient?.bsa || null,
+        ecog_status: demographics.ecog_status !== null && demographics.ecog_status !== undefined 
+          ? demographics.ecog_status 
+          : (updatedPatient?.ecog_status || null),
+        language_preference: demographics.language_preference || updatedPatient?.language_preference || null
+      };
+
       return {
         success: true,
         document_id: documentId,
@@ -371,7 +403,8 @@ export class DocumentProcessor {
         tokens_used: tokensUsed,
         processing_time_ms: processingTime,
         provider,
-        model: extractionResult.model
+        model: extractionResult.model,
+        patient_demographics: patientDemographics
       };
 
     } catch (error) {
@@ -421,9 +454,9 @@ export class DocumentProcessor {
    */
   async extractAndUpdatePatientDemographics(patientId, extractedData) {
     try {
-      // Get current patient data
+      // Get current patient data - get all fields to check what's missing
       const patient = await this.env.DB.prepare(
-        'SELECT name, age, gender FROM patients WHERE id = ?'
+        'SELECT * FROM patients WHERE id = ?'
       ).bind(patientId).first();
 
       if (!patient) {
@@ -431,88 +464,321 @@ export class DocumentProcessor {
         return;
       }
 
-      // Check if patient has placeholder/minimal data
-      const hasPlaceholderData = 
-        !patient.name || 
-        patient.name === 'Processing...' || 
-        patient.name === 'Unknown Patient' ||
-        (!patient.age && !patient.gender);
-
-      if (!hasPlaceholderData) {
-        console.log(`Patient ${patientId} already has demographics, skipping extraction`);
-        return;
-      }
-
       // Extract demographics from extracted data
       const demographics = extractedData.patient_demographics || {};
       
-      // Extract name from various possible fields
-      let patientName = demographics.name || 
-                        extractedData.patient_name || 
-                        extractedData.name || 
-                        null;
+      // ADD THIS LOGGING:
+      console.log(`🔍 Extracting demographics for patient ${patientId}:`, {
+        hasDemographics: !!extractedData.patient_demographics,
+        demographicsKeys: Object.keys(demographics),
+        currentPatientName: patient.name,
+        currentPatientAge: patient.age,
+        extractedName: demographics.name,
+        extractedAge: demographics.age
+      });
+      
+      // Comprehensive diagnostic logging
+      console.log(`📋 Full diagnostic info:`, {
+        extractedDataKeys: Object.keys(extractedData),
+        demographicsObject: demographics,
+        currentPatient: {
+          name: patient.name,
+          age: patient.age,
+          gender: patient.gender,
+          sex: patient.sex,
+          dob: patient.dob,
+          external_mrn: patient.external_mrn,
+          patient_id_uhid: patient.patient_id_uhid,
+          patient_id_ipd: patient.patient_id_ipd
+        },
+        extractedDemographics: {
+          name: demographics.name,
+          age: demographics.age,
+          gender: demographics.gender,
+          sex: demographics.sex,
+          dob: demographics.dob,
+          mrn: demographics.mrn,
+          patient_id_uhid: demographics.patient_id_uhid,
+          patient_id_ipd: demographics.patient_id_ipd,
+          primary_oncologist: demographics.primary_oncologist,
+          primary_center: demographics.primary_center
+        },
+        documentInfo: extractedData.document_info || null
+      });
+      
+      // Build updates array - only update fields that are null/empty or placeholder values
+      const updates = [];
+      const bindings = [];
+      const updatedFields = {};
 
-      // Only update if we found a name
-      if (patientName) {
-        patientName = patientName.trim();
-      }
+      // Helper to check if a value is a placeholder or empty
+      const isPlaceholder = (value) => {
+        if (!value) return true;
+        const str = String(value).trim().toLowerCase();
+        return str === '' || str === 'processing...' || str === 'unknown patient' || str === 'unknown';
+      };
 
-      // Extract age - handle string/number
-      let patientAge = null;
-      if (demographics.age) {
-        const ageStr = String(demographics.age).replace(/[^\d]/g, ''); // Remove non-digits
-        patientAge = ageStr ? parseInt(ageStr) : null;
-      }
+      // Helper to check if we should update a field (current value is null/empty/placeholder)
+      const shouldUpdate = (currentValue, newValue) => {
+        if (!newValue) return false; // No new value to set
+        const result = isPlaceholder(currentValue) || !currentValue;
+        console.log(`  🔎 shouldUpdate: current="${currentValue}", new="${newValue}", result=${result}`);
+        return result;
+      };
 
-      // Extract gender - normalize
-      let patientGender = null;
-      if (demographics.gender || demographics.sex) {
-        const genderValue = demographics.gender || demographics.sex;
-        const genderLower = String(genderValue).toLowerCase().trim();
-        if (['male', 'female', 'other'].includes(genderLower)) {
-          patientGender = genderLower;
-        }
-      }
+      // Helper for fields that should always update if extracted (even if patient has a value)
+      // Used for fields that can change over time or be more accurate in newer documents
+      const shouldAlwaysUpdate = (newValue) => {
+        if (!newValue) return false;
+        const str = String(newValue).trim();
+        return str !== '' && !isPlaceholder(str);
+      };
 
-      // Only update if we have at least one new piece of data
-      if (patientName || patientAge !== null || patientGender) {
-        const updates = [];
-        const bindings = [];
-
-        if (patientName) {
+      // Name - update if missing or placeholder
+      const extractedName = demographics.name || extractedData.patient_name || extractedData.name;
+      console.log(`  🔎 Name check: extracted="${extractedName}", current="${patient.name}", isPlaceholder=${isPlaceholder(patient.name)}`);
+      if (extractedName && shouldUpdate(patient.name, extractedName)) {
+        const cleanName = extractedName.trim();
+        if (cleanName && !isPlaceholder(cleanName)) {
           updates.push('name = ?');
-          bindings.push(patientName);
-        }
-
-        if (patientAge !== null) {
-          updates.push('age = ?');
-          bindings.push(patientAge);
-        }
-
-        if (patientGender) {
-          updates.push('gender = ?');
-          bindings.push(patientGender);
-        }
-
-        if (updates.length > 0) {
-          updates.push('updated_at = ?');
-          bindings.push(getCurrentTimestamp());
-          bindings.push(patientId);
-
-          await this.env.DB.prepare(`
-            UPDATE patients 
-            SET ${updates.join(', ')}
-            WHERE id = ?
-          `).bind(...bindings).run();
-
-          console.log(`✅ Updated patient ${patientId} demographics:`, {
-            name: patientName || '(unchanged)',
-            age: patientAge !== null ? patientAge : '(unchanged)',
-            gender: patientGender || '(unchanged)'
-          });
+          bindings.push(cleanName);
+          updatedFields.name = cleanName;
+          console.log(`  ✅ Name added to updates: "${cleanName}"`);
+        } else {
+          console.log(`  ⚠️ Name extracted but is placeholder: "${cleanName}"`);
         }
       } else {
-        console.log(`No demographics found in extracted data for patient ${patientId}`);
+        console.log(`  ⚠️ Name skipped: extracted="${extractedName}", shouldUpdate=${extractedName ? shouldUpdate(patient.name, extractedName) : false}`);
+      }
+
+      // Age - update if missing
+      console.log(`  🔎 Age check: extracted="${demographics.age}", current="${patient.age}"`);
+      if (demographics.age && shouldUpdate(patient.age, demographics.age)) {
+        const ageStr = String(demographics.age).replace(/[^\d]/g, '');
+        const age = ageStr ? parseInt(ageStr) : null;
+        if (age !== null && age > 0 && age <= 150) {
+          updates.push('age = ?');
+          bindings.push(age);
+          updatedFields.age = age;
+          console.log(`  ✅ Age added to updates: ${age}`);
+        } else {
+          console.log(`  ⚠️ Age invalid: "${demographics.age}" -> ${age}`);
+        }
+      } else {
+        console.log(`  ⚠️ Age skipped: extracted="${demographics.age}", shouldUpdate=${demographics.age ? shouldUpdate(patient.age, demographics.age) : false}`);
+      }
+
+      // Age unit
+      if (demographics.age_unit && shouldUpdate(patient.age_unit, demographics.age_unit)) {
+        const ageUnit = demographics.age_unit.toLowerCase();
+        if (['years', 'months', 'days'].includes(ageUnit)) {
+          updates.push('age_unit = ?');
+          bindings.push(ageUnit);
+          updatedFields.age_unit = ageUnit;
+        }
+      }
+
+      // Sex/Gender - update if missing
+      const genderValue = demographics.gender || demographics.sex;
+      console.log(`  🔎 Gender check: extracted="${genderValue}", current="${patient.gender || patient.sex}"`);
+      if (genderValue && shouldUpdate(patient.gender || patient.sex, genderValue)) {
+        const genderLower = String(genderValue).toLowerCase().trim();
+        if (['male', 'female', 'other'].includes(genderLower)) {
+          updates.push('gender = ?');
+          updates.push('sex = ?');
+          bindings.push(genderLower);
+          bindings.push(genderLower);
+          updatedFields.gender = genderLower;
+          console.log(`  ✅ Gender added to updates: "${genderLower}"`);
+        } else {
+          console.log(`  ⚠️ Gender invalid: "${genderValue}" -> "${genderLower}"`);
+        }
+      } else {
+        console.log(`  ⚠️ Gender skipped: extracted="${genderValue}", shouldUpdate=${genderValue ? shouldUpdate(patient.gender || patient.sex, genderValue) : false}`);
+      }
+
+      // Date of Birth
+      const dobValue = demographics.dob || demographics.date_of_birth;
+      if (dobValue && shouldUpdate(patient.dob || patient.date_of_birth, dobValue)) {
+        // Try to parse and format as YYYY-MM-DD
+        const dobStr = String(dobValue).trim();
+        if (dobStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          updates.push('dob = ?');
+          updates.push('date_of_birth = ?');
+          bindings.push(dobStr);
+          bindings.push(dobStr);
+          updatedFields.dob = dobStr;
+        }
+      }
+
+      // MRN
+      if (demographics.mrn && shouldUpdate(patient.external_mrn, demographics.mrn)) {
+        updates.push('external_mrn = ?');
+        bindings.push(String(demographics.mrn).trim());
+        updatedFields.external_mrn = demographics.mrn;
+      }
+
+      // Patient IDs
+      if (demographics.patient_id_uhid && shouldUpdate(patient.patient_id_uhid, demographics.patient_id_uhid)) {
+        updates.push('patient_id_uhid = ?');
+        bindings.push(String(demographics.patient_id_uhid).trim());
+        updatedFields.patient_id_uhid = demographics.patient_id_uhid;
+      }
+
+      if (demographics.patient_id_ipd && shouldUpdate(patient.patient_id_ipd, demographics.patient_id_ipd)) {
+        updates.push('patient_id_ipd = ?');
+        bindings.push(String(demographics.patient_id_ipd).trim());
+        updatedFields.patient_id_ipd = demographics.patient_id_ipd;
+      }
+
+      // Blood type
+      if (demographics.blood_type && shouldUpdate(patient.blood_type, demographics.blood_type)) {
+        updates.push('blood_type = ?');
+        bindings.push(String(demographics.blood_type).trim());
+        updatedFields.blood_type = demographics.blood_type;
+      }
+
+      // Height
+      if (demographics.height_cm && shouldUpdate(patient.height_cm, demographics.height_cm)) {
+        const height = parseFloat(demographics.height_cm);
+        if (!isNaN(height) && height > 0) {
+          updates.push('height_cm = ?');
+          bindings.push(height);
+          updatedFields.height_cm = height;
+        }
+      }
+
+      // Weight
+      if (demographics.weight_kg && shouldUpdate(patient.weight_kg, demographics.weight_kg)) {
+        const weight = parseFloat(demographics.weight_kg);
+        if (!isNaN(weight) && weight > 0) {
+          updates.push('weight_kg = ?');
+          bindings.push(weight);
+          updatedFields.weight_kg = weight;
+        }
+      }
+
+      // BSA
+      if (demographics.bsa && shouldUpdate(patient.bsa, demographics.bsa)) {
+        const bsa = parseFloat(demographics.bsa);
+        if (!isNaN(bsa) && bsa > 0) {
+          updates.push('bsa = ?');
+          bindings.push(bsa);
+          updatedFields.bsa = bsa;
+        }
+      }
+
+      // ECOG Status
+      if (demographics.ecog_status !== null && demographics.ecog_status !== undefined && 
+          shouldUpdate(patient.ecog_status, demographics.ecog_status)) {
+        const ecog = parseInt(demographics.ecog_status);
+        if (!isNaN(ecog) && ecog >= 0 && ecog <= 5) {
+          updates.push('ecog_status = ?');
+          bindings.push(ecog);
+          updatedFields.ecog_status = ecog;
+        }
+      }
+
+      // Language preference
+      if (demographics.language_preference && shouldUpdate(patient.language_preference, demographics.language_preference)) {
+        updates.push('language_preference = ?');
+        bindings.push(String(demographics.language_preference).trim());
+        updatedFields.language_preference = demographics.language_preference;
+      }
+
+      // Primary oncologist (can also come from document_info)
+      // Always update if extracted (even if patient already has a value) - these can change over time
+      const oncologist = demographics.primary_oncologist || 
+                        extractedData.document_info?.provider ||
+                        extractedData.primary_oncologist;
+      console.log(`  🔎 Primary Oncologist check:`, {
+        fromDemographics: demographics.primary_oncologist,
+        fromDocumentInfo: extractedData.document_info?.provider,
+        fromTopLevel: extractedData.primary_oncologist,
+        extracted: oncologist,
+        current: patient.primary_oncologist,
+        willUpdate: shouldAlwaysUpdate(oncologist)
+      });
+      if (shouldAlwaysUpdate(oncologist)) {
+        const cleanOncologist = String(oncologist).trim();
+        updates.push('primary_oncologist = ?');
+        bindings.push(cleanOncologist);
+        updatedFields.primary_oncologist = cleanOncologist;
+        console.log(`  ✅ Primary Oncologist added to updates: "${cleanOncologist}" (replacing "${patient.primary_oncologist || 'null'}")`);
+      } else {
+        console.log(`  ⚠️ Primary Oncologist skipped: extracted="${oncologist}", not valid or empty`);
+      }
+
+      // Primary center (can also come from document_info)
+      // Always update if extracted (even if patient already has a value) - these can change over time
+      const center = demographics.primary_center || 
+                     extractedData.document_info?.facility ||
+                     extractedData.primary_center;
+      console.log(`  🔎 Primary Center check:`, {
+        fromDemographics: demographics.primary_center,
+        fromDocumentInfo: extractedData.document_info?.facility,
+        fromTopLevel: extractedData.primary_center,
+        extracted: center,
+        current: patient.primary_center,
+        willUpdate: shouldAlwaysUpdate(center)
+      });
+      if (shouldAlwaysUpdate(center)) {
+        const cleanCenter = String(center).trim();
+        updates.push('primary_center = ?');
+        bindings.push(cleanCenter);
+        updatedFields.primary_center = cleanCenter;
+        console.log(`  ✅ Primary Center added to updates: "${cleanCenter}" (replacing "${patient.primary_center || 'null'}")`);
+      } else {
+        console.log(`  ⚠️ Primary Center skipped: extracted="${center}", not valid or empty`);
+      }
+
+      // Summary before update
+      console.log(`📊 Update summary:`, {
+        updatesCount: updates.length,
+        fieldsToUpdate: Object.keys(updatedFields),
+        updatedFields: updatedFields,
+        willExecute: updates.length > 0
+      });
+
+      // Execute update if we have any changes
+      if (updates.length > 0) {
+        updates.push('updated_at = ?');
+        bindings.push(getCurrentTimestamp());
+        bindings.push(patientId);
+
+        console.log(`📝 About to update patient ${patientId} with ${updates.length - 1} fields:`, updatedFields);
+        console.log(`📝 SQL: UPDATE patients SET ${updates.join(', ')} WHERE id = ?`);
+        console.log(`📝 Bindings:`, bindings.slice(0, -1)); // Exclude patientId from log
+
+        await this.env.DB.prepare(`
+          UPDATE patients 
+          SET ${updates.join(', ')}
+          WHERE id = ?
+        `).bind(...bindings).run();
+
+        console.log(`✅ Successfully updated patient ${patientId} demographics:`, updatedFields);
+        
+        // Verify the update
+        const updatedPatient = await this.env.DB.prepare('SELECT name, age, gender, dob FROM patients WHERE id = ?').bind(patientId).first();
+        console.log(`✅ Verified patient ${patientId} after update:`, {
+          name: updatedPatient.name,
+          age: updatedPatient.age,
+          gender: updatedPatient.gender,
+          dob: updatedPatient.dob
+        });
+      } else {
+        console.log(`⚠️ No updates needed for patient ${patientId}. Current values:`, {
+          name: patient.name,
+          age: patient.age,
+          gender: patient.gender,
+          dob: patient.dob
+        });
+        console.log(`⚠️ Extracted demographics available:`, {
+          name: demographics.name,
+          age: demographics.age,
+          gender: demographics.gender,
+          dob: demographics.dob
+        });
       }
     } catch (error) {
       console.error(`Error extracting demographics for patient ${patientId}:`, error);

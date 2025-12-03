@@ -75,13 +75,17 @@ export class Document {
     const validCategories = [
       'pathology',
       'radiology',
+      'scan_report',
       'lab',
+      'lab_report',
       'clinical_notes',
+      'doctor_notes',
       'consultation',
       'imaging',
       'gp_notes',
       'prescription',
       'discharge_summary',
+      'transcript',
       'other'
     ];
 

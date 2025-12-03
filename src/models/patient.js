@@ -100,6 +100,10 @@ export class Patient {
   }
 
   toJSON() {
+    // Rationalize: Use primary field, fallback to backward compatibility field if primary is null
+    const dob = this.dob || this.date_of_birth;
+    const sex = this.sex || this.gender;
+
     return {
       id: this.id,
 
@@ -109,14 +113,12 @@ export class Patient {
       patient_id_uhid: this.patient_id_uhid,
       patient_id_ipd: this.patient_id_ipd,
 
-      // Demographics
+      // Demographics (rationalized - no redundant fields)
       name: this.name,
       age: this.age,
       age_unit: this.age_unit,
-      sex: this.sex,
-      dob: this.dob,
-      date_of_birth: this.date_of_birth, // backward compatibility
-      gender: this.gender, // backward compatibility
+      sex: sex, // Use sex as primary, gender as fallback
+      dob: dob, // Use dob as primary, date_of_birth as fallback
 
       // Physical attributes
       blood_type: this.blood_type,

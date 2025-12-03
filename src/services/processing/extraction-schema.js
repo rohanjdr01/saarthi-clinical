@@ -27,7 +27,9 @@ export const MEDICAL_EXTRACTION_SCHEMA = {
         weight_kg: { type: "number" },
         bsa: { type: "number" },
         ecog_status: { type: "number" },
-        language_preference: { type: "string" }
+        language_preference: { type: "string" },
+        primary_oncologist: { type: "string" },
+        primary_center: { type: "string" }
       }
     },
 
@@ -349,7 +351,24 @@ export const MEDICAL_EXTRACTION_SCHEMA = {
     document_info: {
       type: "object",
       properties: {
-        document_type: { type: "string", enum: ["pathology", "radiology", "discharge_summary", "consultation", "lab_report", "operative_note", "progress_note", "other"] },
+        document_type: { 
+          type: "string", 
+          enum: [
+            "pathology", 
+            "radiology", 
+            "scan_report", 
+            "discharge_summary", 
+            "consultation", 
+            "lab_report", 
+            "prescription",
+            "doctor_notes",
+            "gp_notes",
+            "transcript",
+            "operative_note", 
+            "progress_note", 
+            "other"
+          ] 
+        },
         document_date: { type: "string" },
         facility: { type: "string" },
         provider: { type: "string" },
@@ -361,9 +380,19 @@ export const MEDICAL_EXTRACTION_SCHEMA = {
 
 /**
  * Generate extraction prompt with schema enforcement
+ * Now includes document-type-specific instructions
  */
 export function generateExtractionPrompt(documentType = 'default') {
+  const normalizedType = (documentType || '').toLowerCase().replace(/[_\s-]/g, '_');
+  
+  // Document-type-specific instructions
+  const typeSpecificInstructions = getDocumentTypeInstructions(normalizedType);
+  
   return `You are a medical data extraction AI. Extract ALL relevant clinical information from this medical document.
+
+DOCUMENT TYPE: ${documentType || 'unknown'}
+
+${typeSpecificInstructions}
 
 CRITICAL REQUIREMENTS:
 1. Return ONLY valid JSON - no markdown, no code blocks, no explanatory text
@@ -427,4 +456,179 @@ Example structure:
 }
 
 Extract all relevant information from the document now:`;
+}
+
+/**
+ * Get document-type-specific extraction instructions
+ */
+function getDocumentTypeInstructions(documentType) {
+  const instructions = {
+    'discharge_summary': `SPECIFIC INSTRUCTIONS FOR DISCHARGE SUMMARY:
+- Extract admission and discharge dates, length of stay
+- Extract primary diagnosis and secondary diagnoses
+- Extract procedures performed during hospitalization
+- Extract medications prescribed at discharge (include in medications array)
+- Extract discharge instructions and follow-up recommendations
+- Extract complications that occurred during stay
+- Extract vital signs and key lab values at discharge
+- Extract treatment received during hospitalization
+- Pay special attention to clinical_decisions section for discharge planning
+- Extract any alerts or warnings for post-discharge care`,
+
+    'lab_report': `SPECIFIC INSTRUCTIONS FOR LAB REPORT:
+- Extract ALL laboratory values with units and reference ranges if available
+- Extract collection date and time
+- Extract test names exactly as written
+- Pay special attention to abnormal values (flag in alerts if critical)
+- Extract CBC values: hemoglobin, WBC, ANC, platelets
+- Extract chemistry values: creatinine, eGFR, bilirubin, ALT, AST, albumin, sodium, potassium
+- Extract tumor markers if present: CEA, CA19-9, CA125, AFP, PSA
+- Extract microbiology results if present
+- Extract any comments or notes from the lab
+- If values are flagged as abnormal or critical, create alerts`,
+
+    'scan_report': `SPECIFIC INSTRUCTIONS FOR SCAN/IMAGING REPORT (RADIOLOGY):
+- Extract study type (CT, MRI, PET, X-ray, ultrasound, etc.)
+- Extract study date and contrast used
+- Extract all findings in detail (location, size, characteristics)
+- Extract impression/conclusion section
+- Extract comparison to prior studies if mentioned
+- Extract recommendations for follow-up imaging
+- Pay attention to measurements (tumor size, lymph nodes, etc.)
+- Extract any mention of staging information (TNM)
+- Extract any suspicious or concerning findings (create alerts if urgent)
+- Extract specific anatomical locations mentioned`,
+
+    'radiology': `SPECIFIC INSTRUCTIONS FOR RADIOLOGY REPORT:
+- Extract study type (CT, MRI, PET, X-ray, ultrasound, etc.)
+- Extract study date and contrast used
+- Extract all findings in detail (location, size, characteristics)
+- Extract impression/conclusion section
+- Extract comparison to prior studies if mentioned
+- Extract recommendations for follow-up imaging
+- Pay attention to measurements (tumor size, lymph nodes, etc.)
+- Extract any mention of staging information (TNM)
+- Extract any suspicious or concerning findings (create alerts if urgent)
+- Extract specific anatomical locations mentioned`,
+
+    'prescription': `SPECIFIC INSTRUCTIONS FOR PRESCRIPTION:
+- Extract ALL medications with complete dosing information
+- Extract generic name and brand name if available
+- Extract dose value, unit, frequency, and route
+- Extract start date and duration if mentioned
+- Extract prescriber name and specialty
+- Extract indication/reason for each medication
+- Extract any special instructions (take with food, avoid alcohol, etc.)
+- Extract refill information if present
+- Pay attention to medication categories (chemotherapy, supportive care, etc.)
+- Extract any warnings or contraindications mentioned`,
+
+    'doctor_notes': `SPECIFIC INSTRUCTIONS FOR DOCTOR NOTES:
+- Extract clinical assessment and plan
+- Extract any clinical decisions made during the visit
+- Extract medications prescribed or changed
+- Extract vital signs and physical exam findings
+- Extract any concerns or alerts raised
+- Extract follow-up plans and action items
+- Extract any changes to treatment plan
+- Extract patient status updates
+- Extract any diagnostic considerations or differential diagnoses
+- Pay attention to timeline_events for important dates mentioned`,
+
+    'gp_notes': `SPECIFIC INSTRUCTIONS FOR GP NOTES:
+- Extract chief complaint and presenting symptoms
+- Extract clinical assessment
+- Extract medications prescribed or changed
+- Extract referrals made to specialists
+- Extract follow-up recommendations
+- Extract any concerns that need specialist attention
+- Extract preventive care recommendations
+- Extract any alerts or red flags mentioned
+- Extract patient status and functional assessment
+- Pay attention to social history and lifestyle factors`,
+
+    'transcript': `SPECIFIC INSTRUCTIONS FOR TRANSCRIPT (DOCTOR-PATIENT CONVERSATION):
+- Identify speakers (Doctor vs Patient) when possible
+- Extract clinical decisions made during the conversation
+- Extract medications discussed, prescribed, or changed
+- Extract patient concerns and symptoms reported
+- Extract doctor's assessment and recommendations
+- Extract follow-up actions and next steps
+- Extract any clinical status updates mentioned
+- Extract treatment plan changes discussed
+- Extract any alerts or urgent concerns raised
+- Extract timeline information (dates, appointments, etc.)
+- Pay special attention to clinical_decisions section
+- Extract any diagnostic considerations discussed
+- Note: This is a conversation, so information may be scattered - be thorough in extraction`,
+
+    'pathology': `SPECIFIC INSTRUCTIONS FOR PATHOLOGY REPORT:
+- Extract specimen type and collection site
+- Extract collection date
+- Extract gross and microscopic descriptions
+- Extract final diagnosis with full details
+- Extract tumor grade and differentiation
+- Extract margin status if surgical specimen
+- Extract lymphovascular and perineural invasion status
+- Extract all immunohistochemistry results
+- Extract molecular testing results (HER2, MSI, MMR, PD-L1, etc.)
+- Extract staging information if provided
+- Extract any special notes or comments
+- Pay attention to cancer type, site, and histology details`,
+
+    'consultation': `SPECIFIC INSTRUCTIONS FOR CONSULTATION NOTES:
+- Extract consultation reason and chief complaint
+- Extract clinical assessment and impression
+- Extract recommendations and treatment plan
+- Extract medications prescribed or recommended
+- Extract any procedures or tests recommended
+- Extract follow-up plans
+- Extract any clinical decisions made
+- Extract specialist recommendations
+- Extract any alerts or concerns raised
+- Extract timeline for next steps`,
+
+    'default': `SPECIFIC INSTRUCTIONS:
+- Extract all available patient demographics
+- Extract any diagnosis information
+- Extract any treatment information
+- Extract any medications mentioned
+- Extract any lab values or test results
+- Extract any clinical decisions or recommendations
+- Extract timeline events and dates
+- Extract any alerts or concerns
+- Be comprehensive and extract all relevant clinical information`
+  };
+
+  // Handle variations and aliases
+  const typeMap = {
+    'discharge': 'discharge_summary',
+    'discharge_summary': 'discharge_summary',
+    'lab': 'lab_report',
+    'lab_report': 'lab_report',
+    'laboratory': 'lab_report',
+    'scan': 'scan_report',
+    'scan_report': 'scan_report',
+    'imaging': 'radiology',
+    'radiology': 'radiology',
+    'prescription': 'prescription',
+    'rx': 'prescription',
+    'doctor_notes': 'doctor_notes',
+    'doctor_note': 'doctor_notes',
+    'clinical_notes': 'doctor_notes',
+    'gp_notes': 'gp_notes',
+    'gp_note': 'gp_notes',
+    'general_practitioner': 'gp_notes',
+    'transcript': 'transcript',
+    'conversation': 'transcript',
+    'pathology': 'pathology',
+    'pathology_report': 'pathology',
+    'consultation': 'consultation',
+    'consultation_note': 'consultation'
+  };
+
+  // Normalize the documentType parameter
+  const normalizedType = (documentType || '').toLowerCase().replace(/[_\s-]/g, '_');
+  const mappedType = typeMap[normalizedType] || normalizedType;
+  return instructions[mappedType] || instructions['default'];
 }
