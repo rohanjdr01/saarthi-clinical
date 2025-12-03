@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
+import { MedicationRepository } from '../repositories/medication.repository.js';
 import { NotFoundError, ValidationError, errorResponse } from '../utils/errors.js';
-import { getCurrentTimestamp } from '../utils/helpers.js';
 import { requireAdmin } from '../middleware/auth.js';
 
 const medications = new Hono();
@@ -15,27 +15,14 @@ function validate(body) {
 medications.get('/', async (c) => {
   try {
     const { patientId } = c.req.param();
-    const result = await c.env.DB.prepare(`
-      SELECT * FROM medications
-      WHERE patient_id = ?
-      ORDER BY treatment_context, created_at DESC
-    `).bind(patientId).all();
-
-    // Group by treatment_context
-    const grouped = result.results.reduce((acc, med) => {
-      const context = med.treatment_context || 'Other Medications';
-      if (!acc[context]) {
-        acc[context] = [];
-      }
-      acc[context].push(med);
-      return acc;
-    }, {});
+    const medRepo = MedicationRepository(c.env.DB);
+    const { grouped, flat } = await medRepo.findByPatientId(patientId);
 
     return c.json({ 
       success: true, 
       data: grouped,
       // Also return flat list for backward compatibility
-      flat: result.results
+      flat
     });
   } catch (error) {
     console.error('Error listing medications:', error);
@@ -87,44 +74,15 @@ medications.put('/:medId', requireAdmin(), async (c) => {
     const { patientId, medId } = c.req.param();
     const body = await c.req.json();
 
-    const existing = await c.env.DB.prepare(`
-      SELECT * FROM medications WHERE id = ? AND patient_id = ?
-    `).bind(medId, patientId).first();
+    const medRepo = MedicationRepository(c.env.DB);
+    const existing = await medRepo.findById(medId, patientId);
 
     if (!existing) throw new NotFoundError('Medication');
 
-    const allowed = [
-      'medication_name', 'generic_name', 'drug_class',
-      'dose', 'dose_unit', 'frequency', 'route',
-      'start_date', 'end_date',
-      'medication_status', 'discontinuation_reason',
-      'indication', 'medication_type', 'treatment_context', 'data_sources'
-    ];
-
-    const updates = {};
-    for (const key of allowed) {
-      if (body[key] !== undefined) updates[key] = body[key];
-    }
-
-    if (Object.keys(updates).length === 0) {
+    const updated = await medRepo.update(medId, patientId, body);
+    if (!updated) {
       throw new ValidationError('No valid fields to update');
     }
-
-    const setClause = Object.keys(updates).map(k => `${k} = ?`).join(', ');
-    const mappedValues = [];
-    Object.entries(updates).forEach(([k, v]) => {
-      if (k === 'data_sources' && typeof v !== 'string') {
-        mappedValues.push(JSON.stringify(v));
-      } else {
-        mappedValues.push(v);
-      }
-    });
-
-    await c.env.DB.prepare(`
-      UPDATE medications
-      SET ${setClause}, updated_at = ?
-      WHERE id = ? AND patient_id = ?
-    `).bind(...mappedValues, getCurrentTimestamp(), medId, patientId).run();
 
     return c.json({ success: true, message: 'Medication updated' });
   } catch (error) {
@@ -136,9 +94,8 @@ medications.put('/:medId', requireAdmin(), async (c) => {
 medications.delete('/:medId', requireAdmin(), async (c) => {
   try {
     const { patientId, medId } = c.req.param();
-    await c.env.DB.prepare(`
-      DELETE FROM medications WHERE id = ? AND patient_id = ?
-    `).bind(medId, patientId).run();
+    const medRepo = MedicationRepository(c.env.DB);
+    await medRepo.delete(medId, patientId);
 
     return c.json({ success: true, message: 'Medication deleted' });
   } catch (error) {

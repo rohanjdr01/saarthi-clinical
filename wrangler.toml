@@ -23,6 +23,16 @@ binding = "CACHE"
 id = "66432efaadd945a9939efc2c5baed1c8"
 preview_id = "e759848fc16d4c1b813fd1d21f3c592f"
 
+# Development Queue for document processing
+[[queues.producers]]
+queue = "document-processing-dev"
+binding = "DOCUMENT_PROCESSING_QUEUE"
+
+[[queues.consumers]]
+queue = "document-processing-dev"
+max_batch_size = 10
+max_batch_timeout = 30
+
 [vars]
 ENVIRONMENT = "development"
 LOG_LEVEL = "debug"
@@ -57,6 +67,15 @@ bucket_name = "saarthi-documents-prod"
 [[env.production.kv_namespaces]]
 binding = "CACHE"
 id = "7c080d431a714bde813d1b63464fd1d8"
+
+[[env.production.queues.producers]]
+queue = "document-processing-prod"
+binding = "DOCUMENT_PROCESSING_QUEUE"
+
+[[env.production.queues.consumers]]
+queue = "document-processing-prod"
+max_batch_size = 10
+max_batch_timeout = 30
 
 [[env.production.vectorize]]
 binding = "VECTORIZE"
@@ -94,6 +113,15 @@ bucket_name = "saarthi-documents-dev"
 [[env.staging.kv_namespaces]]
 binding = "CACHE"
 id = "66432efaadd945a9939efc2c5baed1c8"
+
+[[env.staging.queues.producers]]
+queue = "document-processing-staging"
+binding = "DOCUMENT_PROCESSING_QUEUE"
+
+[[env.staging.queues.consumers]]
+queue = "document-processing-staging"
+max_batch_size = 10
+max_batch_timeout = 30
 
 [[env.staging.vectorize]]
 binding = "VECTORIZE"

@@ -1,37 +1,259 @@
-# Quick Start Guide - Deployment & Testing
+# Quick Start Guide
 
-## ✅ What's Done
-1. ✅ **Schema updated** with users and doctors tables
-2. ✅ **Consistent extraction schema** implemented for all AI providers
-3. ✅ **Treatment sync** fixed with consistent field mapping
-4. ✅ **Local database** ready with auth tables
+Get started with the Saarthi Clinical API in minutes. This guide covers the essential endpoints you need to start using the platform.
 
-## 🚀 Next Steps
+## Base URL
 
-### 1. Deploy to Production (5 minutes)
+- **Development:** `http://localhost:8787/api/v1`
+- **Production:** `https://process.saarthihq.com/api/v1`
 
+## Authentication
+
+### Get a Firebase Token
+
+1. **Using Firebase SDK (Recommended):**
+   ```javascript
+   // In your frontend
+   const user = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+   const idToken = await user.user.getIdToken();
+   ```
+
+2. **For Testing (Script):**
+   ```bash
+   FIREBASE_API_KEY=your-key node scripts/generate-firebase-token.js test@example.com
+   ```
+
+### Verify Token
 ```bash
-# 1. Set production secrets (one-time setup)
-npx wrangler secret put FIREBASE_SERVICE_ACCOUNT --env production
-npx wrangler secret put FIREBASE_API_KEY --env production
-npx wrangler secret put GEMINI_API_KEY --env production
-npx wrangler secret put OPENAI_API_KEY --env production
+POST /api/v1/auth/verify
+Content-Type: application/json
 
-# 2. Apply schema to production database
-npx wrangler d1 execute saarthi-clinical-prod --remote --file=schema.sql
-
-# 3. Deploy!
-npx wrangler deploy --env production
-
-# 4. Verify deployment
-curl https://process.saarthihq.com/api/v1/health
+{
+  "idToken": "your-firebase-token"
+}
 ```
 
-**Expected Response:**
+### Use Token in Requests
+Include the token in the `Authorization` header:
+```bash
+Authorization: Bearer your-firebase-token
+```
+
+## Core Workflows
+
+### 1. Create a Patient
+
+```bash
+POST /api/v1/patients
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "age": 65,
+  "sex": "male",
+  "patient_id_uhid": "UHID-12345",
+  "primary_oncologist": "Dr. Smith",
+  "primary_center": "City Hospital"
+}
+```
+
+**Response:**
 ```json
 {
   "success": true,
-  "environment": "production",
+  "data": {
+    "id": "pt_abc123",
+    "name": "John Doe",
+    ...
+  }
+}
+```
+
+### 2. Upload Documents
+
+```bash
+POST /api/v1/patients/pt_abc123/documents
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+
+files: @document.pdf
+category: pathology
+process_immediately: true
+provider: openai
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "documents_uploaded": 1,
+  "processing_status": "processing",
+  "data": [{
+    "id": "doc_xyz789",
+    "filename": "document.pdf",
+    "processing_status": "pending"
+  }]
+}
+```
+
+### 3. Check Processing Status
+
+```bash
+GET /api/v1/patients/pt_abc123/documents/doc_xyz789
+Authorization: Bearer <token>
+```
+
+Wait until `processing_status: "completed"` and `vectorize_status: "completed"`.
+
+### 4. Search Documents (RAG)
+
+```bash
+POST /api/v1/patients/pt_abc123/documents/search
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "query": "What was the diagnosis?",
+  "top_k": 5
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "results": [{
+      "document_id": "doc_xyz789",
+      "chunk_text": "Primary diagnosis: Adenocarcinoma...",
+      "relevance_score": 0.89
+    }]
+  }
+}
+```
+
+## Essential Endpoints
+
+### Patients
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/v1/patients` | Create patient |
+| `GET` | `/api/v1/patients` | List patients |
+| `GET` | `/api/v1/patients/:id` | Get patient details |
+| `PATCH` | `/api/v1/patients/:id` | Update patient |
+
+### Documents
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/v1/patients/:id/documents` | Upload documents |
+| `GET` | `/api/v1/patients/:id/documents` | List documents |
+| `GET` | `/api/v1/patients/:id/documents/:docId` | Get document metadata |
+| `POST` | `/api/v1/patients/:id/documents/search` | Semantic search (RAG) |
+| `POST` | `/api/v1/patients/:id/documents/:docId/reprocess` | Reprocess document |
+
+### Diagnosis & Staging
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/v1/patients/:id/diagnosis` | Get diagnosis |
+| `PUT` | `/api/v1/patients/:id/diagnosis` | Update diagnosis |
+| `GET` | `/api/v1/patients/:id/staging` | Get staging |
+| `PUT` | `/api/v1/patients/:id/staging` | Update staging |
+
+### Treatment
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/v1/patients/:id/treatment` | Get treatment overview |
+| `PUT` | `/api/v1/patients/:id/treatment` | Update treatment |
+| `GET` | `/api/v1/patients/:id/treatment/cycles` | List cycles |
+| `POST` | `/api/v1/patients/:id/treatment/cycles` | Add cycle |
+
+### Medications
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/v1/patients/:id/medications` | Get medications |
+| `POST` | `/api/v1/patients/:id/medications` | Add medication |
+| `PUT` | `/api/v1/patients/:id/medications/:medId` | Update medication |
+| `GET` | `/api/v1/patients/:id/medications/interactions` | Check drug interactions |
+
+### Labs
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/v1/patients/:id/labs/latest` | Get latest labs |
+| `GET` | `/api/v1/patients/:id/labs/trends?marker=hemoglobin` | Get lab trends |
+| `GET` | `/api/v1/patients/:id/tumor-markers` | Get tumor markers |
+
+### Alerts
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/v1/patients/:id/alerts` | Get all alerts |
+| `POST` | `/api/v1/patients/:id/alerts` | Create alert |
+
+### Timeline
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/v1/patients/:id/timeline` | Get patient timeline |
+
+## Processing Modes
+
+### Fast Mode (Default)
+- Extracts medical highlight
+- Vectorizes for search
+- Documents searchable immediately
+- Use: `process_immediately=true` (default)
+
+### Full Mode
+- Complete AI extraction
+- Syncs to patient profile
+- Updates diagnosis, medications, treatment
+- Use: `process_mode=full`
+
+## Common Query Examples
+
+### Search for Diagnosis
+```json
+{
+  "query": "What was the primary diagnosis?",
+  "top_k": 3
+}
+```
+
+### Search for Treatment
+```json
+{
+  "query": "What chemotherapy regimen was used?",
+  "top_k": 5
+}
+```
+
+### Search with Category Filter
+```json
+{
+  "query": "HER2 status",
+  "top_k": 5,
+  "category_filter": ["pathology"]
+}
+```
+
+## Health Check
+
+```bash
+GET /api/v1/health
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Saarthi Clinical Platform is running",
   "services": {
     "database": true,
     "storage": true,
@@ -41,231 +263,40 @@ curl https://process.saarthihq.com/api/v1/health
 }
 ```
 
-### 2. Set Up Your First User (2 minutes)
+## Error Responses
 
-**Option A: Using Firebase Console**
-1. Go to Firebase Console → Authentication
-2. Add a test user with email/phone
-3. Copy the UID
+All endpoints return consistent error format:
 
-**Option B: Authenticate via API**
-```bash
-# Send OTP (client-side in production)
-curl -X POST "https://process.saarthihq.com/api/v1/auth/phone/send" \
-  -H "Content-Type: application/json" \
-  -d '{"phoneNumber": "+91XXXXXXXXXX"}'
-
-# Verify OTP and get token
-curl -X POST "https://process.saarthihq.com/api/v1/auth/phone/verify" \
-  -H "Content-Type: application/json" \
-  -d '{"sessionInfo": "...", "code": "123456"}'
-
-# Response includes:
-{
-  "data": {
-    "user": {"id": "usr_...", "role": "user"},
-    "idToken": "eyJhbG..." // Use this for API calls
-  }
-}
-```
-
-### 3. Promote User to Doctor (1 minute)
-
-```bash
-# Update role to doctor
-npx wrangler d1 execute saarthi-clinical-prod --remote \
-  --command="UPDATE users SET role = 'doctor' WHERE firebase_uid = 'YOUR_FIREBASE_UID'"
-
-# Create doctor profile
-npx wrangler d1 execute saarthi-clinical-prod --remote \
-  --command="INSERT INTO doctors (id, user_id, specialization, hospital, created_at, updated_at) VALUES ('doc_$(date +%s)', 'usr_XXX', 'Oncology', 'Test Hospital', $(date +%s)000, $(date +%s)000)"
-```
-
-### 4. Test RAG (Vector Search) - 3 minutes
-
-**Step 1: Create a patient**
-```bash
-curl -X POST "https://process.saarthihq.com/api/v1/patients" \
-  -H "Authorization: Bearer YOUR_FIREBASE_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Test Patient",
-    "age": 65,
-    "sex": "male",
-    "patient_id_uhid": "TEST001"
-  }'
-
-# Save the patient ID from response
-```
-
-**Step 2: Upload & process a document**
-```bash
-curl -X POST "https://process.saarthihq.com/api/v1/patients/PATIENT_ID/documents" \
-  -H "Authorization: Bearer YOUR_FIREBASE_TOKEN" \
-  -F "files=@your_medical_document.pdf" \
-  -F "category=pathology" \
-  -F "process_immediately=true" \
-  -F "provider=openai"
-
-# Wait 30-60 seconds for processing
-```
-
-**Step 3: Check processing status**
-```bash
-curl "https://process.saarthihq.com/api/v1/patients/PATIENT_ID/documents/DOC_ID" \
-  -H "Authorization: Bearer YOUR_FIREBASE_TOKEN"
-
-# Look for:
-# "processing_status": "completed" ✅
-# "vectorize_status": "completed" ✅
-```
-
-**Step 4: Search with natural language!**
-```bash
-curl -X POST "https://process.saarthihq.com/api/v1/patients/PATIENT_ID/documents/search" \
-  -H "Authorization: Bearer YOUR_FIREBASE_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "What was the diagnosis?",
-    "top_k": 5
-  }'
-
-# You'll get semantically relevant chunks with relevance scores!
-```
-
-## 📊 Example Queries to Try
-
-Once you have documents processed:
-
-```bash
-# Find diagnosis information
-"What was the primary diagnosis?"
-
-# Treatment details
-"What chemotherapy regimen was used?"
-
-# Lab results
-"What were the latest hemoglobin and WBC counts?"
-
-# Timeline questions
-"When did the patient start treatment?"
-
-# Biomarker info
-"What was the HER2 status?"
-
-# Staging
-"What is the TNM staging?"
-```
-
-## 🔧 Troubleshooting
-
-### RAG not working?
-```bash
-# Check if Vectorize is configured
-npx wrangler vectorize list
-
-# Check document status
-curl "https://process.saarthihq.com/api/v1/patients/PATIENT_ID/documents/DOC_ID"
-
-# Manually trigger vectorization
-curl -X POST "https://process.saarthihq.com/api/v1/patients/PATIENT_ID/documents/DOC_ID/vectorize" \
-  -H "Authorization: Bearer YOUR_FIREBASE_TOKEN"
-```
-
-### Auth not working?
-```bash
-# Check if tables exist
-npx wrangler d1 execute saarthi-clinical-prod --remote \
-  --command="SELECT name FROM sqlite_master WHERE type='table'"
-
-# Check user exists
-npx wrangler d1 execute saarthi-clinical-prod --remote \
-  --command="SELECT * FROM users LIMIT 5"
-```
-
-### View production logs
-```bash
-# Real-time logs
-npx wrangler tail --env production
-
-# Filter for errors only
-npx wrangler tail --env production --format=pretty | grep ERROR
-```
-
-## 📖 Full Documentation
-
-See `DEPLOYMENT_GUIDE.md` for:
-- Complete role setup instructions
-- Security best practices
-- Advanced RAG queries
-- Monitoring & analytics
-- Database management commands
-
-## 🎯 What's New
-
-### Consistent Extraction Schema
-All documents now extract to the same structure:
 ```json
 {
-  "patient_demographics": {...},
-  "diagnosis": {...},
-  "treatment": {
-    "regimen_name": "FOLFOX-6",
-    "drugs": ["5-FU", "Leucovorin", "Oxaliplatin"],
-    "start_date": "2025-10-03"
-  },
-  "medications": [{...}],
-  "labs": {...},
-  "pathology": {...},
-  "imaging": {...}
+  "success": false,
+  "error": "Not Found",
+  "message": "Patient not found",
+  "statusCode": 404
 }
 ```
 
-**Benefits:**
-- ✅ Predictable field names
-- ✅ Works identically with Gemini and OpenAI
-- ✅ No more treatment sync issues
-- ✅ Easier to debug extractions
+## Next Steps
 
-### OpenAI Structured Output
-OpenAI now uses `response_format` with strict JSON schema enforcement:
-- Guaranteed valid JSON
-- Required fields always present
-- Type safety (numbers as numbers, not strings)
+- See [README.md](./README.md) for architecture and design details
+- See [UPCOMING_FEATURES.md](./UPCOMING_FEATURES.md) for planned features
+- Check Postman collection: `postman_collection.json`
 
-## 🚨 Important Notes
+## Troubleshooting
 
-1. **RAG only works in production/staging** - Vectorize requires remote mode
-2. **Firebase tokens expire** - Refresh tokens client-side
-3. **Secrets are environment-specific** - Set separately for production
-4. **Schema migrations** - Always backup before applying to production
-5. **Rate limits** - Gemini/OpenAI have API rate limits
+### 401 Unauthorized
+- Check Firebase token is valid (expires after 1 hour)
+- Get fresh token: `await auth.currentUser.getIdToken(true)`
 
-## 📞 Support
+### 404 Not Found
+- Verify patient/document IDs are correct
+- Check endpoint path matches exactly
 
-**Having issues?** Run diagnostics:
-```bash
-# Health check
-curl https://process.saarthihq.com/api/v1/health
+### Processing Stuck
+- Check logs: `npx wrangler tail --env production`
+- Reprocess: `POST /api/v1/patients/:id/documents/:docId/reprocess`
 
-# Check bindings
-npx wrangler tail --env production --format=pretty
-
-# Verify secrets
-npx wrangler secret list --env production
-```
-
-**Common Issues:**
-- ❌ 401 Unauthorized → Check Firebase token
-- ❌ 404 Not Found → Verify patient/document IDs
-- ❌ 500 Server Error → Check logs with `wrangler tail`
-- ❌ "Vectorize not configured" → Only works remotely
-
----
-
-**Ready to deploy?** Run:
-```bash
-npx wrangler deploy --env production
-```
-
-Then visit: https://process.saarthihq.com/api/v1/health
+### RAG Not Working
+- Ensure `vectorize_status: "completed"` on document
+- Only works in production/staging (not local)
+- Check Vectorize index exists: `npx wrangler vectorize list`

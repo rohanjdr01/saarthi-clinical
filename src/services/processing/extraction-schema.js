@@ -5,6 +5,137 @@
  * Based on API endpoints defined in refactored_api_endpoints.md
  */
 
+import { z } from 'zod';
+
+// Zod runtime validation schemas
+export const PatientDemographicsSchema = z.object({
+  name: z.string().nullish(),
+  age: z.number().nullish(),
+  age_unit: z.enum(["years", "months", "days"]).nullish(),
+  sex: z.enum(["male", "female", "other", "unknown"]).nullish(),
+  dob: z.string().nullish(),
+  mrn: z.string().nullish(),
+  patient_id_uhid: z.string().nullish(),
+  patient_id_ipd: z.string().nullish(),
+  admission_date: z.string().nullish(),
+  discharge_date: z.string().nullish(),
+  blood_type: z.string().nullish(),
+  height_cm: z.number().nullish(),
+  weight_kg: z.number().nullish(),
+  bsa: z.number().nullish(),
+  ecog_status: z.number().nullish(),
+  language_preference: z.string().nullish(),
+  primary_oncologist: z.string().nullish(),
+  primary_center: z.string().nullish()
+}).passthrough();
+
+export const DiagnosisSchema = z.object({
+  cancer_type: z.string().nullish(),
+  primary_cancer_type: z.string().nullish(), // Allow both field names
+  cancer_site_primary: z.string().nullish(),
+  cancer_site_subsite: z.string().nullish(),
+  histology: z.string().nullish(),
+  histology_code: z.string().nullish(),
+  differentiation_grade: z.string().nullish(),
+  grade: z.string().nullish(), // Allow both field names
+  tumor_grade: z.string().nullish(),
+  metastasis_status: z.string().nullish(),
+  metastatic_sites: z.array(z.string()).nullish(),
+  diagnosis_date: z.string().nullish(),
+  location: z.string().nullish(), // Allow both field names
+  tumor_location: z.string().nullish(),
+  laterality: z.string().nullish(),
+  tumor_laterality: z.string().nullish(),
+  tumor_size_cm: z.number().nullish(),
+  her2_status: z.string().nullish(),
+  her2_score: z.string().nullish(),
+  msi_status: z.string().nullish(),
+  mmr_status: z.string().nullish(),
+  pdl1_status: z.string().nullish(),
+  pdl1_tps_percent: z.number().nullish(),
+  lauren_classification: z.string().nullish(),
+  biomarkers: z.any().nullish(),
+  genetic_mutations: z.any().nullish(),
+  icd_code: z.string().nullish()
+}).passthrough();
+
+export const TreatmentSchema = z.object({
+  treatment_intent: z.enum(["curative", "palliative", "neoadjuvant", "adjuvant", "maintenance"]).nullish(),
+  treatment_line: z.string().nullish(),
+  regimen_name: z.string().nullish(),
+  protocol: z.string().nullish(),
+  drugs: z.union([z.array(z.string()), z.string()]).nullish(), // Allow array or string
+  start_date: z.string().nullish(),
+  end_date: z.string().nullish(),
+  planned_end_date: z.string().nullish(),
+  cycle_number: z.number().nullish(),
+  cycles_completed: z.number().nullish(),
+  cycles_planned: z.number().nullish(),
+  cycle_interval_days: z.number().nullish(),
+  treatment_status: z.enum(["active", "completed", "discontinued", "on_hold"]).nullish(),
+  best_response: z.string().nullish(),
+  response_date: z.string().nullish(),
+  response_assessment_method: z.string().nullish()
+}).passthrough();
+
+export const MedicationSchema = z.object({
+  generic_name: z.string().nullish(),
+  brand_name: z.string().nullish(),
+  dose_value: z.number().nullish(),
+  dose: z.string().nullish(), // Allow string dose
+  dose_unit: z.string().nullish(),
+  frequency: z.string().nullish(),
+  route: z.enum(["oral", "iv", "im", "sc", "topical", "other"]).nullish(),
+  indication: z.string().nullish(),
+  start_date: z.string().nullish(),
+  end_date: z.string().nullish(),
+  status: z.enum(["active", "discontinued", "completed"]).nullish(),
+  prescriber: z.string().nullish(),
+  category: z.string().nullish()
+}).passthrough();
+
+export const MedicalExtractionSchema = z.object({
+  patient_demographics: PatientDemographicsSchema.nullish(),
+  diagnosis: DiagnosisSchema.nullish(),
+  primary_diagnosis: DiagnosisSchema.nullish(), // Allow both field names
+  staging: z.any().nullish(),
+  treatment: TreatmentSchema.nullish(),
+  treatment_cycle: z.any().nullish(),
+  medications: z.array(MedicationSchema).nullish(),
+  alerts: z.array(z.any()).nullish(),
+  labs: z.any().nullish(),
+  tumor_markers: z.any().nullish(),
+  medical_history: z.any().nullish(),
+  surgical_history: z.any().nullish(),
+  family_history: z.any().nullish(),
+  social_history: z.any().nullish(),
+  timeline_events: z.array(z.any()).nullish(),
+  hospitalizations: z.array(z.any()).nullish(),
+  clinical_decisions: z.any().nullish(),
+  imaging: z.any().nullish(),
+  pathology: z.any().nullish(),
+  document_info: z.any().nullish(),
+  document_date: z.string().nullish(), // Allow top-level document_date
+  patient_name: z.string().nullish(), // Allow top-level patient_name
+  name: z.string().nullish() // Allow top-level name
+}).passthrough(); // Allow additional fields
+
+/**
+ * Validate and normalize extracted data
+ * Returns validated data or throws detailed error
+ */
+export function validateExtractedData(data) {
+  try {
+    const validated = MedicalExtractionSchema.parse(data);
+    console.log('✅ Schema validation passed');
+    return validated;
+  } catch (error) {
+    console.error('❌ Schema validation failed:', error.errors);
+    throw new Error(`Schema validation failed: ${error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`);
+  }
+}
+
+// JSON Schema for OpenAI Structured Outputs (unchanged)
 export const MEDICAL_EXTRACTION_SCHEMA = {
   type: "object",
   properties: {

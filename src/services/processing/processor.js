@@ -13,8 +13,11 @@ import { OpenAIService } from '../openai/client.js';
 import { vectorizeDocument } from '../vectorize/indexer.js';
 import { Diagnosis } from '../../models/diagnosis.js';
 import { Treatment } from '../../models/treatment.js';
+import { PatientRepository } from '../../repositories/patient.repository.js';
+import { DocumentRepository } from '../../repositories/document.repository.js';
 import { trackFieldSource, parseDataSources, serializeDataSources } from '../../utils/data-source.js';
 import { getCurrentTimestamp } from '../../utils/helpers.js';
+import { validateExtractedData } from './extraction-schema.js';
 
 export class DocumentProcessor {
   constructor(env, options = {}) {
@@ -256,18 +259,38 @@ export class DocumentProcessor {
         thinkingLevel: 'low' // For Gemini 3
       });
 
-      // 6. Parse response
+      // 6. Parse and validate response
       let extractedData;
       try {
-        extractedData = JSON.parse(extractionResult.text);
-        console.log(`📊 Extracted data structure:`, {
-          hasPatientDemographics: !!extractedData.patient_demographics,
-          patientDemographicsKeys: extractedData.patient_demographics ? Object.keys(extractedData.patient_demographics) : [],
-          topLevelKeys: Object.keys(extractedData)
-        });
-      } catch {
-        console.warn('Response not JSON, storing as raw text');
-        extractedData = { raw_response: extractionResult.text };
+        const parsedData = JSON.parse(extractionResult.text);
+
+        // Validate against schema
+        try {
+          extractedData = validateExtractedData(parsedData);
+          console.log(`📊 Extracted data structure (validated):`, {
+            hasPatientDemographics: !!extractedData.patient_demographics,
+            patientDemographicsKeys: extractedData.patient_demographics ? Object.keys(extractedData.patient_demographics) : [],
+            topLevelKeys: Object.keys(extractedData)
+          });
+        } catch (validationError) {
+          console.error('⚠️ Schema validation failed, but continuing with unvalidated data:', validationError.message);
+          // Log the invalid fields for debugging
+          console.error('Invalid data structure:', {
+            topLevelKeys: Object.keys(parsedData),
+            sampleData: JSON.stringify(parsedData).substring(0, 500)
+          });
+
+          // Still use the data but mark it as unvalidated
+          extractedData = parsedData;
+          extractedData._validation_failed = true;
+          extractedData._validation_error = validationError.message;
+        }
+      } catch (parseError) {
+        console.error('❌ Response not valid JSON:', parseError.message);
+        extractedData = {
+          raw_response: extractionResult.text,
+          _parse_failed: true
+        };
       }
 
       const tokensUsed = highlightResult.tokensUsed + extractionResult.tokensUsed;
@@ -369,9 +392,8 @@ export class DocumentProcessor {
       await this.logProcessing(doc.patient_id, documentId, tokensUsed, processingTime, `${provider}:${extractionResult.model}`, vectorizeStatus);
 
       // 16. Fetch updated patient demographics after sync
-      const updatedPatient = await this.env.DB.prepare(
-        'SELECT name, age, age_unit, sex, dob, external_mrn, patient_id_uhid, patient_id_ipd, blood_type, height_cm, weight_kg, bsa, ecog_status, language_preference FROM patients WHERE id = ?'
-      ).bind(doc.patient_id).first();
+      const patientRepo = PatientRepository(this.env.DB);
+      const updatedPatient = await patientRepo.findDemographicsById(doc.patient_id);
 
       // Extract patient demographics from extracted data (for response)
       const demographics = extractedData.patient_demographics || {};
@@ -382,7 +404,7 @@ export class DocumentProcessor {
         age_unit: demographics.age_unit || updatedPatient?.age_unit || null,
         sex: demographics.gender || demographics.sex || updatedPatient?.sex || null,
         dob: demographics.dob || demographics.date_of_birth || updatedPatient?.dob || null,
-        mrn: demographics.mrn || updatedPatient?.external_mrn || null,
+        mrn: demographics.mrn || updatedPatient?.mrn || null,
         patient_id_uhid: demographics.patient_id_uhid || updatedPatient?.patient_id_uhid || null,
         patient_id_ipd: demographics.patient_id_ipd || updatedPatient?.patient_id_ipd || null,
         blood_type: demographics.blood_type || updatedPatient?.blood_type || null,
@@ -415,37 +437,19 @@ export class DocumentProcessor {
   }
 
   async updateStatus(documentId, status, error = null) {
-    const now = getCurrentTimestamp();
-    
-    if (status === 'processing') {
-      await this.env.DB.prepare(
-        'UPDATE documents SET processing_status = ?, processing_started_at = ?, updated_at = ? WHERE id = ?'
-      ).bind(status, now, now, documentId).run();
-    } else if (status === 'completed') {
-      await this.env.DB.prepare(
-        'UPDATE documents SET processing_status = ?, processing_completed_at = ?, updated_at = ? WHERE id = ?'
-      ).bind(status, now, now, documentId).run();
-    } else if (status === 'failed') {
-      await this.env.DB.prepare(
-        'UPDATE documents SET processing_status = ?, processing_error = ?, updated_at = ? WHERE id = ?'
-      ).bind(status, error, now, documentId).run();
-    }
+    const docRepo = DocumentRepository(this.env.DB);
+    await docRepo.updateProcessingStatus(documentId, status, error);
   }
 
   async saveExtractedData(documentId, extractedData, tokensUsed, model, medicalHighlight, rawText = '') {
-    await this.env.DB.prepare(`
-      UPDATE documents
-      SET extracted_data = ?, extracted_text = ?, tokens_used = ?, gemini_model = ?, medical_highlight = ?, updated_at = ?
-      WHERE id = ?
-    `).bind(
-      JSON.stringify(extractedData),
-      rawText,
-      tokensUsed,
-      model,
-      medicalHighlight,
-      getCurrentTimestamp(),
-      documentId
-    ).run();
+    const docRepo = DocumentRepository(this.env.DB);
+    await docRepo.updateById(documentId, {
+      extracted_data: JSON.stringify(extractedData),
+      extracted_text: rawText,
+      tokens_used: tokensUsed,
+      gemini_model: model,
+      medical_highlight: medicalHighlight
+    });
   }
 
   /**
@@ -455,9 +459,17 @@ export class DocumentProcessor {
   async extractAndUpdatePatientDemographics(patientId, extractedData) {
     try {
       // Get current patient data - get all fields to check what's missing
-      const patient = await this.env.DB.prepare(
+      const patientRepo = PatientRepository(this.env.DB);
+      const patientRow = await this.env.DB.prepare(
         'SELECT * FROM patients WHERE id = ?'
       ).bind(patientId).first();
+      
+      if (!patientRow) {
+        console.warn(`Patient ${patientId} not found, skipping demographic extraction`);
+        return;
+      }
+      
+      const patient = patientRow;
 
       if (!patient) {
         console.warn(`Patient ${patientId} not found, skipping demographic extraction`);
@@ -734,38 +746,32 @@ export class DocumentProcessor {
 
       // Summary before update
       console.log(`📊 Update summary:`, {
-        updatesCount: updates.length,
+        updatesCount: Object.keys(updatedFields).length,
         fieldsToUpdate: Object.keys(updatedFields),
         updatedFields: updatedFields,
-        willExecute: updates.length > 0
+        willExecute: Object.keys(updatedFields).length > 0
       });
 
       // Execute update if we have any changes
-      if (updates.length > 0) {
-        updates.push('updated_at = ?');
-        bindings.push(getCurrentTimestamp());
-        bindings.push(patientId);
+      if (Object.keys(updatedFields).length > 0) {
+        console.log(`📝 About to update patient ${patientId} with ${Object.keys(updatedFields).length} fields:`, updatedFields);
 
-        console.log(`📝 About to update patient ${patientId} with ${updates.length - 1} fields:`, updatedFields);
-        console.log(`📝 SQL: UPDATE patients SET ${updates.join(', ')} WHERE id = ?`);
-        console.log(`📝 Bindings:`, bindings.slice(0, -1)); // Exclude patientId from log
-
-        await this.env.DB.prepare(`
-          UPDATE patients 
-          SET ${updates.join(', ')}
-          WHERE id = ?
-        `).bind(...bindings).run();
+        // Use repository's updateFields method
+        const patientRepo = PatientRepository(this.env.DB);
+        await patientRepo.updateFields(patientId, updatedFields);
 
         console.log(`✅ Successfully updated patient ${patientId} demographics:`, updatedFields);
         
         // Verify the update
-        const updatedPatient = await this.env.DB.prepare('SELECT name, age, gender, dob FROM patients WHERE id = ?').bind(patientId).first();
-        console.log(`✅ Verified patient ${patientId} after update:`, {
-          name: updatedPatient.name,
-          age: updatedPatient.age,
-          gender: updatedPatient.gender,
-          dob: updatedPatient.dob
-        });
+        const updatedPatient = await patientRepo.findById(patientId);
+        if (updatedPatient) {
+          console.log(`✅ Verified patient ${patientId} after update:`, {
+            name: updatedPatient.name,
+            age: updatedPatient.age,
+            gender: updatedPatient.gender || updatedPatient.sex,
+            dob: updatedPatient.dob
+          });
+        }
       } else {
         console.log(`⚠️ No updates needed for patient ${patientId}. Current values:`, {
           name: patient.name,
@@ -907,31 +913,13 @@ Data: ${JSON.stringify(extractedData)}`;
   }
 
   async updateVectorizeStatus(documentId, status) {
-    await this.env.DB.prepare(`
-      UPDATE documents
-      SET vectorize_status = ?, vectorized_at = ?, updated_at = ?
-      WHERE id = ?
-    `).bind(
-      status,
-      getCurrentTimestamp(),
-      getCurrentTimestamp(),
-      documentId
-    ).run();
+    const docRepo = DocumentRepository(this.env.DB);
+    await docRepo.updateVectorizeStatus(documentId, status);
   }
 
   async updateFileSearchStatus(documentId, status, storeName, documentName) {
-    await this.env.DB.prepare(`
-      UPDATE documents
-      SET vectorize_status = ?, file_search_store_name = ?, file_search_document_name = ?, vectorized_at = ?, updated_at = ?
-      WHERE id = ?
-    `).bind(
-      status,
-      storeName,
-      documentName,
-      getCurrentTimestamp(),
-      getCurrentTimestamp(),
-      documentId
-    ).run();
+    const docRepo = DocumentRepository(this.env.DB);
+    await docRepo.updateFileSearchStatus(documentId, status, storeName, documentName);
   }
 
   async logProcessing(patientId, documentId, tokensUsed, processingTime, model, vectorizeStatus = null) {

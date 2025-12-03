@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { TimelineRepository } from '../repositories/timeline.repository.js';
 import { NotFoundError, errorResponse } from '../utils/errors.js';
 
 const timeline = new Hono();
@@ -9,35 +10,14 @@ timeline.get('/', async (c) => {
     const { patientId } = c.req.param();
     const { from, to, types } = c.req.query();
     
-    // Build query
-    let query = 'SELECT * FROM timeline_events WHERE patient_id = ?';
-    const params = [patientId];
-    
-    if (from) {
-      query += ' AND event_date >= ?';
-      params.push(from);
-    }
-    
-    if (to) {
-      query += ' AND event_date <= ?';
-      params.push(to);
-    }
-    
-    if (types) {
-      const typeList = types.split(',').map(t => `'${t}'`).join(',');
-      query += ` AND event_type IN (${typeList})`;
-    }
-    
-    query += ' ORDER BY event_date ASC';
-    
-    const stmt = c.env.DB.prepare(query);
-    const result = await stmt.bind(...params).all();
+    const timelineRepo = TimelineRepository(c.env.DB);
+    const events = await timelineRepo.findByPatientId(patientId, { from, to, types });
     
     // Group events by date
     const eventsByDate = {};
     const trackAssignment = {};
     
-    result.results.forEach(event => {
+    events.forEach(event => {
       const date = event.event_date;
       if (!eventsByDate[date]) {
         eventsByDate[date] = [];
@@ -68,7 +48,7 @@ timeline.get('/', async (c) => {
     
     // Group by track
     const tracks = {};
-    result.results.forEach(event => {
+    events.forEach(event => {
       const track = event.event_type;
       if (!tracks[track]) {
         tracks[track] = [];
@@ -89,7 +69,7 @@ timeline.get('/', async (c) => {
       timeline,
       tracks,
       date_range: dateRange,
-      total_events: result.results.length
+      total_events: events.length
     });
     
   } catch (error) {
@@ -103,37 +83,13 @@ timeline.get('/tracks', async (c) => {
   try {
     const { patientId } = c.req.param();
     
-    const result = await c.env.DB.prepare(`
-      SELECT * FROM timeline_events 
-      WHERE patient_id = ?
-      ORDER BY event_date ASC
-    `).bind(patientId).all();
-    
-    // Organize by track/event_type
-    const trackData = {};
-    
-    result.results.forEach(event => {
-      const track = event.event_type;
-      if (!trackData[track]) {
-        trackData[track] = {
-          track_name: track,
-          events: []
-        };
-      }
-      
-      trackData[track].events.push({
-        id: event.id,
-        date: event.event_date,
-        title: event.title,
-        description: event.description,
-        category: event.event_category
-      });
-    });
+    const timelineRepo = TimelineRepository(c.env.DB);
+    const tracks = await timelineRepo.findByPatientIdGroupedByTracks(patientId);
     
     return c.json({
       success: true,
       patient_id: patientId,
-      tracks: Object.values(trackData)
+      tracks
     });
     
   } catch (error) {

@@ -1,4 +1,7 @@
 import { Hono } from 'hono';
+import { PatientRepository } from '../repositories/patient.repository.js';
+import { DocumentRepository } from '../repositories/document.repository.js';
+import { TimelineRepository } from '../repositories/timeline.repository.js';
 import { NotFoundError, errorResponse } from '../utils/errors.js';
 
 const views = new Hono();
@@ -8,29 +11,28 @@ views.get('/summary', async (c) => {
   try {
     const { patientId } = c.req.param();
     
-    // Get patient info
-    const patient = await c.env.DB.prepare(
-      'SELECT * FROM patients WHERE id = ?'
-    ).bind(patientId).first();
+    // Get patient info using repository
+    const patientRepo = PatientRepository(c.env.DB);
+    const patient = await patientRepo.findById(patientId);
     
     if (!patient) {
       throw new NotFoundError('Patient');
     }
     
-    // Get all clinical sections
+    // Get all clinical sections (still need direct query as no repository exists)
     const sections = await c.env.DB.prepare(
       'SELECT * FROM clinical_sections WHERE patient_id = ?'
     ).bind(patientId).all();
     
-    // Get document count
-    const docCount = await c.env.DB.prepare(
-      'SELECT COUNT(*) as count FROM documents WHERE patient_id = ?'
-    ).bind(patientId).first();
+    // Get document count using repository
+    const docRepo = DocumentRepository(c.env.DB);
+    const documents = await docRepo.findByPatientId(patientId);
+    const docCount = documents.length;
     
-    // Get timeline event count
-    const eventCount = await c.env.DB.prepare(
-      'SELECT COUNT(*) as count FROM timeline_events WHERE patient_id = ?'
-    ).bind(patientId).first();
+    // Get timeline event count using repository
+    const timelineRepo = TimelineRepository(c.env.DB);
+    const events = await timelineRepo.findByPatientId(patientId);
+    const eventCount = events.length;
     
     // Format sections
     const sectionsData = {};
@@ -47,8 +49,8 @@ views.get('/summary', async (c) => {
       patient_name: patient.name,
       last_updated: patient.updated_at,
       sections: sectionsData,
-      document_count: docCount.count,
-      timeline_event_count: eventCount.count
+      document_count: docCount,
+      timeline_event_count: eventCount
     });
     
   } catch (error) {

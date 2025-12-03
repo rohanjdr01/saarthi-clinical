@@ -6,6 +6,8 @@
 
 import { Hono } from 'hono';
 import { Document } from '../models/document.js';
+import { DocumentRepository } from '../repositories/document.repository.js';
+import { PatientRepository } from '../repositories/patient.repository.js';
 import { DocumentProcessor } from '../services/processing/processor.js';
 import { searchDocuments } from '../services/vectorize/indexer.js';
 import { GeminiService } from '../services/gemini/client.js';
@@ -23,8 +25,8 @@ documents.post('/', async (c) => {
     const { patientId } = c.req.param();
 
     // Check if patient exists
-    const patient = await c.env.DB.prepare('SELECT id FROM patients WHERE id = ?')
-      .bind(patientId).first();
+    const patientRepo = PatientRepository(c.env.DB);
+    const patient = await patientRepo.findById(patientId);
 
     if (!patient) {
       throw new NotFoundError('Patient');
@@ -83,23 +85,9 @@ documents.post('/', async (c) => {
         }
       });
 
-      // Save metadata to D1 with new fields
-      await c.env.DB.prepare(`
-        INSERT INTO documents (
-          id, patient_id, filename, file_type, mime_type, file_size, storage_key,
-          document_type, document_subtype, category, subcategory, title, document_date,
-          case_pack_order, processing_status, vectorize_status, reviewed_status,
-          created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).bind(
-        document.id, document.patient_id, document.filename, document.file_type,
-        document.mime_type, document.file_size, document.storage_key,
-        document.document_type || 'other', document.document_subtype,
-        document.category, document.subcategory, document.title, document.document_date,
-        document.case_pack_order, document.processing_status,
-        document.vectorize_status, document.reviewed_status,
-        document.created_at, document.updated_at
-      ).run();
+      // Save metadata to D1 using repository
+      const docRepo = DocumentRepository(c.env.DB);
+      await docRepo.create(documentData);
 
       uploadedDocuments.push(document.toJSON());
 
@@ -107,31 +95,68 @@ documents.post('/', async (c) => {
       processingTasks.push({ id: document.id, mode: processMode });
     }
 
-    // Trigger processing in background
-    // Fast mode: highlight + vectorize only (makes searchable immediately)
-    // Full mode: complete extraction + patient profile sync
+    // Trigger processing
+    // Fast mode: Process synchronously (quick, within Worker limits)
+    // Full mode: Send to queue (long-running, avoids timeout)
     if (processingTasks.length > 0) {
       for (const { id: docId, mode } of processingTasks) {
-        c.executionCtx.waitUntil(
-          (async () => {
-            try {
-              const processor = new DocumentProcessor(c.env, { provider });
-              if (mode === 'fast') {
+        if (mode === 'fast') {
+          // Fast mode: Process in background (quick enough for waitUntil)
+          c.executionCtx.waitUntil(
+            (async () => {
+              try {
+                const processor = new DocumentProcessor(c.env, { provider });
                 await processor.processDocumentFast(docId, { provider });
-              } else {
-                await processor.processDocument(docId, { mode: 'incremental', provider });
+              } catch (error) {
+                console.error(`Error processing document ${docId} in fast mode:`, error);
+                const docRepo = DocumentRepository(c.env.DB);
+                await docRepo.updateProcessingStatus(docId, 'failed', error.message);
               }
-            } catch (error) {
-              console.error(`Error processing document ${docId}:`, error);
-              // Update document status to failed
-              await c.env.DB.prepare(`
-                UPDATE documents
-                SET processing_status = ?, processing_error = ?
-                WHERE id = ?
-              `).bind('failed', error.message, docId).run();
+            })()
+          );
+        } else {
+          // Full mode: Send to queue to avoid Worker timeout
+          if (c.env.DOCUMENT_PROCESSING_QUEUE) {
+            try {
+              await c.env.DOCUMENT_PROCESSING_QUEUE.send({
+                documentId: docId,
+                mode: 'full',
+                provider: provider
+              });
+              console.log(`📤 Queued document ${docId} for full processing`);
+            } catch (queueError) {
+              console.error(`Error queueing document ${docId}:`, queueError);
+              // Fallback to waitUntil if queue fails
+              c.executionCtx.waitUntil(
+                (async () => {
+                  try {
+                    const processor = new DocumentProcessor(c.env, { provider });
+                    await processor.processDocument(docId, { mode: 'incremental', provider });
+                  } catch (error) {
+                    console.error(`Error processing document ${docId}:`, error);
+                    const docRepo = DocumentRepository(c.env.DB);
+                    await docRepo.updateProcessingStatus(docId, 'failed', error.message);
+                  }
+                })()
+              );
             }
-          })()
-        );
+          } else {
+            // Queue not configured, fallback to waitUntil
+            console.warn('⚠️  DOCUMENT_PROCESSING_QUEUE not configured, using waitUntil (may timeout)');
+            c.executionCtx.waitUntil(
+              (async () => {
+                try {
+                  const processor = new DocumentProcessor(c.env, { provider });
+                  await processor.processDocument(docId, { mode: 'incremental', provider });
+                } catch (error) {
+                  console.error(`Error processing document ${docId}:`, error);
+                  const docRepo = DocumentRepository(c.env.DB);
+                  await docRepo.updateProcessingStatus(docId, 'failed', error.message);
+                }
+              })()
+            );
+          }
+        }
       }
     }
 
@@ -166,44 +191,24 @@ documents.get('/', async (c) => {
       order = 'desc'
     } = c.req.query();
 
-    // Build query with filters
-    let query = 'SELECT * FROM documents WHERE patient_id = ?';
-    const bindings = [patientId];
+    const docRepo = DocumentRepository(c.env.DB);
+    const documentList = await docRepo.findByPatientId(patientId, {
+      category,
+      start_date,
+      end_date,
+      reviewed_status,
+      sort,
+      order
+    });
 
-    if (category) {
-      query += ' AND category = ?';
-      bindings.push(category);
-    }
-
-    if (start_date) {
-      query += ' AND document_date >= ?';
-      bindings.push(start_date);
-    }
-
-    if (end_date) {
-      query += ' AND document_date <= ?';
-      bindings.push(end_date);
-    }
-
-    if (reviewed_status) {
-      query += ' AND reviewed_status = ?';
-      bindings.push(reviewed_status);
-    }
-
-    // Sort
+    // Get sort field for response
     const validSortFields = ['created_at', 'document_date', 'case_pack_order', 'category'];
     const sortField = validSortFields.includes(sort) ? sort : 'created_at';
     const sortOrder = order.toLowerCase() === 'asc' ? 'ASC' : 'DESC';
 
-    query += ` ORDER BY ${sortField} ${sortOrder}`;
-
-    const stmt = c.env.DB.prepare(query);
-    const result = await stmt.bind(...bindings).all();
-    const documentList = result.results.map(row => Document.fromDBRow(row).toJSON());
-
     return c.json({
       success: true,
-      data: documentList,
+      data: documentList.map(doc => doc.toJSON()),
       total: documentList.length,
       filters: {
         category,
@@ -229,18 +234,12 @@ documents.get('/:docId', async (c) => {
   try {
     const { patientId, docId } = c.req.param();
 
-    const stmt = c.env.DB.prepare(`
-      SELECT * FROM documents
-      WHERE id = ? AND patient_id = ?
-    `);
+    const docRepo = DocumentRepository(c.env.DB);
+    const document = await docRepo.findById(docId, patientId);
 
-    const result = await stmt.bind(docId, patientId).first();
-
-    if (!result) {
+    if (!document) {
       throw new NotFoundError('Document');
     }
-
-    const document = Document.fromDBRow(result);
 
     return c.json({
       success: true,
@@ -262,11 +261,10 @@ documents.patch('/:docId', async (c) => {
     const { patientId, docId } = c.req.param();
     const body = await c.req.json();
 
-    // Get existing document
-    const existing = await c.env.DB.prepare(`
-      SELECT * FROM documents WHERE id = ? AND patient_id = ?
-    `).bind(docId, patientId).first();
-
+    const docRepo = DocumentRepository(c.env.DB);
+    
+    // Check if document exists
+    const existing = await docRepo.findById(docId, patientId);
     if (!existing) {
       throw new NotFoundError('Document');
     }
@@ -291,24 +289,13 @@ documents.patch('/:docId', async (c) => {
       throw new ValidationError('No valid fields to update');
     }
 
-    // Build UPDATE query
-    const setClause = Object.keys(updates).map(key => `${key} = ?`).join(', ');
-    const values = [...Object.values(updates), getCurrentTimestamp(), docId, patientId];
-
-    await c.env.DB.prepare(`
-      UPDATE documents SET ${setClause}, updated_at = ?
-      WHERE id = ? AND patient_id = ?
-    `).bind(...values).run();
-
-    // Get updated document
-    const updated = await c.env.DB.prepare(`
-      SELECT * FROM documents WHERE id = ?
-    `).bind(docId).first();
+    // Update using repository
+    const updated = await docRepo.update(docId, patientId, updates);
 
     return c.json({
       success: true,
       message: 'Document metadata updated successfully',
-      data: Document.fromDBRow(updated).toJSON()
+      data: updated.toJSON()
     });
 
   } catch (error) {
@@ -325,19 +312,12 @@ documents.get('/:docId/download', async (c) => {
   try {
     const { patientId, docId } = c.req.param();
 
-    // Get document metadata
-    const stmt = c.env.DB.prepare(`
-      SELECT * FROM documents
-      WHERE id = ? AND patient_id = ?
-    `);
+    const docRepo = DocumentRepository(c.env.DB);
+    const document = await docRepo.findById(docId, patientId);
 
-    const result = await stmt.bind(docId, patientId).first();
-
-    if (!result) {
+    if (!document) {
       throw new NotFoundError('Document');
     }
-
-    const document = Document.fromDBRow(result);
 
     // Get file from R2
     const object = await c.env.DOCUMENTS.get(document.storage_key);
@@ -369,19 +349,12 @@ documents.delete('/:docId', async (c) => {
   try {
     const { patientId, docId } = c.req.param();
 
-    // Get document metadata
-    const stmt = c.env.DB.prepare(`
-      SELECT * FROM documents
-      WHERE id = ? AND patient_id = ?
-    `);
+    const docRepo = DocumentRepository(c.env.DB);
+    const document = await docRepo.findById(docId, patientId);
 
-    const result = await stmt.bind(docId, patientId).first();
-
-    if (!result) {
+    if (!document) {
       throw new NotFoundError('Document');
     }
-
-    const document = Document.fromDBRow(result);
 
     // Delete from R2
     await c.env.DOCUMENTS.delete(document.storage_key);
@@ -399,10 +372,6 @@ documents.delete('/:docId', async (c) => {
       }
     }
 
-    // Delete vector chunks (Vectorize fallback)
-    await c.env.DB.prepare('DELETE FROM document_vectors WHERE document_id = ?')
-      .bind(docId).run();
-
     // Delete from Vectorize if configured
     if (c.env.VECTORIZE) {
       try {
@@ -413,9 +382,8 @@ documents.delete('/:docId', async (c) => {
       }
     }
 
-    // Delete from D1
-    await c.env.DB.prepare('DELETE FROM documents WHERE id = ?')
-      .bind(docId).run();
+    // Delete from D1 using repository (handles document_vectors cleanup)
+    await docRepo.delete(docId);
 
     return c.json({
       success: true,
@@ -444,14 +412,13 @@ documents.post('/reorder', async (c) => {
       throw new ValidationError('document_orders array is required');
     }
 
-    // Update each document's case_pack_order
-    for (const { document_id, order } of document_orders) {
-      await c.env.DB.prepare(`
-        UPDATE documents
-        SET case_pack_order = ?, updated_at = ?
-        WHERE id = ? AND patient_id = ?
-      `).bind(order, getCurrentTimestamp(), document_id, patientId).run();
-    }
+    // Update each document's case_pack_order using repository
+    const docRepo = DocumentRepository(c.env.DB);
+    const orders = document_orders.map(({ document_id, order }) => ({
+      document_id,
+      case_pack_order: order
+    }));
+    await docRepo.updateCasePackOrder(patientId, orders);
 
     return c.json({
       success: true,
@@ -493,16 +460,10 @@ documents.post('/search', async (c) => {
 
     if (fileSearchEnabled) {
       // Check if patient has any documents uploaded to File Search
-      const fileSearchDocCount = await c.env.DB.prepare(`
-        SELECT COUNT(*) as count 
-        FROM documents 
-        WHERE patient_id = ? 
-        AND file_search_document_name IS NOT NULL 
-        AND file_search_document_name != ''
-      `).bind(patientId).first();
-
-      const hasFileSearchDocs = fileSearchDocCount?.count > 0;
-      console.log(`File Search check: ${fileSearchDocCount?.count || 0} documents in File Search for patient ${patientId}`);
+      const docRepo = DocumentRepository(c.env.DB);
+      const fileSearchDocCount = await docRepo.countWithFileSearch(patientId);
+      const hasFileSearchDocs = fileSearchDocCount > 0;
+      console.log(`File Search check: ${fileSearchDocCount} documents in File Search for patient ${patientId}`);
 
       if (!hasFileSearchDocs) {
         console.warn('⚠️  No documents in File Search, falling back to Vectorize');
@@ -626,12 +587,11 @@ documents.post('/reprocess', async (c) => {
     const processMode = body.process_mode || c.req.query('process_mode') || 'full'; // 'fast' or 'full'
     const provider = body.provider || c.req.query('provider');
 
-    // Get all documents for patient
-    const documentsResult = await c.env.DB.prepare(`
-      SELECT id FROM documents WHERE patient_id = ?
-    `).bind(patientId).all();
+    // Get all document IDs for patient
+    const docRepo = DocumentRepository(c.env.DB);
+    const documentIds = await docRepo.findIdsByPatientId(patientId);
 
-    if (!documentsResult.results || documentsResult.results.length === 0) {
+    if (!documentIds || documentIds.length === 0) {
       return c.json({
         success: true,
         message: 'No documents found to reprocess',
@@ -639,40 +599,69 @@ documents.post('/reprocess', async (c) => {
       });
     }
 
-    const documentIds = documentsResult.results.map(row => row.id);
-
     // Reset processing status for all documents
-    await c.env.DB.prepare(`
-      UPDATE documents
-      SET processing_status = 'pending',
-          processing_error = NULL,
-          processing_started_at = NULL,
-          processing_completed_at = NULL,
-          updated_at = ?
-      WHERE patient_id = ?
-    `).bind(getCurrentTimestamp(), patientId).run();
-
-    // Trigger reprocessing in background for all documents
     for (const docId of documentIds) {
-      c.executionCtx.waitUntil(
-        (async () => {
-          try {
-            const processor = new DocumentProcessor(c.env, { provider });
-            if (processMode === 'fast') {
+      await docRepo.updateProcessingStatus(docId, 'pending');
+    }
+
+    // Trigger reprocessing
+    // Fast mode: Process in background
+    // Full mode: Send to queue
+    for (const docId of documentIds) {
+      if (processMode === 'fast') {
+        c.executionCtx.waitUntil(
+          (async () => {
+            try {
+              const processor = new DocumentProcessor(c.env, { provider });
               await processor.processDocumentFast(docId, { provider });
-            } else {
-              await processor.processDocument(docId, { mode: 'full', provider });
+            } catch (error) {
+              console.error(`Error reprocessing document ${docId}:`, error);
+              const docRepo = DocumentRepository(c.env.DB);
+              await docRepo.updateProcessingStatus(docId, 'failed', error.message);
             }
-          } catch (error) {
-            console.error(`Error reprocessing document ${docId}:`, error);
-            await c.env.DB.prepare(`
-              UPDATE documents
-              SET processing_status = ?, processing_error = ?
-              WHERE id = ?
-            `).bind('failed', error.message, docId).run();
+          })()
+        );
+      } else {
+        // Full mode: Send to queue
+        if (c.env.DOCUMENT_PROCESSING_QUEUE) {
+          try {
+            await c.env.DOCUMENT_PROCESSING_QUEUE.send({
+              documentId: docId,
+              mode: 'full',
+              provider: provider
+            });
+          } catch (queueError) {
+            console.error(`Error queueing document ${docId} for reprocessing:`, queueError);
+            // Fallback to waitUntil
+            c.executionCtx.waitUntil(
+              (async () => {
+                try {
+                  const processor = new DocumentProcessor(c.env, { provider });
+                  await processor.processDocument(docId, { mode: 'full', provider });
+                } catch (error) {
+                  console.error(`Error reprocessing document ${docId}:`, error);
+                  const docRepo = DocumentRepository(c.env.DB);
+                  await docRepo.updateProcessingStatus(docId, 'failed', error.message);
+                }
+              })()
+            );
           }
-        })()
-      );
+        } else {
+          // Queue not configured, fallback
+          c.executionCtx.waitUntil(
+            (async () => {
+              try {
+                const processor = new DocumentProcessor(c.env, { provider });
+                await processor.processDocument(docId, { mode: 'full', provider });
+              } catch (error) {
+                console.error(`Error reprocessing document ${docId}:`, error);
+                const docRepo = DocumentRepository(c.env.DB);
+                await docRepo.updateProcessingStatus(docId, 'failed', error.message);
+              }
+            })()
+          );
+        }
+      }
     }
 
     return c.json({
@@ -700,45 +689,74 @@ documents.post('/:docId/reprocess', async (c) => {
     const provider = body.provider || c.req.query('provider');
 
     // Get document
-    const existing = await c.env.DB.prepare(`
-      SELECT * FROM documents WHERE id = ? AND patient_id = ?
-    `).bind(docId, patientId).first();
+    const docRepo = DocumentRepository(c.env.DB);
+    const existing = await docRepo.findById(docId, patientId);
 
     if (!existing) {
       throw new NotFoundError('Document');
     }
 
     // Reset processing status
-    await c.env.DB.prepare(`
-      UPDATE documents
-      SET processing_status = 'pending',
-          processing_error = NULL,
-          processing_started_at = NULL,
-          processing_completed_at = NULL,
-          updated_at = ?
-      WHERE id = ?
-    `).bind(getCurrentTimestamp(), docId).run();
+    await docRepo.updateProcessingStatus(docId, 'pending');
 
-    // Trigger reprocessing in background
-    c.executionCtx.waitUntil(
-      (async () => {
-        try {
-          const processor = new DocumentProcessor(c.env, { provider });
-          if (processMode === 'fast') {
+    // Trigger reprocessing
+    // Fast mode: Process in background
+    // Full mode: Send to queue
+    if (processMode === 'fast') {
+      c.executionCtx.waitUntil(
+        (async () => {
+          try {
+            const processor = new DocumentProcessor(c.env, { provider });
             await processor.processDocumentFast(docId, { provider });
-          } else {
-            await processor.processDocument(docId, { mode: 'full', provider });
+          } catch (error) {
+            console.error(`Error reprocessing document ${docId}:`, error);
+            const docRepo = DocumentRepository(c.env.DB);
+            await docRepo.updateProcessingStatus(docId, 'failed', error.message);
           }
-        } catch (error) {
-          console.error(`Error reprocessing document ${docId}:`, error);
-          await c.env.DB.prepare(`
-            UPDATE documents
-            SET processing_status = ?, processing_error = ?
-            WHERE id = ?
-          `).bind('failed', error.message, docId).run();
+        })()
+      );
+    } else {
+      // Full mode: Send to queue
+      if (c.env.DOCUMENT_PROCESSING_QUEUE) {
+        try {
+          await c.env.DOCUMENT_PROCESSING_QUEUE.send({
+            documentId: docId,
+            mode: 'full',
+            provider: provider
+          });
+          console.log(`📤 Queued document ${docId} for reprocessing in full mode`);
+        } catch (queueError) {
+          console.error(`Error queueing document ${docId}:`, queueError);
+          // Fallback to waitUntil
+          c.executionCtx.waitUntil(
+            (async () => {
+              try {
+                const processor = new DocumentProcessor(c.env, { provider });
+                await processor.processDocument(docId, { mode: 'full', provider });
+              } catch (error) {
+                console.error(`Error reprocessing document ${docId}:`, error);
+                const docRepo = DocumentRepository(c.env.DB);
+                await docRepo.updateProcessingStatus(docId, 'failed', error.message);
+              }
+            })()
+          );
         }
-      })()
-    );
+      } else {
+        // Queue not configured, fallback
+        c.executionCtx.waitUntil(
+          (async () => {
+            try {
+              const processor = new DocumentProcessor(c.env, { provider });
+              await processor.processDocument(docId, { mode: 'full', provider });
+            } catch (error) {
+              console.error(`Error reprocessing document ${docId}:`, error);
+              const docRepo = DocumentRepository(c.env.DB);
+              await docRepo.updateProcessingStatus(docId, 'failed', error.message);
+            }
+          })()
+        );
+      }
+    }
 
     return c.json({
       success: true,
