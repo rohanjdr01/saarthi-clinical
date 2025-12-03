@@ -64,6 +64,63 @@ app.get('/api/v1/health', (c) => {
   });
 });
 
+// Database diagnostic endpoint
+app.get('/api/v1/health/db', async (c) => {
+  try {
+    if (!c.env.DB) {
+      return c.json({
+        success: false,
+        error: 'DB binding not found in environment',
+        diagnostic: {
+          hasDB: false,
+          envKeys: Object.keys(c.env || {}),
+          environment: c.env?.ENVIRONMENT || 'unknown'
+        }
+      }, 500);
+    }
+
+    // Test basic query
+    const testQuery = await c.env.DB.prepare('SELECT name FROM sqlite_master WHERE type="table" AND name="patients"').first();
+    
+    if (!testQuery) {
+      return c.json({
+        success: false,
+        error: 'patients table not found',
+        diagnostic: {
+          hasDB: true,
+          tableExists: false,
+          allTables: await c.env.DB.prepare('SELECT name FROM sqlite_master WHERE type="table" ORDER BY name').all().then(r => r.results.map(t => t.name))
+        }
+      }, 500);
+    }
+
+    // Test actual query
+    const patientCount = await c.env.DB.prepare('SELECT COUNT(*) as count FROM patients').first();
+
+    return c.json({
+      success: true,
+      message: 'Database connection successful',
+      diagnostic: {
+        hasDB: true,
+        tableExists: true,
+        patientCount: patientCount?.count || 0,
+        databaseId: c.env.DB?.database_id || 'unknown',
+        environment: c.env?.ENVIRONMENT || 'unknown'
+      }
+    });
+  } catch (error) {
+    return c.json({
+      success: false,
+      error: error.message,
+      diagnostic: {
+        hasDB: !!c.env.DB,
+        errorType: error.constructor.name,
+        stack: error.stack
+      }
+    }, 500);
+  }
+});
+
 // Mount routes
 app.route('/api/v1/auth', auth);
 app.route('/api/v1/patients', patients);
