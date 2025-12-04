@@ -762,6 +762,36 @@ Authorization: Bearer <token>
 - `limit` (number, optional) - Default 20
 - `type` (string, optional) - extraction, vectorization, all
 
+### Get Document Processing Status
+```
+GET /api/v1/patients/:patientId/processing/documents/:docId/status
+Authorization: Bearer <token>
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "document_id": "doc_abc123",
+  "filename": "2025-11-21_Chemo_IV_-_Discharge_Summary.pdf",
+  "processing_status": "completed",
+  "processing_started_at": "2025-12-04T13:00:00Z",
+  "processing_completed_at": "2025-12-04T13:02:30Z",
+  "processing_error": null,
+  "vectorize_status": "completed",
+  "vectorized_at": "2025-12-04T13:02:25Z",
+  "file_search_status": "completed",
+  "file_search_store_name": "fileSearchStores/patient-pt_abc123",
+  "file_search_document_name": "fileSearchDocuments/doc_mirh9g5kny6nnhm",
+  "tokens_used": 15234,
+  "model": "gpt-5",
+  "created_at": "2025-12-04T12:55:41Z",
+  "updated_at": "2025-12-04T13:02:30Z"
+}
+```
+
+Use the aggregate `/processing/status` for dashboard counts and this endpoint for per-document progress/errors.
+
 ---
 
 ## 📊 Views & Summary

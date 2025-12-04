@@ -111,7 +111,7 @@ export class FileSearchService {
           displayName: filename
         }
       });
-      formData.append('metadata', new Blob([metadata], { type: 'application/json' }));
+      formData.append('metadata', metadata);
       formData.append('file', blob, filename);
 
       console.log(`📤 Direct upload to File Search store: ${filename}`);
@@ -133,22 +133,30 @@ export class FileSearchService {
       const uploadData = await uploadResponse.json();
       console.log(`📥 File Search upload response:`, JSON.stringify(uploadData, null, 2));
 
-      // Check if this is a long-running operation
-      if (uploadData.name && !uploadData.done) {
+      // Check if response already contains the documentName (sync completion)
+      if (uploadData.response?.documentName) {
+        const documentName = uploadData.response.documentName;
+        console.log(`✅ File uploaded to File Search (sync): ${documentName}`);
+        return documentName;
+      }
+
+      // Check if this is a long-running operation that needs polling
+      if (uploadData.name && !uploadData.done && !uploadData.response) {
         // Poll for completion
         console.log(`⏳ Upload started as async operation: ${uploadData.name}`);
         return await this.pollOperation(uploadData.name, documentId);
       }
 
-      // Operation completed immediately
+      // Operation completed immediately with done flag
       if (uploadData.done) {
         const documentName = uploadData.response?.fileSearchDocument?.name 
+          || uploadData.response?.documentName
           || uploadData.fileSearchDocument?.name;
         console.log(`✅ File uploaded to File Search: ${documentName}`);
         return documentName;
       }
 
-      // Direct response with document name
+      // Direct response with document name (fallback)
       const documentName = uploadData.fileSearchDocument?.name 
         || uploadData.name
         || uploadData.response?.name;

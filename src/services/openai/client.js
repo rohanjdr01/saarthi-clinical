@@ -26,20 +26,22 @@ export class OpenAIService {
     const url = `${this.baseUrl}/chat/completions`;
     const model = useReasoning ? this.reasoningModel : this.model;
 
+    const baseBody = {
+      model,
+      messages: [{ role: 'user', content: prompt }],
+      ...(model.startsWith('gpt-5')
+        ? { max_completion_tokens: 16384 }
+        : { max_tokens: 16384 })
+    };
+
     const requestBody = useReasoning
       ? {
-          model,
-          messages: [{ role: 'user', content: prompt }],
+          ...baseBody,
           reasoning_effort: 'medium'
         }
       : {
-          model,
-          messages: [{ role: 'user', content: prompt }],
-          temperature,
-          // gpt-5 uses `max_completion_tokens` instead of `max_tokens`
-          ...(model.startsWith('gpt-5')
-            ? { max_completion_tokens: 16384 }
-            : { max_tokens: 16384 })
+          ...baseBody,
+          ...(model.startsWith('gpt-5') ? {} : { temperature })
         };
 
     console.log(`🤖 OpenAI request (${model})...`);
@@ -111,35 +113,30 @@ export class OpenAIService {
       }
     ];
 
+    const baseBody = {
+      model,
+      messages: [{ role: 'user', content }],
+      response_format: {
+        type: 'json_schema',
+        json_schema: {
+          name: 'medical_extraction',
+          strict: true,
+          schema: MEDICAL_EXTRACTION_SCHEMA
+        }
+      },
+      ...(model.startsWith('gpt-5')
+        ? { max_completion_tokens: 16384 }
+        : { max_tokens: 16384 })
+    };
+
     const requestBody = useReasoning
       ? {
-          model,
-          messages: [{ role: 'user', content }],
-          reasoning_effort: 'high',
-          response_format: {
-            type: 'json_schema',
-            json_schema: {
-              name: 'medical_extraction',
-              strict: true,
-              schema: MEDICAL_EXTRACTION_SCHEMA
-            }
-          }
+          ...baseBody,
+          reasoning_effort: 'high'
         }
       : {
-          model,
-          messages: [{ role: 'user', content }],
-          temperature: 0.2,
-          ...(model.startsWith('gpt-5')
-            ? { max_completion_tokens: 16384 }
-            : { max_tokens: 16384 }),
-          response_format: {
-            type: 'json_schema',
-            json_schema: {
-              name: 'medical_extraction',
-              strict: true,
-              schema: MEDICAL_EXTRACTION_SCHEMA
-            }
-          }
+          ...baseBody,
+          ...(model.startsWith('gpt-5') ? {} : { temperature: 0.2 })
         };
 
     console.log(`📄 OpenAI image processing (${model}, ${mimeType})...`);

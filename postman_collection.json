@@ -743,6 +743,28 @@
           }
         },
         {
+          "name": "Get Document Processing Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/processing/documents/{{documentId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "processing",
+                "documents",
+                "{{documentId}}",
+                "status"
+              ]
+            },
+            "description": "Get processing status (processing/vectorize/file-search) for a specific document"
+          }
+        },
+        {
           "name": "Get Processing Log",
           "request": {
             "method": "GET",
