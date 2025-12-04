@@ -71,14 +71,29 @@ intake.post('/', async (c) => {
       
       // Upload to R2
       const fileBuffer = await file.arrayBuffer();
-      await c.env.DOCUMENTS.put(document.storage_key, fileBuffer, {
-        httpMetadata: { contentType: file.type },
-        customMetadata: {
-          patient_id: placeholderPatient.id,
-          document_type: document.document_type,
-          uploaded_at: new Date().toISOString()
-        }
-      });
+      console.log(`📤 Uploading to R2: ${document.storage_key} (${fileBuffer.byteLength} bytes)`);
+      
+      try {
+        await c.env.DOCUMENTS.put(document.storage_key, fileBuffer, {
+          httpMetadata: { contentType: file.type },
+          customMetadata: {
+            patient_id: placeholderPatient.id,
+            document_type: document.document_type,
+            uploaded_at: new Date().toISOString()
+          }
+        });
+      } catch (r2Error) {
+        console.error(`❌ R2 upload failed for ${document.storage_key}:`, r2Error);
+        throw new Error(`Failed to upload file to storage: ${r2Error.message}`);
+      }
+
+      // IMPORTANT: Verify R2 upload succeeded before saving to DB
+      const verifyUpload = await c.env.DOCUMENTS.head(document.storage_key);
+      if (!verifyUpload) {
+        console.error(`❌ R2 verification failed - file not found after upload: ${document.storage_key}`);
+        throw new Error(`File upload verification failed for ${file.name}. The file was not stored properly.`);
+      }
+      console.log(`✅ R2 upload verified: ${document.storage_key} (${verifyUpload.size} bytes)`);
       
       // Save to D1
       await c.env.DB.prepare(`

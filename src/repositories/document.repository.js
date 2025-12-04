@@ -74,11 +74,18 @@ export const DocumentRepository = (db) => ({
 
   /**
    * Create a new document
+   * @param {Document|Object} documentData - Either a Document instance or raw data
    */
   create: async (documentData) => {
-    const document = new Document(documentData);
+    // If already a Document instance with an ID, use it directly
+    // Otherwise, create a new Document (which will generate an ID)
+    const document = (documentData.id && documentData instanceof Document) 
+      ? documentData 
+      : new Document(documentData);
     
-    await db.prepare(`
+    console.log(`📝 Repository inserting document: ${document.id} (${document.filename})`);
+    
+    const result = await db.prepare(`
       INSERT INTO documents (
         id, patient_id, filename, file_type, mime_type, file_size, storage_key,
         document_type, document_subtype, category, subcategory, title, document_date,
@@ -94,6 +101,12 @@ export const DocumentRepository = (db) => ({
       document.vectorize_status, document.reviewed_status,
       document.created_at, document.updated_at
     ).run();
+
+    console.log(`✅ Repository insert result:`, { 
+      success: result.success, 
+      meta: result.meta,
+      id: document.id 
+    });
 
     return document;
   },

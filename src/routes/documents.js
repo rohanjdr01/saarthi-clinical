@@ -74,20 +74,55 @@ documents.post('/', async (c) => {
 
       // Upload to R2
       const fileBuffer = await file.arrayBuffer();
-      await c.env.DOCUMENTS.put(document.storage_key, fileBuffer, {
-        httpMetadata: {
-          contentType: file.type
-        },
-        customMetadata: {
-          patient_id: patientId,
-          category: category || 'unknown',
-          uploaded_at: new Date().toISOString()
-        }
-      });
+      console.log(`📤 Uploading to R2: ${document.storage_key} (${fileBuffer.byteLength} bytes)`);
+      
+      try {
+        await c.env.DOCUMENTS.put(document.storage_key, fileBuffer, {
+          httpMetadata: {
+            contentType: file.type
+          },
+          customMetadata: {
+            patient_id: patientId,
+            category: category || 'unknown',
+            uploaded_at: new Date().toISOString()
+          }
+        });
+      } catch (r2Error) {
+        console.error(`❌ R2 upload failed for ${document.storage_key}:`, r2Error);
+        throw new Error(`Failed to upload file to storage: ${r2Error.message}`);
+      }
+
+      // IMPORTANT: Verify R2 upload succeeded before saving to DB
+      const verifyUpload = await c.env.DOCUMENTS.head(document.storage_key);
+      if (!verifyUpload) {
+        console.error(`❌ R2 verification failed - file not found after upload: ${document.storage_key}`);
+        throw new Error(`File upload verification failed for ${file.name}. The file was not stored properly.`);
+      }
+      console.log(`✅ R2 upload verified: ${document.storage_key} (${verifyUpload.size} bytes)`);
 
       // Save metadata to D1 using repository
+      // IMPORTANT: Pass 'document' not 'documentData' - document has the generated ID
       const docRepo = DocumentRepository(c.env.DB);
-      await docRepo.create(documentData);
+      console.log(`💾 Saving to DB: ${document.id} (${document.filename})`);
+      
+      try {
+        await docRepo.create(document);
+        console.log(`✅ Document saved to DB: ${document.id}`);
+      } catch (dbError) {
+        console.error(`❌ Failed to save document to DB:`, {
+          id: document.id,
+          filename: document.filename,
+          error: dbError.message
+        });
+        // Clean up R2 since DB save failed
+        try {
+          await c.env.DOCUMENTS.delete(document.storage_key);
+          console.log(`🗑️ Cleaned up R2 file after DB failure: ${document.storage_key}`);
+        } catch (cleanupError) {
+          console.error(`⚠️ Failed to clean up R2 file: ${document.storage_key}`);
+        }
+        throw new Error(`Failed to save document metadata: ${dbError.message}`);
+      }
 
       uploadedDocuments.push(document.toJSON());
 
@@ -99,7 +134,26 @@ documents.post('/', async (c) => {
     // Fast mode: Process synchronously (quick, within Worker limits)
     // Full mode: Send to queue (long-running, avoids timeout)
     if (processingTasks.length > 0) {
+      // IMPORTANT: Verify all documents are in DB before queueing
+      const docIds = processingTasks.map(t => t.id);
+      const verifyQuery = await c.env.DB.prepare(`
+        SELECT id FROM documents WHERE id IN (${docIds.map(() => '?').join(',')})
+      `).bind(...docIds).all();
+      
+      const foundIds = new Set(verifyQuery.results.map(r => r.id));
+      const missingIds = docIds.filter(id => !foundIds.has(id));
+      
+      if (missingIds.length > 0) {
+        console.error(`⚠️ Documents not found in DB before queueing:`, missingIds);
+      }
+
       for (const { id: docId, mode } of processingTasks) {
+        // Skip if document wasn't successfully saved to DB
+        if (!foundIds.has(docId)) {
+          console.error(`❌ Skipping queue for ${docId} - not found in DB`);
+          continue;
+        }
+
         if (mode === 'fast') {
           // Fast mode: Process in background (quick enough for waitUntil)
           c.executionCtx.waitUntil(
@@ -118,12 +172,27 @@ documents.post('/', async (c) => {
           // Full mode: Send to queue to avoid Worker timeout
           if (c.env.DOCUMENT_PROCESSING_QUEUE) {
             try {
+              // Verify document exists one more time before queueing
+              const docCheck = await c.env.DB.prepare(
+                'SELECT id, filename, storage_key FROM documents WHERE id = ?'
+              ).bind(docId).first();
+              
+              if (!docCheck) {
+                console.error(`❌ Cannot queue ${docId} - document disappeared from DB`);
+                continue;
+              }
+
+              console.log(`📝 Queueing document: ${docCheck.filename} (${docId})`);
+              
+              // Add delay to ensure R2 write and DB replication complete
               await c.env.DOCUMENT_PROCESSING_QUEUE.send({
                 documentId: docId,
                 mode: 'full',
                 provider: provider
+              }, {
+                delaySeconds: 3  // Wait 3 seconds before processing (increased from 2)
               });
-              console.log(`📤 Queued document ${docId} for full processing`);
+              console.log(`📤 Queued document ${docId} for full processing (with 3s delay)`);
             } catch (queueError) {
               console.error(`Error queueing document ${docId}:`, queueError);
               // Fallback to waitUntil if queue fails

@@ -88,76 +88,86 @@ export class FileSearchService {
 
   /**
    * Upload document to File Search store
-   * Uses the Files API first, then imports to File Search store
+   * Uses the direct uploadToFileSearchStore method as per:
+   * https://ai.google.dev/gemini-api/docs/file-search
    * Returns the document name in the File Search store
    */
   async uploadDocumentToFileSearch(patientId, documentId, fileBuffer, mimeType, filename) {
     try {
-      // Step 1: Upload file to Files API
-      const fileUrl = `${this.baseUrl}/files?key=${this.apiKey}`;
+      // Step 1: Ensure File Search store exists
+      const storeName = await this.createFileSearchStore(patientId);
       
+      // Step 2: Direct upload to File Search store
+      // This is the recommended approach from the docs
+      const uploadUrl = `https://generativelanguage.googleapis.com/upload/v1beta/${storeName}:uploadToFileSearchStore?key=${this.apiKey}`;
+      
+      // Create multipart form data
       const formData = new FormData();
       const blob = new Blob([fileBuffer], { type: mimeType });
-      formData.append('metadata', JSON.stringify({
-        name: filename
-      }));
+      
+      // Metadata with display name (will be visible in citations)
+      const metadata = JSON.stringify({
+        fileSearchDocument: {
+          displayName: filename
+        }
+      });
+      formData.append('metadata', new Blob([metadata], { type: 'application/json' }));
       formData.append('file', blob, filename);
 
-      console.log(`📤 Uploading file to Gemini Files API: ${filename}`);
+      console.log(`📤 Direct upload to File Search store: ${filename}`);
+      console.log(`   Store: ${storeName}`);
+      console.log(`   Size: ${fileBuffer.byteLength} bytes`);
+      console.log(`   Type: ${mimeType}`);
 
-      const fileResponse = await this.fetchWithTimeout(fileUrl, {
+      const uploadResponse = await this.fetchWithTimeout(uploadUrl, {
         method: 'POST',
         body: formData
       }, 300000); // 5 min for large files
 
-      if (!fileResponse.ok) {
-        const error = await fileResponse.text();
-        throw new Error(`File upload failed: ${fileResponse.status} - ${error}`);
+      if (!uploadResponse.ok) {
+        const error = await uploadResponse.text();
+        console.error(`❌ File Search upload failed: ${uploadResponse.status}`, error);
+        throw new Error(`File Search upload failed: ${uploadResponse.status} - ${error}`);
       }
 
-      const fileData = await fileResponse.json();
-      const uploadedFileName = fileData.file?.name;
+      const uploadData = await uploadResponse.json();
+      console.log(`📥 File Search upload response:`, JSON.stringify(uploadData, null, 2));
 
-      if (!uploadedFileName) {
-        throw new Error('File upload did not return file name');
+      // Check if this is a long-running operation
+      if (uploadData.name && !uploadData.done) {
+        // Poll for completion
+        console.log(`⏳ Upload started as async operation: ${uploadData.name}`);
+        return await this.pollOperation(uploadData.name, documentId);
       }
 
-      console.log(`✅ File uploaded to Files API: ${uploadedFileName}`);
-
-      // Step 2: Ensure File Search store exists
-      const storeName = await this.createFileSearchStore(patientId);
-
-      // Step 3: Import file into File Search store
-      const importUrl = `${this.baseUrl}/${storeName}:importFile?key=${this.apiKey}`;
-
-      const importResponse = await this.fetchWithTimeout(importUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fileName: uploadedFileName
-        })
-      }, 30000);
-
-      if (!importResponse.ok) {
-        const error = await importResponse.text();
-        throw new Error(`File Search import failed: ${importResponse.status} - ${error}`);
-      }
-
-      const importData = await importResponse.json();
-
-      // Check if operation is complete
-      if (importData.done) {
-        const documentName = importData.response?.fileSearchDocument?.name;
-        console.log(`✅ File imported to File Search: ${documentName}`);
+      // Operation completed immediately
+      if (uploadData.done) {
+        const documentName = uploadData.response?.fileSearchDocument?.name 
+          || uploadData.fileSearchDocument?.name;
+        console.log(`✅ File uploaded to File Search: ${documentName}`);
         return documentName;
       }
 
-      // If operation is async, poll for completion
-      if (importData.name) {
-        return await this.pollOperation(importData.name, documentId);
+      // Direct response with document name
+      const documentName = uploadData.fileSearchDocument?.name 
+        || uploadData.name
+        || uploadData.response?.name;
+      
+      if (documentName) {
+        console.log(`✅ File uploaded to File Search: ${documentName}`);
+        return documentName;
       }
 
-      throw new Error('Unexpected response from File Search import');
+      // Log unexpected response for debugging
+      console.warn(`⚠️ Unexpected File Search response structure:`, {
+        keys: Object.keys(uploadData),
+        hasName: !!uploadData.name,
+        hasDone: !!uploadData.done,
+        hasFileSearchDocument: !!uploadData.fileSearchDocument
+      });
+      
+      // Return null but don't fail - let Vectorize fallback handle it
+      return null;
     } catch (error) {
       console.error('Error uploading to File Search:', error);
       throw error;

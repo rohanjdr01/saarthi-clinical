@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saarthi GP Dashboard</title>
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        .animate-slideIn { animation: slideIn 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans antialiased">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // --- ICONS (Inlined for standalone usage) ---
+        const Icon = ({ path, className, size = 20 }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                {path}
+            </svg>
+        );
+
+        const Icons = {
+            Search: (props) => <Icon {...props} path={<><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></>} />,
+            AlertTriangle: (props) => <Icon {...props} path={<><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></>} />,
+            FileText: (props) => <Icon {...props} path={<><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></>} />,
+            Upload: (props) => <Icon {...props} path={<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></>} />,
+            Thermometer: (props) => <Icon {...props} path={<><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path></>} />,
+            Pill: (props) => <Icon {...props} path={<><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"></path><path d="m8.5 8.5 7 7"></path></>} />,
+            Activity: (props) => <Icon {...props} path={<><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></>} />,
+            User: (props) => <Icon {...props} path={<><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></>} />,
+            X: (props) => <Icon {...props} path={<><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></>} />,
+            Send: (props) => <Icon {...props} path={<><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></>} />
+        };
+
+        // --- DATA ---
+        const patientData = {
+            id: "IPD.25-26-29851",
+            name: "Mohammed Kutty P K",
+            age: 68,
+            diagnosis: "Ca Stomach (Body/Antrum)",
+            stage: "cT3N1M0 (Stage III)",
+            treatment: "Neoadjuvant Chemo (FLOT)",
+            alerts: [
+                { type: 'critical', title: 'Seizure Disorder', desc: 'Onset post-CT. Controlled on Eptoin.' },
+                { type: 'warning', title: 'Nutritional Decline', desc: 'Weight loss: 57kg -> 54kg' }
+            ]
+        };
+
+        const timelineData = [
+            { date: "Nov 21, 2025", type: "lab", title: "Haematology & Biochemistry", value: "Hb 10.2 | WBC 4.5 | Plt 150", docId: "doc_123" },
+            { date: "Nov 21, 2025", type: "treatment", title: "Chemo Cycle 4 (Dose Reduced)", desc: "Due to recent Salmonella infection", docId: "doc_124" },
+            { date: "Nov 07, 2025", type: "alert", title: "Infectious Complication", desc: "Admitted for Salmonella Infection (7 days)", docId: "doc_125" },
+            { date: "Oct 22, 2025", type: "consult", title: "Neurology Consult", desc: "Seizure management plan updated", docId: "doc_126" },
+            { date: "Sept 30, 2025", type: "procedure", title: "D-Lap Procedure", desc: "Peritoneal wash cytology negative", docId: "doc_127" },
+        ];
+
+        const documents = [
+            { name: "2025-11-21_Chemo_Discharge.pdf", tag: "Discharge", status: "processed", date: "Nov 21" },
+            { name: "2025-11-21_Lab_Report.pdf", tag: "Lab", status: "processed", date: "Nov 21" },
+            { name: "2025-10-22_Neuro_Consult.pdf", tag: "Consult", status: "processed", date: "Oct 22" },
+            { name: "2025-09-30_DLAP_Summary.pdf", tag: "Surgical", status: "processed", date: "Sept 30" },
+        ];
+
+        // --- MAIN APP ---
+        function App() {
+            const [activeTab, setActiveTab] = useState('snapshot');
+            const [aiOpen, setAiOpen] = useState(false);
+            const [chatQuery, setChatQuery] = useState("");
+            const [chatHistory, setChatHistory] = useState([
+                { role: 'ai', text: "Hello doctor. I have analyzed Mohammed's case files. Ask me about his latest blood work or tumor markers." }
+            ]);
+
+            const handleChatSubmit = (e) => {
+                e.preventDefault();
+                if (!chatQuery.trim()) return;
+                
+                // Mock AI Response
+                const newHistory = [...chatHistory, { role: 'user', text: chatQuery }];
+                setChatHistory(newHistory);
+                setChatQuery("");
+                
+                setTimeout(() => {
+                    setChatHistory(prev => [...prev, { 
+                        role: 'ai', 
+                        text: "Based on the Lab Report from Nov 21, his Hemoglobin is 10.2 g/dL, down from 11.5 previously. This correlates with the recent nutritional decline noted in the discharge summary.",
+                        source: "2025-11-21_Lab_Report.pdf"
+                    }]);
+                }, 800);
+            };
+
+            const Header = () => (
+                <div className="bg-slate-900 text-white p-4 shadow-md sticky top-0 z-50">
+                    <div className="max-w-7xl mx-auto flex justify-between items-center">
+                        <div className="flex items-center space-x-4">
+                            <div className="h-10 w-10 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-xl shadow-inner">S</div>
+                            <div>
+                                <h1 className="text-lg font-bold leading-tight">{patientData.name}</h1>
+                                <div className="text-xs text-slate-400 flex items-center space-x-2">
+                                    <span>ID: {patientData.id}</span>
+                                    <span className="w-1 h-1 bg-slate-500 rounded-full"></span>
+                                    <span>{patientData.age}Y Male</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex space-x-3">
+                            <button 
+                                onClick={() => setAiOpen(!aiOpen)}
+                                className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all border ${aiOpen ? 'bg-white text-slate-900 border-white' : 'bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-500'}`}
+                            >
+                                {aiOpen ? <Icons.X size={16} /> : <Icons.Search size={16} />}
+                                <span className="hidden sm:inline">{aiOpen ? "Close Assistant" : "Ask Saarthi AI"}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            const SnapshotView = () => (
+                <div className="space-y-6 animate-fadeIn">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {patientData.alerts.map((alert, i) => (
+                            <div key={i} className={`p-4 rounded-lg border-l-4 shadow-sm flex items-start ${alert.type === 'critical' ? 'bg-red-50 border-red-500' : 'bg-orange-50 border-orange-500'}`}>
+                                <Icons.AlertTriangle className={`mt-0.5 flex-shrink-0 ${alert.type === 'critical' ? 'text-red-600' : 'text-orange-600'}`} size={20} />
+                                <div className="ml-3">
+                                    <h3 className={`font-bold ${alert.type === 'critical' ? 'text-red-900' : 'text-orange-900'}`}>{alert.title}</h3>
+                                    <p className={`text-sm mt-1 ${alert.type === 'critical' ? 'text-red-800' : 'text-orange-800'}`}>{alert.desc}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                            <h3 className="text-slate-400 uppercase text-xs font-bold mb-4 tracking-wider">Diagnosis & Staging</h3>
+                            <div className="space-y-5">
+                                <div>
+                                    <label className="text-xs text-slate-500 font-semibold block mb-1">Primary Diagnosis</label>
+                                    <div className="text-xl font-bold text-slate-900">{patientData.diagnosis}</div>
+                                </div>
+                                <div>
+                                    <label className="text-xs text-slate-500 font-semibold block mb-1">Current Stage</label>
+                                    <div className="inline-block bg-slate-100 px-3 py-1 rounded text-slate-800 font-mono font-medium">{patientData.stage}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                            <h3 className="text-slate-400 uppercase text-xs font-bold mb-4 tracking-wider">Current Treatment</h3>
+                            <div className="space-y-5">
+                                <div>
+                                    <label className="text-xs text-slate-500 font-semibold block mb-1">Active Regimen</label>
+                                    <div className="text-xl font-bold text-blue-700">{patientData.treatment}</div>
+                                </div>
+                                <div>
+                                    <div className="flex justify-between text-xs text-slate-600 mb-1">
+                                        <span>Progress</span>
+                                        <span>Cycle 4 of 6</span>
+                                    </div>
+                                    <div className="w-full bg-slate-100 rounded-full h-2.5">
+                                        <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-1000" style={{ width: '66%' }}></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            const TimelineView = () => (
+                <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm animate-fadeIn">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                        <div>
+                            <h2 className="text-xl font-bold text-slate-800">Clinical Journey</h2>
+                            <p className="text-sm text-slate-500">Chronological view of labs, imaging, and events</p>
+                        </div>
+                        <div className="flex space-x-1 bg-slate-100 p-1 rounded-lg">
+                           <button className="px-3 py-1 bg-white text-slate-800 text-xs font-medium rounded shadow-sm">All</button>
+                           <button className="px-3 py-1 text-slate-600 text-xs font-medium rounded hover:bg-slate-200 transition-colors">Labs</button>
+                           <button className="px-3 py-1 text-slate-600 text-xs font-medium rounded hover:bg-slate-200 transition-colors">Imaging</button>
+                        </div>
+                    </div>
+                    
+                    <div className="relative border-l-2 border-slate-200 ml-4 space-y-8 pl-8 pb-4">
+                        {timelineData.map((event, i) => (
+                            <div key={i} className="relative group">
+                                <div className={`absolute -left-[43px] h-8 w-8 rounded-full border-4 border-white flex items-center justify-center shadow-sm z-10
+                                    ${event.type === 'lab' ? 'bg-indigo-100 text-indigo-600' : 
+                                      event.type === 'treatment' ? 'bg-blue-100 text-blue-600' :
+                                      event.type === 'alert' ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-600'}`}>
+                                    {event.type === 'lab' && <Icons.Thermometer size={14} />}
+                                    {event.type === 'treatment' && <Icons.Pill size={14} />}
+                                    {event.type === 'alert' && <Icons.AlertTriangle size={14} />}
+                                    {event.type === 'consult' && <Icons.User size={14} />}
+                                    {event.type === 'procedure' && <Icons.Activity size={14} />}
+                                </div>
+
+                                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group-hover:bg-slate-50">
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{event.date}</span>
+                                            <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase font-bold
+                                                ${event.type === 'lab' ? 'bg-indigo-50 text-indigo-700' : 
+                                                event.type === 'treatment' ? 'bg-blue-50 text-blue-700' :
+                                                event.type === 'alert' ? 'bg-red-50 text-red-700' : 'bg-slate-100 text-slate-600'}`}>
+                                                {event.type}
+                                            </span>
+                                        </div>
+                                        <h4 className="text-base font-bold text-slate-800">{event.title}</h4>
+                                        <p className={`text-sm mt-1 ${event.type === 'alert' ? 'text-red-700' : 'text-slate-600'}`}>
+                                            {event.desc || event.value}
+                                        </p>
+                                    </div>
+                                    <div className="mt-3 sm:mt-0 sm:ml-4">
+                                        <button className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded transition-colors">
+                                            <Icons.FileText size={14}/> <span>Source</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+
+            const DocumentsView = () => (
+                <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm animate-fadeIn">
+                    <div className="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 className="text-xl font-bold text-slate-800">Case Pack</h2>
+                            <p className="text-sm text-slate-500">Digitized medical records</p>
+                        </div>
+                        <button className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-md text-sm transition-colors shadow-sm">
+                            <Icons.Upload size={16} /> Upload New
+                        </button>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full text-left text-sm">
+                            <thead className="bg-slate-50 text-slate-500 border-b border-slate-200">
+                                <tr>
+                                    <th className="px-4 py-3 font-semibold">Document Name</th>
+                                    <th className="px-4 py-3 font-semibold">Date</th>
+                                    <th className="px-4 py-3 font-semibold">Category</th>
+                                    <th className="px-4 py-3 font-semibold">Status</th>
+                                    <th className="px-4 py-3 font-semibold text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {documents.map((doc, i) => (
+                                    <tr key={i} className="hover:bg-slate-50 transition-colors group">
+                                        <td className="px-4 py-3 font-medium text-slate-700 flex items-center gap-3">
+                                            <div className="p-2 bg-white border border-slate-200 rounded text-red-500">
+                                                <Icons.FileText size={16} />
+                                            </div>
+                                            {doc.name}
+                                        </td>
+                                        <td className="px-4 py-3 text-slate-500">{doc.date}</td>
+                                        <td className="px-4 py-3">
+                                            <span className="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium border border-slate-200">{doc.tag}</span>
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <span className="flex items-center gap-1.5 text-green-700 text-xs font-bold bg-green-50 px-2 py-1 rounded-full w-fit">
+                                                <span className="w-1.5 h-1.5 bg-green-600 rounded-full"></span> Processed
+                                            </span>
+                                        </td>
+                                        <td className="px-4 py-3 text-right">
+                                            <button className="text-blue-600 hover:text-blue-800 font-medium hover:underline">View</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="min-h-screen bg-slate-50">
+                    <Header />
+
+                    <main className="max-w-7xl mx-auto p-4 lg:p-8 flex gap-6 items-start relative">
+                        
+                        {/* Main Content Area */}
+                        <div className={`flex-1 space-y-6 transition-all duration-300 ${aiOpen ? 'lg:mr-[340px]' : ''}`}>
+                            
+                            {/* Tabs */}
+                            <div className="flex p-1 bg-slate-200/80 rounded-lg w-full sm:w-auto inline-flex backdrop-blur-sm">
+                                {['snapshot', 'timeline', 'docs'].map((tab) => (
+                                    <button 
+                                        key={tab}
+                                        onClick={() => setActiveTab(tab)}
+                                        className={`flex-1 sm:flex-none px-6 py-2 rounded-md text-sm font-semibold transition-all duration-200 capitalize
+                                            ${activeTab === tab 
+                                                ? 'bg-white text-blue-700 shadow-sm transform scale-[1.02]' 
+                                                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'}`}
+                                    >
+                                        {tab === 'docs' ? 'Case Pack' : tab}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {activeTab === 'snapshot' && <SnapshotView />}
+                            {activeTab === 'timeline' && <TimelineView />}
+                            {activeTab === 'docs' && <DocumentsView />}
+                        </div>
+
+                        {/* AI Sidebar */}
+                        {aiOpen && (
+                            <div className="fixed inset-y-0 right-0 w-full sm:w-[380px] bg-white border-l border-slate-200 shadow-2xl flex flex-col z-40 mt-[72px] sm:mt-[72px] animate-slideIn">
+                                <div className="p-4 border-b border-slate-100 bg-gradient-to-r from-blue-50 to-indigo-50">
+                                    <h3 className="font-bold text-blue-900 flex items-center gap-2">
+                                        <Icons.Search size={18}/> Saarthi Assistant
+                                    </h3>
+                                    <p className="text-xs text-blue-700 mt-1 font-medium">RAG Active • Searching 14 documents</p>
+                                </div>
+                                
+                                <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-50/50">
+                                    {chatHistory.map((msg, i) => (
+                                        <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                            <div className={`max-w-[85%] p-3 text-sm rounded-2xl shadow-sm
+                                                ${msg.role === 'user' 
+                                                    ? 'bg-blue-600 text-white rounded-tr-none' 
+                                                    : 'bg-white text-slate-700 border border-slate-200 rounded-tl-none'}`}>
+                                                <p className="leading-relaxed">{msg.text}</p>
+                                                {msg.source && (
+                                                    <div className="mt-2 pt-2 border-t border-slate-100 flex items-center gap-1 text-xs text-blue-600 cursor-pointer hover:underline font-medium">
+                                                        <Icons.FileText size={12} /> Source: {msg.source}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="p-4 bg-white border-t border-slate-200">
+                                    <form onSubmit={handleChatSubmit} className="relative">
+                                        <input 
+                                            type="text" 
+                                            value={chatQuery}
+                                            onChange={(e) => setChatQuery(e.target.value)}
+                                            placeholder="Ask a clinical question..." 
+                                            className="w-full border border-slate-300 rounded-full pl-4 pr-12 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm" 
+                                        />
+                                        <button type="submit" className="absolute right-2 top-2 p-1.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors">
+                                            <Icons.Send size={16} />
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        )}
+                    </main>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

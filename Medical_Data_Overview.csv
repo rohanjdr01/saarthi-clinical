@@ -1,0 +1,85 @@
+Section,Subsection,Data Field,Type,Example,Notes
+1. Patient Information,Demographics,Patient ID,Text,pt_abc123,System-generated unique identifier
+1. Patient Information,Demographics,Patient Name,Text,John Doe,Full name
+1. Patient Information,Demographics,Age,Number,65,Age in years
+1. Patient Information,Demographics,Gender,Text,"male, female, other",Patient gender
+1. Patient Information,Demographics,Status,Text,"active, inactive",Current patient status
+1. Patient Information,Caregiver Info,Caregiver Name,Text,Jane Doe,Primary caregiver name
+1. Patient Information,Caregiver Info,Relationship,Text,"daughter, spouse",Relationship to patient
+1. Patient Information,Caregiver Info,Contact Number,Phone,+91-9999999999,Emergency contact
+2. Diagnosis,Primary Diagnosis,Primary Cancer Type,Text,Breast Cancer,Main cancer diagnosis
+2. Diagnosis,Primary Diagnosis,Cancer Subtype,Text,Invasive Ductal Carcinoma,Specific subtype
+2. Diagnosis,Primary Diagnosis,Diagnosis Date,Date,2024-01-15,Date of confirmed diagnosis
+2. Diagnosis,Tumor Details,Tumor Location,Text,"Upper outer quadrant, left breast",Anatomical location
+2. Diagnosis,Tumor Details,Laterality,Text,"left, right, bilateral",Which side affected
+2. Diagnosis,Tumor Details,Tumor Size,Number,2.5 cm,Size in centimeters
+2. Diagnosis,Tumor Details,Tumor Grade,Text,"G1, G2, G3, G4",Histological grade
+2. Diagnosis,Tumor Details,Histology,Text,Ductal carcinoma,Tissue type
+2. Diagnosis,Biomarkers,ER Status,Text,"positive, negative",Estrogen Receptor
+2. Diagnosis,Biomarkers,PR Status,Text,"positive, negative",Progesterone Receptor
+2. Diagnosis,Biomarkers,HER2 Status,Text,"positive, negative",HER2/neu status
+3. Staging,Clinical Staging,Clinical T,Text,cT2,Tumor size/extent
+3. Staging,Clinical Staging,Clinical N,Text,cN1,Lymph node involvement
+3. Staging,Clinical Staging,Clinical M,Text,cM0,Metastasis status
+3. Staging,Clinical Staging,Clinical Stage,Text,"IIA, IIB, IIIA",Overall clinical stage
+3. Staging,Pathological Staging,Pathological T,Text,pT2,Post-surgery tumor assessment
+3. Staging,Pathological Staging,Pathological N,Text,pN1,Post-surgery node assessment
+3. Staging,Pathological Staging,Pathological M,Text,pM0,Post-surgery metastasis status
+3. Staging,Pathological Staging,Pathological Stage,Text,"IIA, IIB",Overall pathological stage
+3. Staging,Staging Details,Staging System,Text,AJCC 8th,Which staging system used
+3. Staging,Staging Details,Staging Date,Date,2024-01-20,When staging was determined
+4. Treatment,Treatment Plan,Regimen Name,Text,AC-T,Treatment protocol name
+4. Treatment,Treatment Plan,Treatment Intent,Text,"adjuvant, neoadjuvant",Purpose of treatment
+4. Treatment,Treatment Plan,Treatment Line,Text,"first-line, second-line",Which line of therapy
+4. Treatment,Treatment Plan,Protocol Name,Text,AC-T Protocol,Full protocol name
+4. Treatment,Treatment Plan,Drug Names,List,"Doxorubicin, Cyclophosphamide",All drugs in regimen
+4. Treatment,Treatment Plan,Start Date,Date,2024-02-01,Treatment start date
+4. Treatment,Treatment Plan,Planned Cycles,Number,8,Total cycles planned
+4. Treatment,Treatment Plan,Treatment Status,Text,"active, completed",Current status
+4. Treatment,Cycle Details,Cycle Number,Number,"1, 2, 3",Which cycle
+4. Treatment,Cycle Details,Planned Date,Date,2024-02-01,When cycle was scheduled
+4. Treatment,Cycle Details,Actual Date,Date,2024-02-01,When cycle was administered
+4. Treatment,Cycle Details,Cycle Status,Text,"completed, delayed",Status of this cycle
+4. Treatment,Cycle Details,Dose Percentage,Number,"100%, 75%",% of full dose given
+4. Treatment,Drug Administration,Drug Name,Text,Doxorubicin,Specific drug
+4. Treatment,Drug Administration,Dose,Number,60,Dose amount
+4. Treatment,Drug Administration,Unit,Text,"mg/m2, mg",Dose unit
+4. Treatment,Drug Administration,Route,Text,"IV, PO, SC",How administered
+4. Treatment,Side Effects,Adverse Event,Text,"Nausea, Neutropenia",Specific side effect
+4. Treatment,Side Effects,CTCAE Grade,Number,"1, 2, 3, 4, 5",Severity grade (1=mild 5=death)
+5. Laboratory,Lab Results,Test Name,Text,"Hemoglobin, WBC Count",Name of lab test
+5. Laboratory,Lab Results,Result Value,Number,"10.5, 7500",Numeric result
+5. Laboratory,Lab Results,Unit,Text,"g/dL, cells/mcL",Unit of measurement
+5. Laboratory,Lab Results,Test Date,Date,2025-01-01,When test was performed
+5. Laboratory,Lab Results,Is Abnormal,Yes/No,"Yes, No",Whether result is out of range
+6. Medications,Current Medications,Medication Name,Text,"Cisplatin, Lisinopril",Drug name
+6. Medications,Current Medications,Dose,Number,50,Dose amount
+6. Medications,Current Medications,Dose Unit,Text,"mg, mcg",Dose measurement
+6. Medications,Current Medications,Frequency,Text,"q3w, daily, BID",How often given
+6. Medications,Current Medications,Route,Text,"IV, PO, SC",Administration route
+6. Medications,Current Medications,Status,Text,"active, discontinued",Current status
+6. Medications,Current Medications,Discontinuation Reason,Text,Completed regimen,Why stopped (if applicable)
+7. Medical History,Past Medical,Past Medical Condition,Text,"Hypertension, Diabetes",Previous condition
+7. Medical History,Past Medical,Diagnosis Date,Date,2010-01-01,When diagnosed
+7. Medical History,Surgical,Surgical Procedure,Text,Appendectomy,Surgery performed
+7. Medical History,Surgical,Surgery Date,Date,2015-05-05,When performed
+7. Medical History,Family,Family Relationship,Text,"mother, father",Family member
+7. Medical History,Family,Family Condition,Text,Breast cancer,Condition in family
+7. Medical History,Social,Tobacco Use,Text,"never, former, current",Smoking status
+7. Medical History,Social,Alcohol Use,Text,"never, occasional",Drinking status
+8. Clinical Alerts,Alerts,Alert Type,Text,"clinical, administrative",Category of alert
+8. Clinical Alerts,Alerts,Severity,Text,"high, medium, low",How urgent
+8. Clinical Alerts,Alerts,Title,Text,Neutropenia risk,Brief description
+8. Clinical Alerts,Alerts,Description,Text,ANC trending down,Detailed information
+8. Clinical Alerts,Alerts,Status,Text,"active, acknowledged",Current status
+8. Clinical Alerts,Alerts,Acknowledged By,Text,Dr. Smith,Who reviewed the alert
+9. Clinical Decisions,Decisions,Decision Type,Text,treatment_plan,Type of decision
+9. Clinical Decisions,Decisions,Clinical Question,Text,Next line therapy?,Question being addressed
+9. Clinical Decisions,Decisions,Decision Made,Text,Start AC-T regimen,The decision reached
+9. Clinical Decisions,Decisions,Implementation Status,Text,"planned, in_progress",Status
+10. Documents,Document Info,Document ID,Text,doc_123,System identifier
+10. Documents,Document Info,Filename,Text,pathology_report.pdf,Original file name
+10. Documents,Document Info,Document Type,Text,"pathology, imaging, lab",Category
+10. Documents,Document Info,Processing Status,Text,"pending, completed",Upload status
+10. Documents,Document Info,Medical Highlight,Text,Biopsy confirms invasive ductal carcinoma,Key finding from document
+10. Documents,Document Info,Upload Date,Date/Time,2024-01-15 10:30 AM,When uploaded

@@ -136,6 +136,10 @@ LOG_LEVEL = "info"
 EMBEDDING_MODEL = "bge-large-en-v1.5"
 FILE_SEARCH_ENABLED = "true"
 
+[[env.staging.routes]]
+pattern = "staging.saarthihq.com/*"
+zone_name = "saarthihq.com"
+
 [observability]
 enabled = false
 head_sampling_rate = 1

@@ -1,6 +1,6 @@
 /**
  * OpenAI Client - Latest Models
- * Uses GPT-4o for images and Responses API for PDFs
+ * Uses GPT-5 for primary processing and GPT-4o/o3-mini where appropriate.
  * https://platform.openai.com/docs/guides/vision
  */
 
@@ -12,7 +12,7 @@ export class OpenAIService {
     this.baseUrl = 'https://api.openai.com/v1';
     
     // Latest models
-    this.model = 'gpt-4o'; // Best for multimodal tasks
+    this.model = 'gpt-5'; // Default for full processing
     this.reasoningModel = 'o3-mini'; // For complex reasoning
     
     // Supported image types for Vision API
@@ -26,16 +26,21 @@ export class OpenAIService {
     const url = `${this.baseUrl}/chat/completions`;
     const model = useReasoning ? this.reasoningModel : this.model;
 
-    const requestBody = useReasoning ? {
-      model,
-      messages: [{ role: 'user', content: prompt }],
-      reasoning_effort: 'medium'
-    } : {
-      model,
-      messages: [{ role: 'user', content: prompt }],
-      temperature,
-      max_tokens: 16384
-    };
+    const requestBody = useReasoning
+      ? {
+          model,
+          messages: [{ role: 'user', content: prompt }],
+          reasoning_effort: 'medium'
+        }
+      : {
+          model,
+          messages: [{ role: 'user', content: prompt }],
+          temperature,
+          // gpt-5 uses `max_completion_tokens` instead of `max_tokens`
+          ...(model.startsWith('gpt-5')
+            ? { max_completion_tokens: 16384 }
+            : { max_tokens: 16384 })
+        };
 
     console.log(`🤖 OpenAI request (${model})...`);
 
@@ -106,32 +111,36 @@ export class OpenAIService {
       }
     ];
 
-    const requestBody = useReasoning ? {
-      model,
-      messages: [{ role: 'user', content }],
-      reasoning_effort: 'high',
-      response_format: {
-        type: 'json_schema',
-        json_schema: {
-          name: 'medical_extraction',
-          strict: true,
-          schema: MEDICAL_EXTRACTION_SCHEMA
+    const requestBody = useReasoning
+      ? {
+          model,
+          messages: [{ role: 'user', content }],
+          reasoning_effort: 'high',
+          response_format: {
+            type: 'json_schema',
+            json_schema: {
+              name: 'medical_extraction',
+              strict: true,
+              schema: MEDICAL_EXTRACTION_SCHEMA
+            }
+          }
         }
-      }
-    } : {
-      model,
-      messages: [{ role: 'user', content }],
-      temperature: 0.2,
-      max_tokens: 16384,
-      response_format: {
-        type: 'json_schema',
-        json_schema: {
-          name: 'medical_extraction',
-          strict: true,
-          schema: MEDICAL_EXTRACTION_SCHEMA
-        }
-      }
-    };
+      : {
+          model,
+          messages: [{ role: 'user', content }],
+          temperature: 0.2,
+          ...(model.startsWith('gpt-5')
+            ? { max_completion_tokens: 16384 }
+            : { max_tokens: 16384 }),
+          response_format: {
+            type: 'json_schema',
+            json_schema: {
+              name: 'medical_extraction',
+              strict: true,
+              schema: MEDICAL_EXTRACTION_SCHEMA
+            }
+          }
+        };
 
     console.log(`📄 OpenAI image processing (${model}, ${mimeType})...`);
 
@@ -297,7 +306,9 @@ Return ONLY the highlight, nothing else.`;
         ]
       }],
       temperature: 0.1,
-      max_tokens: 256
+      ...(this.model.startsWith('gpt-5')
+        ? { max_completion_tokens: 256 }
+        : { max_tokens: 256 })
     };
 
     const response = await this.fetchWithTimeout(`${this.baseUrl}/chat/completions`, {

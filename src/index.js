@@ -123,6 +123,67 @@ app.get('/api/v1/health/db', async (c) => {
   }
 });
 
+// R2 Storage diagnostic endpoint
+app.get('/api/v1/health/storage', async (c) => {
+  try {
+    if (!c.env.DOCUMENTS) {
+      return c.json({
+        success: false,
+        error: 'R2 DOCUMENTS binding not found',
+        diagnostic: {
+          hasDocuments: false,
+          environment: c.env?.ENVIRONMENT || 'unknown'
+        }
+      }, 500);
+    }
+
+    // Get recent documents from DB
+    const recentDocs = await c.env.DB.prepare(`
+      SELECT id, filename, storage_key, file_size, processing_status, created_at
+      FROM documents
+      ORDER BY created_at DESC
+      LIMIT 5
+    `).all();
+
+    // Check if each document exists in R2
+    const storageChecks = [];
+    for (const doc of recentDocs.results || []) {
+      const r2Object = await c.env.DOCUMENTS.get(doc.storage_key);
+      storageChecks.push({
+        document_id: doc.id,
+        filename: doc.filename,
+        storage_key: doc.storage_key,
+        db_size: doc.file_size,
+        r2_exists: !!r2Object,
+        r2_size: r2Object?.size || null,
+        processing_status: doc.processing_status,
+        created_at: doc.created_at
+      });
+    }
+
+    return c.json({
+      success: true,
+      message: 'R2 storage check completed',
+      diagnostic: {
+        hasDocuments: true,
+        totalDocumentsInDB: recentDocs.results?.length || 0,
+        recentDocuments: storageChecks,
+        environment: c.env?.ENVIRONMENT || 'unknown'
+      }
+    });
+  } catch (error) {
+    return c.json({
+      success: false,
+      error: error.message,
+      diagnostic: {
+        hasDocuments: !!c.env.DOCUMENTS,
+        errorType: error.constructor.name,
+        stack: error.stack
+      }
+    }, 500);
+  }
+});
+
 // Mount routes
 app.route('/api/v1/auth', auth);
 app.route('/api/v1/patients', patients);
@@ -167,12 +228,15 @@ export default {
   async queue(batch, env, ctx) {
     // Process each message in the batch
     for (const message of batch.messages) {
+      let job = null;
       try {
-        const job = JSON.parse(message.body);
+        job = typeof message.body === 'string' ? JSON.parse(message.body) : message.body;
+        
         console.log(`📥 Processing queue job:`, {
           documentId: job.documentId,
           mode: job.mode,
-          provider: job.provider
+          provider: job.provider,
+          attempt: message.attempts || 0
         });
 
         // Validate job
@@ -182,48 +246,107 @@ export default {
           continue;
         }
 
-        // Initialize processor
+        // Diagnostic: Check environment bindings
+        console.log(`🔍 Queue environment check:`, {
+          hasDB: !!env.DB,
+          hasDocuments: !!env.DOCUMENTS,
+          hasVectorize: !!env.VECTORIZE,
+          hasAI: !!env.AI,
+          hasGeminiKey: !!env.GEMINI_API_KEY,
+          hasOpenAIKey: !!env.OPENAI_API_KEY
+        });
+
+        // Verify document exists in DB and R2
+        const doc = await env.DB.prepare('SELECT * FROM documents WHERE id = ?')
+          .bind(job.documentId)
+          .first();
+        
+        if (!doc) {
+          // On first attempt, this might be a timing issue - retry
+          if ((message.attempts || 0) === 0) {
+            console.warn(`⚠️ Document ${job.documentId} not found in database on first attempt - will retry`);
+            throw new Error(`Document ${job.documentId} not found in database (timing issue - retrying)`);
+          }
+          
+          // After retries, this is a real error - acknowledge to prevent infinite loop
+          console.error(`❌ Document ${job.documentId} not found in database after retries - acknowledging`);
+          message.ack();
+          continue;
+        }
+
+        console.log(`📄 Document metadata:`, {
+          id: doc.id,
+          patient_id: doc.patient_id,
+          filename: doc.filename,
+          storage_key: doc.storage_key,
+          mime_type: doc.mime_type,
+          processing_status: doc.processing_status
+        });
+
+        // Check if file exists in R2
+        const r2Object = await env.DOCUMENTS.get(doc.storage_key);
+        if (!r2Object) {
+          throw new Error(`Document file not found in R2 at key: ${doc.storage_key}`);
+        }
+
+        console.log(`📦 R2 object found:`, {
+          storage_key: doc.storage_key,
+          size: r2Object.size,
+          uploaded: r2Object.uploaded?.toISOString()
+        });
+
+        // Initialize processor with env
         const processor = new DocumentProcessor(env, { provider: job.provider });
-        const docRepo = DocumentRepository(env.DB);
 
         // Process based on mode
         if (job.mode === 'fast') {
           // Fast mode: quick highlight + vectorize
+          console.log(`⚡ Starting fast processing for ${doc.filename}`);
           await processor.processDocumentFast(job.documentId, { provider: job.provider });
         } else {
           // Full mode: complete extraction + patient sync
+          console.log(`🔬 Starting full processing for ${doc.filename}`);
           await processor.processDocument(job.documentId, {
             mode: job.mode === 'full' ? 'incremental' : job.mode,
             provider: job.provider
           });
         }
 
-        console.log(`✅ Successfully processed document ${job.documentId} in ${job.mode} mode`);
+        console.log(`✅ Successfully processed document ${job.documentId} (${doc.filename}) in ${job.mode} mode`);
         message.ack();
 
       } catch (error) {
-        console.error(`❌ Error processing queue message:`, error);
+        console.error(`❌ Error processing queue message:`, {
+          error: error.message,
+          stack: error.stack,
+          documentId: job?.documentId,
+          mode: job?.mode,
+          attempt: message.attempts || 0
+        });
 
         // Update document status to failed
         try {
-          const job = JSON.parse(message.body);
-          if (job.documentId) {
+          if (job?.documentId && env.DB) {
             const docRepo = DocumentRepository(env.DB);
             await docRepo.updateProcessingStatus(
               job.documentId,
               'failed',
-              error.message || 'Queue processing failed'
+              `Queue error: ${error.message}`
             );
+            console.log(`Updated document ${job.documentId} status to failed`);
           }
         } catch (updateError) {
-          console.error('Failed to update document status:', updateError);
+          console.error('Failed to update document status:', {
+            error: updateError.message,
+            documentId: job?.documentId
+          });
         }
 
         // Retry logic: retry up to 3 times, then acknowledge to prevent infinite loops
         const retries = message.attempts || 0;
         if (retries < 3) {
           console.log(`🔄 Retrying message (attempt ${retries + 1}/3)`);
-          message.retry();
+          message.retry({ delaySeconds: Math.min(60, Math.pow(2, retries) * 5) });
         } else {
           console.error(`❌ Max retries reached for document ${job?.documentId}, acknowledging to prevent infinite loop`);
           message.ack();

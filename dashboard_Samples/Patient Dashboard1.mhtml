@@ -1,0 +1,1917 @@
+From: <Saved by Blink>
+Snapshot-Content-Location: https://faris.saarthihealth.com/
+Subject: Patient Dashboard
+Date: Tue, 2 Dec 2025 20:42:52 +0530
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----MultipartBoundary--N0VnYHEz0DEIlDSxPgyGGljp1dq1eWhDvpCfTjZNzf----"
+
+
+------MultipartBoundary--N0VnYHEz0DEIlDSxPgyGGljp1dq1eWhDvpCfTjZNzf----
+Content-Type: text/html
+Content-ID: <frame-521A41FA88809B90C318AB2D74645A0B@mhtml.blink>
+Content-Transfer-Encoding: quoted-printable
+Content-Location: https://faris.saarthihealth.com/
+
+<!DOCTYPE html><html lang=3D"en"><head><meta http-equiv=3D"Content-Type" co=
+ntent=3D"text/html; charset=3DUTF-8"><link rel=3D"stylesheet" type=3D"text/=
+css" href=3D"cid:css-855312e8-8aea-4ed6-a6b0-ea4acba877b4@mhtml.blink" /><l=
+ink rel=3D"stylesheet" type=3D"text/css" href=3D"cid:css-922f1705-4c1b-4214=
+-875c-3c2756906606@mhtml.blink" /><link rel=3D"stylesheet" type=3D"text/css=
+" href=3D"cid:css-417cedd0-21cd-44c0-ae35-59e2709e0209@mhtml.blink" /><link=
+ rel=3D"stylesheet" type=3D"text/css" href=3D"cid:css-58498d5f-6348-4317-a9=
+7b-15067c174e84@mhtml.blink" /><link rel=3D"stylesheet" type=3D"text/css" h=
+ref=3D"cid:css-c12bdfd6-b8ad-4ce5-bce2-f1e2b696235a@mhtml.blink" /><link re=
+l=3D"stylesheet" type=3D"text/css" href=3D"cid:css-d82545e6-c709-4399-991d-=
+1c3c37b83e2b@mhtml.blink" /><link rel=3D"stylesheet" type=3D"text/css" href=
+=3D"cid:css-6207923a-f56f-4a88-8deb-1e38e569afe7@mhtml.blink" /><link rel=
+=3D"stylesheet" type=3D"text/css" href=3D"cid:css-debbbe6e-fe21-4007-8657-0=
+d17e0edbee7@mhtml.blink" />
+   =20
+    <meta name=3D"viewport" content=3D"width=3Ddevice-width, initial-scale=
+=3D1.0">
+    <title>Patient Dashboard</title>
+   =20
+    <link rel=3D"stylesheet" href=3D"https://faris.saarthihealth.com/assets=
+/index-a4f4e638.css">
+ =20
+ =20
+</head>
+  <body>
+    <div id=3D"root"><div class=3D"min-h-screen bg-slate-50 flex font-sans =
+text-slate-900"><button class=3D"lg:hidden fixed top-4 left-4 z-50 p-2 bg-w=
+hite rounded-md shadow-md"><svg xmlns=3D"http://www.w3.org/2000/svg" width=
+=3D"24" height=3D"24" viewBox=3D"0 0 24 24" fill=3D"none" stroke=3D"current=
+Color" stroke-width=3D"2" stroke-linecap=3D"round" stroke-linejoin=3D"round=
+" class=3D"lucide lucide-menu"><line x1=3D"4" x2=3D"20" y1=3D"12" y2=3D"12"=
+></line><line x1=3D"4" x2=3D"20" y1=3D"6" y2=3D"6"></line><line x1=3D"4" x2=
+=3D"20" y1=3D"18" y2=3D"18"></line></svg></button><div class=3D"
+        fixed lg:static inset-y-0 left-0 z-40 w-64 bg-black text-slate-100 =
+transform transition-transform duration-200 ease-in-out
+        -translate-x-full lg:translate-x-0
+      "><div class=3D"p-6"><div class=3D"flex items-center space-x-3 mb-8">=
+<img src=3D"https://saarthihealth.com/wp-content/uploads/2025/08/saarthi_lo=
+go_insta.webp" alt=3D"Saarthi Logo" class=3D"w-10 h-10 rounded-lg"><span cl=
+ass=3D"text-xl font-bold">Saarthi</span></div><nav class=3D"space-y-2"><but=
+ton class=3D"w-full flex items-center space-x-3 px-4 py-3 rounded-lg transi=
+tion-colors bg-blue-600 text-white shadow-lg"><svg xmlns=3D"http://www.w3.o=
+rg/2000/svg" width=3D"24" height=3D"24" viewBox=3D"0 0 24 24" fill=3D"none"=
+ stroke=3D"currentColor" stroke-width=3D"2" stroke-linecap=3D"round" stroke=
+-linejoin=3D"round" class=3D"w-5 h-5"><path d=3D"M19 21v-2a4 4 0 0 0-4-4H9a=
+4 4 0 0 0-4 4v2"></path><circle cx=3D"12" cy=3D"7" r=3D"4"></circle></svg><=
+span class=3D"font-medium">Summary Diagnosis</span><svg xmlns=3D"http://www=
+.w3.org/2000/svg" width=3D"24" height=3D"24" viewBox=3D"0 0 24 24" fill=3D"=
+none" stroke=3D"currentColor" stroke-width=3D"2" stroke-linecap=3D"round" s=
+troke-linejoin=3D"round" class=3D"w-4 h-4 ml-auto"><path d=3D"m9 18 6-6-6-6=
+"></path></svg></button><button class=3D"w-full flex items-center space-x-3=
+ px-4 py-3 rounded-lg transition-colors text-slate-400 hover:bg-slate-900 h=
+over:text-white"><svg xmlns=3D"http://www.w3.org/2000/svg" width=3D"24" hei=
+ght=3D"24" viewBox=3D"0 0 24 24" fill=3D"none" stroke=3D"currentColor" stro=
+ke-width=3D"2" stroke-linecap=3D"round" stroke-linejoin=3D"round" class=3D"=
+w-5 h-5"><rect width=3D"18" height=3D"18" x=3D"3" y=3D"4" rx=3D"2" ry=3D"2"=
+></rect><line x1=3D"16" x2=3D"16" y1=3D"2" y2=3D"6"></line><line x1=3D"8" x=
+2=3D"8" y1=3D"2" y2=3D"6"></line><line x1=3D"3" x2=3D"21" y1=3D"10" y2=3D"1=
+0"></line></svg><span class=3D"font-medium">Timeline</span></button><button=
+ class=3D"w-full flex items-center space-x-3 px-4 py-3 rounded-lg transitio=
+n-colors text-slate-400 hover:bg-slate-900 hover:text-white"><svg xmlns=3D"=
+http://www.w3.org/2000/svg" width=3D"24" height=3D"24" viewBox=3D"0 0 24 24=
+" fill=3D"none" stroke=3D"currentColor" stroke-width=3D"2" stroke-linecap=
+=3D"round" stroke-linejoin=3D"round" class=3D"w-5 h-5"><path d=3D"m21.73 18=
+-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><p=
+ath d=3D"M12 9v4"></path><path d=3D"M12 17h.01"></path></svg><span class=3D=
+"font-medium">Risk Factors</span></button><button class=3D"w-full flex item=
+s-center space-x-3 px-4 py-3 rounded-lg transition-colors text-slate-400 ho=
+ver:bg-slate-900 hover:text-white"><svg xmlns=3D"http://www.w3.org/2000/svg=
+" width=3D"24" height=3D"24" viewBox=3D"0 0 24 24" fill=3D"none" stroke=3D"=
+currentColor" stroke-width=3D"2" stroke-linecap=3D"round" stroke-linejoin=
+=3D"round" class=3D"w-5 h-5"><path d=3D"M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 =
+0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points=3D"14 2 14 8 20=
+ 8"></polyline><line x1=3D"16" x2=3D"8" y1=3D"13" y2=3D"13"></line><line x1=
+=3D"16" x2=3D"8" y1=3D"17" y2=3D"17"></line><line x1=3D"10" x2=3D"8" y1=3D"=
+9" y2=3D"9"></line></svg><span class=3D"font-medium">Detailed Case Pack</sp=
+an></button><button class=3D"w-full flex items-center space-x-3 px-4 py-3 r=
+ounded-lg transition-colors text-slate-400 hover:bg-slate-900 hover:text-wh=
+ite"><svg xmlns=3D"http://www.w3.org/2000/svg" width=3D"24" height=3D"24" v=
+iewBox=3D"0 0 24 24" fill=3D"none" stroke=3D"currentColor" stroke-width=3D"=
+2" stroke-linecap=3D"round" stroke-linejoin=3D"round" class=3D"w-5 h-5"><re=
+ct width=3D"8" height=3D"4" x=3D"8" y=3D"2" rx=3D"1" ry=3D"1"></rect><path =
+d=3D"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2=
+h2"></path></svg><span class=3D"font-medium">Oncologist One-Pager</span></b=
+utton></nav><div class=3D"mt-10 pt-6 border-t border-slate-700"><p class=3D=
+"text-xs text-slate-500 uppercase tracking-wider mb-4">Patient ID</p><p cla=
+ss=3D"text-sm font-mono text-slate-300">IPD.25-26-29851</p><p class=3D"text=
+-sm font-mono text-slate-300 mt-1">UHID-1010111284</p></div></div></div><di=
+v class=3D"flex-1 lg:pl-0 p-4 lg:p-8 overflow-y-auto h-screen"><div class=
+=3D"max-w-5xl mx-auto pt-12 lg:pt-0"><div class=3D"space-y-6 animate-fadeIn=
+"><div class=3D"bg-white p-6 rounded-lg shadow-sm border border-slate-200">=
+<div class=3D"flex justify-between items-start mb-4"><div><h1 class=3D"text=
+-3xl font-bold text-slate-900">Mr. Mohammed Kutty P K</h1><p class=3D"text-=
+slate-500 font-medium mt-1">68 Years | Male | DOB: 08-10-1957</p></div><div=
+ class=3D"bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm font-bold b=
+order border-blue-100">IPD: 25-26-29851</div></div><div class=3D"grid grid-=
+cols-1 md:grid-cols-2 gap-6 mt-6"><div class=3D"space-y-3"><div class=3D"fl=
+ex justify-between border-b border-dashed border-slate-200 pb-2"><span clas=
+s=3D"text-slate-500">Diagnosis</span><span class=3D"font-bold text-slate-90=
+0 text-right">Carcinoma Stomach (Body/Antrum)</span></div><div class=3D"fle=
+x justify-between border-b border-dashed border-slate-200 pb-2"><span class=
+=3D"text-slate-500">Histology</span><span class=3D"font-bold text-red-600 t=
+ext-right">Adenocarcinoma with Focal Signet Ring Cell</span></div><div clas=
+s=3D"flex justify-between border-b border-dashed border-slate-200 pb-2"><sp=
+an class=3D"text-slate-500">Stage (Clinical)</span><span class=3D"font-bold=
+ text-slate-900 text-right">Localized Node+ (cTNM)</span></div></div><div c=
+lass=3D"space-y-3"><div class=3D"flex justify-between border-b border-dashe=
+d border-slate-200 pb-2"><span class=3D"text-slate-500">Primary Oncologist<=
+/span><span class=3D"font-bold text-slate-900 text-right">Dr. Prasanth Para=
+meswaran</span></div><div class=3D"flex justify-between border-b border-das=
+hed border-slate-200 pb-2"><span class=3D"text-slate-500">Primary Center</s=
+pan><span class=3D"font-bold text-slate-900 text-right">MVR Cancer Centre &=
+amp; Research Institute</span></div><div class=3D"flex justify-between bord=
+er-b border-dashed border-slate-200 pb-2"><span class=3D"text-slate-500">Cu=
+rrent Status</span><span class=3D"font-bold text-green-700 text-right">On T=
+reatment (Neoadjuvant Chemo)</span></div></div></div></div><div class=3D"bg=
+-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg border border-gre=
+en-200 shadow-sm"><div class=3D"flex flex-col sm:flex-row items-center just=
+ify-between gap-4"><div class=3D"flex items-center gap-3"><svg xmlns=3D"htt=
+p://www.w3.org/2000/svg" width=3D"24" height=3D"24" viewBox=3D"0 0 24 24" f=
+ill=3D"none" stroke=3D"currentColor" stroke-width=3D"2" stroke-linecap=3D"r=
+ound" stroke-linejoin=3D"round" class=3D"w-6 h-6 text-green-600"><path d=3D=
+"M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></p=
+ath><polyline points=3D"14 2 14 8 20 8"></polyline><line x1=3D"16" x2=3D"8"=
+ y1=3D"13" y2=3D"13"></line><line x1=3D"16" x2=3D"8" y1=3D"17" y2=3D"17"></=
+line><line x1=3D"10" x2=3D"8" y1=3D"9" y2=3D"9"></line></svg><div><h3 class=
+=3D"font-bold text-green-900">Oncologist One-Pager</h3><p class=3D"text-sm =
+text-green-700">View formatted summary with PII redacted</p></div></div><bu=
+tton class=3D"flex items-center gap-2 bg-green-600 hover:bg-green-700 text-=
+white font-semibold px-6 py-3 rounded-lg shadow-md hover:shadow-lg transiti=
+on-all transform hover:scale-105"><svg xmlns=3D"http://www.w3.org/2000/svg"=
+ width=3D"24" height=3D"24" viewBox=3D"0 0 24 24" fill=3D"none" stroke=3D"c=
+urrentColor" stroke-width=3D"2" stroke-linecap=3D"round" stroke-linejoin=3D=
+"round" class=3D"w-5 h-5"><path d=3D"M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2=
+ 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points=3D"14 2 14 8 20 8"=
+></polyline><line x1=3D"16" x2=3D"8" y1=3D"13" y2=3D"13"></line><line x1=3D=
+"16" x2=3D"8" y1=3D"17" y2=3D"17"></line><line x1=3D"10" x2=3D"8" y1=3D"9" =
+y2=3D"9"></line></svg>View Summary</button></div></div><div class=3D"grid g=
+rid-cols-1 md:grid-cols-3 gap-4"><button class=3D"p-4 bg-white border borde=
+r-slate-200 rounded-lg hover:shadow-md transition-shadow text-left group"><=
+svg xmlns=3D"http://www.w3.org/2000/svg" width=3D"24" height=3D"24" viewBox=
+=3D"0 0 24 24" fill=3D"none" stroke=3D"currentColor" stroke-width=3D"2" str=
+oke-linecap=3D"round" stroke-linejoin=3D"round" class=3D"w-8 h-8 text-blue-=
+500 mb-2 group-hover:scale-110 transition-transform"><rect width=3D"8" heig=
+ht=3D"4" x=3D"8" y=3D"2" rx=3D"1" ry=3D"1"></rect><path d=3D"M16 4h2a2 2 0 =
+0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path></svg><h=
+3 class=3D"font-bold text-slate-800">Timeline</h3><p class=3D"text-sm text-=
+slate-500 mt-1">Key Clinical Events</p></button><button class=3D"p-4 bg-whi=
+te border border-slate-200 rounded-lg hover:shadow-md transition-shadow tex=
+t-left group"><svg xmlns=3D"http://www.w3.org/2000/svg" width=3D"24" height=
+=3D"24" viewBox=3D"0 0 24 24" fill=3D"none" stroke=3D"currentColor" stroke-=
+width=3D"2" stroke-linecap=3D"round" stroke-linejoin=3D"round" class=3D"w-8=
+ h-8 text-red-500 mb-2 group-hover:scale-110 transition-transform"><path d=
+=3D"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-=
+3Z"></path><path d=3D"M12 9v4"></path><path d=3D"M12 17h.01"></path></svg><=
+h3 class=3D"font-bold text-slate-800">Risk Factors</h3><p class=3D"text-sm =
+text-slate-500 mt-1">Clinical Alerts &amp; Warnings</p></button><button cla=
+ss=3D"p-4 bg-white border border-slate-200 rounded-lg hover:shadow-md trans=
+ition-shadow text-left group"><svg xmlns=3D"http://www.w3.org/2000/svg" wid=
+th=3D"24" height=3D"24" viewBox=3D"0 0 24 24" fill=3D"none" stroke=3D"curre=
+ntColor" stroke-width=3D"2" stroke-linecap=3D"round" stroke-linejoin=3D"rou=
+nd" class=3D"w-8 h-8 text-purple-500 mb-2 group-hover:scale-110 transition-=
+transform"><ellipse cx=3D"12" cy=3D"5" rx=3D"9" ry=3D"3"></ellipse><path d=
+=3D"M3 5V19A9 3 0 0 0 21 19V5"></path><path d=3D"M3 12A9 3 0 0 0 21 12"></p=
+ath></svg><h3 class=3D"font-bold text-slate-800">Detailed Case Pack</h3><p =
+class=3D"text-sm text-slate-500 mt-1">Full Document List</p></button></div>=
+<div class=3D"bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg bor=
+der border-blue-200 shadow-sm mt-6"><div class=3D"flex items-start gap-3"><=
+svg xmlns=3D"http://www.w3.org/2000/svg" width=3D"24" height=3D"24" viewBox=
+=3D"0 0 24 24" fill=3D"none" stroke=3D"currentColor" stroke-width=3D"2" str=
+oke-linecap=3D"round" stroke-linejoin=3D"round" class=3D"w-6 h-6 text-blue-=
+600 mt-1"><path d=3D"M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 =
+2-2V7.5L14.5 2z"></path><polyline points=3D"14 2 14 8 20 8"></polyline><lin=
+e x1=3D"16" x2=3D"8" y1=3D"13" y2=3D"13"></line><line x1=3D"16" x2=3D"8" y1=
+=3D"17" y2=3D"17"></line><line x1=3D"10" x2=3D"8" y1=3D"9" y2=3D"9"></line>=
+</svg><div><h3 class=3D"font-bold text-blue-900 text-lg">Case Details</h3><=
+/div></div></div><div class=3D"grid grid-cols-1 lg:grid-cols-2 gap-6"><div =
+class=3D"bg-white p-5 rounded-lg border border-slate-200 shadow-sm"><h3 cla=
+ss=3D"font-bold text-slate-800 border-b pb-2 mb-3 flex items-center"><svg x=
+mlns=3D"http://www.w3.org/2000/svg" width=3D"24" height=3D"24" viewBox=3D"0=
+ 0 24 24" fill=3D"none" stroke=3D"currentColor" stroke-width=3D"2" stroke-l=
+inecap=3D"round" stroke-linejoin=3D"round" class=3D"w-4 h-4 mr-2 text-blue-=
+600"><path d=3D"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle c=
+x=3D"12" cy=3D"7" r=3D"4"></circle></svg> Patient Demographics</h3><div cla=
+ss=3D"space-y-2 text-sm"><div class=3D"flex justify-between"><span class=3D=
+"text-slate-600">Patient:</span><span class=3D"font-semibold text-slate-800=
+">68-year-old male</span></div><div class=3D"flex justify-between"><span cl=
+ass=3D"text-slate-600">Primary Caregiver:</span><span class=3D"font-semibol=
+d text-slate-800">Son (Faris Mohammed)</span></div><div class=3D"flex justi=
+fy-between"><span class=3D"text-slate-600">Current Care:</span><span class=
+=3D"font-semibold text-slate-800">Dr. Prashant at MVR Hospital</span></div>=
+</div></div><div class=3D"bg-white p-5 rounded-lg border border-slate-200 s=
+hadow-sm"><h3 class=3D"font-bold text-slate-800 border-b pb-2 mb-3 flex ite=
+ms-center"><svg xmlns=3D"http://www.w3.org/2000/svg" width=3D"24" height=3D=
+"24" viewBox=3D"0 0 24 24" fill=3D"none" stroke=3D"currentColor" stroke-wid=
+th=3D"2" stroke-linecap=3D"round" stroke-linejoin=3D"round" class=3D"w-4 h-=
+4 mr-2 text-red-600"><path d=3D"M6 18h8"></path><path d=3D"M3 22h18"></path=
+><path d=3D"M14 22a7 7 0 1 0 0-14h-1"></path><path d=3D"M9 14h2"></path><pa=
+th d=3D"M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z"></path><path d=3D"M12 6V3=
+a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3"></path></svg> Diagnosis &amp; Staging</h3=
+><div class=3D"space-y-3 text-sm"><div><span class=3D"block font-semibold t=
+ext-slate-700">Cancer Type</span><span class=3D"text-slate-600">Gastric ade=
+nocarcinoma</span></div><div><span class=3D"block font-semibold text-slate-=
+700">Stage</span><span class=3D"text-red-600 font-medium">Locally advanced =
+Stage III</span><p class=3D"text-xs text-slate-500 mt-1">(Verbally communic=
+ated by medical team, not documented in reports)</p></div><div><span class=
+=3D"block font-semibold text-slate-700">Location</span><span class=3D"text-=
+slate-600">Proximity to esophagus (precludes segmental gastrectomy)</span><=
+/div><div><span class=3D"block font-semibold text-slate-700">Metastasis Sta=
+tus</span><ul class=3D"text-slate-600 text-xs mt-1 space-y-1 list-disc list=
+-inside"><li>Diagnostic laparoscopy with peritoneal wash cytology: <strong =
+class=3D"text-green-700">Negative</strong></li><li>CT thorax: <strong class=
+=3D"text-green-700">No distant metastasis</strong></li><li>Disease confirme=
+d as localized</li></ul></div></div></div><div class=3D"bg-white p-5 rounde=
+d-lg border border-slate-200 shadow-sm"><h3 class=3D"font-bold text-slate-8=
+00 border-b pb-2 mb-3 flex items-center"><svg xmlns=3D"http://www.w3.org/20=
+00/svg" width=3D"24" height=3D"24" viewBox=3D"0 0 24 24" fill=3D"none" stro=
+ke=3D"currentColor" stroke-width=3D"2" stroke-linecap=3D"round" stroke-line=
+join=3D"round" class=3D"w-4 h-4 mr-2 text-purple-600"><rect width=3D"18" he=
+ight=3D"18" x=3D"3" y=3D"4" rx=3D"2" ry=3D"2"></rect><line x1=3D"16" x2=3D"=
+16" y1=3D"2" y2=3D"6"></line><line x1=3D"8" x2=3D"8" y1=3D"2" y2=3D"6"></li=
+ne><line x1=3D"3" x2=3D"21" y1=3D"10" y2=3D"10"></line></svg> Timeline &amp=
+; Presentation</h3><div class=3D"space-y-3 text-sm"><div><span class=3D"blo=
+ck font-semibold text-slate-700">March 2024: Initial symptoms</span><p clas=
+s=3D"text-slate-600">Stomach upset, loss of appetite during Ramadan. Initia=
+lly attributed to gas; temporary relief with 2-week medication course.</p><=
+/div><div><span class=3D"block font-semibold text-slate-700">June 2024: Sym=
+ptom recurrence</span><ul class=3D"text-slate-600 text-xs mt-1 space-y-1 li=
+st-disc list-inside"><li>Ultrasound: Negative</li><li>CT scan: Revealed abn=
+ormalities</li><li>Biopsy: Confirmed gastric adenocarcinoma</li></ul></div>=
+</div><button class=3D"mt-4 w-full flex items-center justify-center gap-2 t=
+ext-purple-700 hover:text-purple-900 font-semibold text-sm py-2 px-4 border=
+ border-purple-300 rounded-lg hover:bg-purple-50 transition-colors"><svg xm=
+lns=3D"http://www.w3.org/2000/svg" width=3D"24" height=3D"24" viewBox=3D"0 =
+0 24 24" fill=3D"none" stroke=3D"currentColor" stroke-width=3D"2" stroke-li=
+necap=3D"round" stroke-linejoin=3D"round" class=3D"w-4 h-4"><rect width=3D"=
+18" height=3D"18" x=3D"3" y=3D"4" rx=3D"2" ry=3D"2"></rect><line x1=3D"16" =
+x2=3D"16" y1=3D"2" y2=3D"6"></line><line x1=3D"8" x2=3D"8" y1=3D"2" y2=3D"6=
+"></line><line x1=3D"3" x2=3D"21" y1=3D"10" y2=3D"10"></line></svg>See comp=
+lete timeline<svg xmlns=3D"http://www.w3.org/2000/svg" width=3D"24" height=
+=3D"24" viewBox=3D"0 0 24 24" fill=3D"none" stroke=3D"currentColor" stroke-=
+width=3D"2" stroke-linecap=3D"round" stroke-linejoin=3D"round" class=3D"w-4=
+ h-4"><path d=3D"m9 18 6-6-6-6"></path></svg></button></div><div class=3D"b=
+g-white p-5 rounded-lg border border-slate-200 shadow-sm"><h3 class=3D"font=
+-bold text-slate-800 border-b pb-2 mb-3 flex items-center"><svg xmlns=3D"ht=
+tp://www.w3.org/2000/svg" width=3D"24" height=3D"24" viewBox=3D"0 0 24 24" =
+fill=3D"none" stroke=3D"currentColor" stroke-width=3D"2" stroke-linecap=3D"=
+round" stroke-linejoin=3D"round" class=3D"w-4 h-4 mr-2 text-green-600"><rec=
+t width=3D"8" height=3D"4" x=3D"8" y=3D"2" rx=3D"1" ry=3D"1"></rect><path d=
+=3D"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h=
+2"></path></svg> Treatment History</h3><div class=3D"space-y-3 text-sm"><di=
+v><span class=3D"block font-semibold text-slate-700">Chemotherapy Regimen</=
+span><span class=3D"text-slate-600">FOLFOX (4 cycles completed as of Nov 21=
+, 2025)</span><button class=3D"inline-flex items-center gap-1 bg-blue-50 te=
+xt-blue-700 hover:bg-blue-100 hover:text-blue-900 border border-blue-200 te=
+xt-xs px-2 py-0.5 rounded ml-2 font-mono transition-all cursor-pointer grou=
+p disabled:opacity-50" title=3D"Open Document: faris/public/2025-11-21_Chem=
+o_IV_-_Discharge_Summary.pdf"><svg xmlns=3D"http://www.w3.org/2000/svg" wid=
+th=3D"24" height=3D"24" viewBox=3D"0 0 24 24" fill=3D"none" stroke=3D"curre=
+ntColor" stroke-width=3D"2" stroke-linecap=3D"round" stroke-linejoin=3D"rou=
+nd" class=3D"w-3 h-3 text-blue-500 group-hover:text-blue-700"><path d=3D"M1=
+4.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path=
+><polyline points=3D"14 2 14 8 20 8"></polyline><line x1=3D"16" x2=3D"8" y1=
+=3D"13" y2=3D"13"></line><line x1=3D"16" x2=3D"8" y1=3D"17" y2=3D"17"></lin=
+e><line x1=3D"10" x2=3D"8" y1=3D"9" y2=3D"9"></line></svg><span>2025-11-21_=
+C...</span><svg xmlns=3D"http://www.w3.org/2000/svg" width=3D"24" height=3D=
+"24" viewBox=3D"0 0 24 24" fill=3D"none" stroke=3D"currentColor" stroke-wid=
+th=3D"2" stroke-linecap=3D"round" stroke-linejoin=3D"round" class=3D"w-2.5 =
+h-2.5 opacity-50 group-hover:opacity-100"><path d=3D"M18 13v6a2 2 0 0 1-2 2=
+H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points=3D"15 3 21 3 21=
+ 9"></polyline><line x1=3D"10" x2=3D"21" y1=3D"14" y2=3D"3"></line></svg></=
+button><ul class=3D"text-slate-600 text-xs mt-2 space-y-1 list-disc list-in=
+side"><li>Cycles 1-2: Full dose, 2-3 days hospitalization per cycle</li><li=
+>Cycle 3 (Nov 2): Full dose</li><li>Cycle 4 (Nov 21): Completed post-infect=
+ion recovery</li></ul></div><div><span class=3D"block font-semibold text-sl=
+ate-700">Side Effects</span><span class=3D"text-slate-600">General tirednes=
+s, lack of appetite (as expected). Neurological events (LOC) managed.</span=
+><button class=3D"inline-flex items-center gap-1 bg-blue-50 text-blue-700 h=
+over:bg-blue-100 hover:text-blue-900 border border-blue-200 text-xs px-2 py=
+-0.5 rounded ml-2 font-mono transition-all cursor-pointer group disabled:op=
+acity-50" title=3D"Open Document: faris/public/OPD_Consultations/2025-10-22=
+_Neurology_Consultation.pdf"><svg xmlns=3D"http://www.w3.org/2000/svg" widt=
+h=3D"24" height=3D"24" viewBox=3D"0 0 24 24" fill=3D"none" stroke=3D"curren=
+tColor" stroke-width=3D"2" stroke-linecap=3D"round" stroke-linejoin=3D"roun=
+d" class=3D"w-3 h-3 text-blue-500 group-hover:text-blue-700"><path d=3D"M14=
+.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>=
+<polyline points=3D"14 2 14 8 20 8"></polyline><line x1=3D"16" x2=3D"8" y1=
+=3D"13" y2=3D"13"></line><line x1=3D"16" x2=3D"8" y1=3D"17" y2=3D"17"></lin=
+e><line x1=3D"10" x2=3D"8" y1=3D"9" y2=3D"9"></line></svg><span>2025-10-22_=
+N...</span><svg xmlns=3D"http://www.w3.org/2000/svg" width=3D"24" height=3D=
+"24" viewBox=3D"0 0 24 24" fill=3D"none" stroke=3D"currentColor" stroke-wid=
+th=3D"2" stroke-linecap=3D"round" stroke-linejoin=3D"round" class=3D"w-2.5 =
+h-2.5 opacity-50 group-hover:opacity-100"><path d=3D"M18 13v6a2 2 0 0 1-2 2=
+H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points=3D"15 3 21 3 21=
+ 9"></polyline><line x1=3D"10" x2=3D"21" y1=3D"14" y2=3D"3"></line></svg></=
+button></div><div class=3D"bg-orange-50 p-2 rounded border border-orange-20=
+0"><span class=3D"block font-semibold text-orange-800">Complication: Salmon=
+ella Infection</span><button class=3D"inline-flex items-center gap-1 bg-blu=
+e-50 text-blue-700 hover:bg-blue-100 hover:text-blue-900 border border-blue=
+-200 text-xs px-2 py-0.5 rounded ml-2 font-mono transition-all cursor-point=
+er group disabled:opacity-50" title=3D"Open Document: faris/public/2025-11-=
+07_Salmonella_Infection_-_Discharge_Summary.pdf"><svg xmlns=3D"http://www.w=
+3.org/2000/svg" width=3D"24" height=3D"24" viewBox=3D"0 0 24 24" fill=3D"no=
+ne" stroke=3D"currentColor" stroke-width=3D"2" stroke-linecap=3D"round" str=
+oke-linejoin=3D"round" class=3D"w-3 h-3 text-blue-500 group-hover:text-blue=
+-700"><path d=3D"M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V=
+7.5L14.5 2z"></path><polyline points=3D"14 2 14 8 20 8"></polyline><line x1=
+=3D"16" x2=3D"8" y1=3D"13" y2=3D"13"></line><line x1=3D"16" x2=3D"8" y1=3D"=
+17" y2=3D"17"></line><line x1=3D"10" x2=3D"8" y1=3D"9" y2=3D"9"></line></sv=
+g><span>2025-11-07_S...</span><svg xmlns=3D"http://www.w3.org/2000/svg" wid=
+th=3D"24" height=3D"24" viewBox=3D"0 0 24 24" fill=3D"none" stroke=3D"curre=
+ntColor" stroke-width=3D"2" stroke-linecap=3D"round" stroke-linejoin=3D"rou=
+nd" class=3D"w-2.5 h-2.5 opacity-50 group-hover:opacity-100"><path d=3D"M18=
+ 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline poi=
+nts=3D"15 3 21 3 21 9"></polyline><line x1=3D"10" x2=3D"21" y1=3D"14" y2=3D=
+"3"></line></svg></button><ul class=3D"text-orange-700 text-xs mt-1 space-y=
+-1 list-disc list-inside"><li>Occurred post-cycle 3 (Nov 7)</li><li>Severe =
+diarrhea and tiredness</li><li>7-day hospital admission required</li></ul><=
+/div></div></div></div><div class=3D"bg-red-50 p-5 rounded-lg border-l-4 bo=
+rder-red-500 shadow-sm"><h3 class=3D"font-bold text-red-800 mb-3 flex items=
+-center text-lg"><svg xmlns=3D"http://www.w3.org/2000/svg" width=3D"24" hei=
+ght=3D"24" viewBox=3D"0 0 24 24" fill=3D"none" stroke=3D"currentColor" stro=
+ke-width=3D"2" stroke-linecap=3D"round" stroke-linejoin=3D"round" class=3D"=
+w-5 h-5 mr-2"><path d=3D"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 =
+21h16a2 2 0 0 0 1.73-3Z"></path><path d=3D"M12 9v4"></path><path d=3D"M12 1=
+7h.01"></path></svg> Significant Comorbid Event: Seizure Activity</h3><div =
+class=3D"grid grid-cols-1 md:grid-cols-2 gap-4 text-sm"><div><span class=3D=
+"block font-semibold text-red-700">Onset &amp; Frequency</span><p class=3D"=
+text-red-600">Day after CT scan procedure (pre-chemotherapy). Total of 4-5 =
+episodes during 2nd and 3rd chemotherapy rounds.</p></div><div><span class=
+=3D"block font-semibold text-red-700">Initial Attribution</span><p class=3D=
+"text-red-600">Dehydration</p></div><div><span class=3D"block font-semibold=
+ text-red-700">Management</span><ul class=3D"text-red-600 text-xs space-y-1=
+ list-disc list-inside"><li>Neurology consultation obtained</li><li>Medicat=
+ion adjustment: Changed from 2 tablets at night to 1 morning + 1 night + ad=
+ditional tablet</li><li>Medication: "Eptoine" (partially documented)</li></=
+ul></div><div><span class=3D"block font-semibold text-green-700">Outcome</s=
+pan><p class=3D"text-green-700">Episodes ceased after medication adjustment=
+</p></div></div></div><div class=3D"grid grid-cols-1 lg:grid-cols-2 gap-6">=
+<div class=3D"bg-white p-5 rounded-lg border border-slate-200 shadow-sm"><h=
+3 class=3D"font-bold text-slate-800 border-b pb-2 mb-3 flex items-center"><=
+svg xmlns=3D"http://www.w3.org/2000/svg" width=3D"24" height=3D"24" viewBox=
+=3D"0 0 24 24" fill=3D"none" stroke=3D"currentColor" stroke-width=3D"2" str=
+oke-linecap=3D"round" stroke-linejoin=3D"round" class=3D"w-4 h-4 mr-2 text-=
+blue-600"><path d=3D"M22 12h-4l-3 9L9 3l-3 9H2"></path></svg> Current Clini=
+cal Status</h3><div class=3D"space-y-3 text-sm"><div><span class=3D"block f=
+ont-semibold text-slate-700">Weight</span><span class=3D"text-orange-600">D=
+ecreased from 57.8 kg to 54 kg</span><p class=3D"text-xs text-slate-500">(P=
+ost-cycle 3 and Salmonella infection)</p></div><div><span class=3D"block fo=
+nt-semibold text-slate-700">Functional Status</span><span class=3D"text-sla=
+te-600">Engaged in day-to-day activities ~60% of time when not physically t=
+ired; guides workers on farm</span></div><div><span class=3D"block font-sem=
+ibold text-slate-700">Mental Status</span><span class=3D"text-slate-600">In=
+itially struggled with diagnosis and prospect of total gastrectomy; now acc=
+epting of treatment plan after multiple consultations</span></div></div></d=
+iv><div class=3D"bg-white p-5 rounded-lg border border-slate-200 shadow-sm"=
+><h3 class=3D"font-bold text-slate-800 border-b pb-2 mb-3 flex items-center=
+"><svg xmlns=3D"http://www.w3.org/2000/svg" width=3D"24" height=3D"24" view=
+Box=3D"0 0 24 24" fill=3D"none" stroke=3D"currentColor" stroke-width=3D"2" =
+stroke-linecap=3D"round" stroke-linejoin=3D"round" class=3D"w-4 h-4 mr-2 te=
+xt-slate-600"><path d=3D"M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 =
+0 0 2-2V7.5L14.5 2z"></path><polyline points=3D"14 2 14 8 20 8"></polyline>=
+<line x1=3D"16" x2=3D"8" y1=3D"13" y2=3D"13"></line><line x1=3D"16" x2=3D"8=
+" y1=3D"17" y2=3D"17"></line><line x1=3D"10" x2=3D"8" y1=3D"9" y2=3D"9"></l=
+ine></svg> Past Medical History</h3><div class=3D"space-y-2 text-sm"><div c=
+lass=3D"flex justify-between"><span class=3D"text-slate-600">Comorbidities:=
+</span><span class=3D"font-semibold text-green-700">None (no HTN, DM)</span=
+></div><div class=3D"flex justify-between"><span class=3D"text-slate-600">R=
+egular Medications:</span><span class=3D"font-semibold text-slate-800">None=
+ prior to diagnosis</span></div><div class=3D"flex justify-between"><span c=
+lass=3D"text-slate-600">Surgical History:</span><span class=3D"font-semibol=
+d text-slate-800">Leg surgery (12 years ago)</span></div><div class=3D"flex=
+ justify-between"><span class=3D"text-slate-600">Social History:</span><spa=
+n class=3D"font-semibold text-green-700">No alcohol/smoking/tobacco</span><=
+/div><div><span class=3D"block text-slate-600">Family History:</span><p cla=
+ss=3D"text-slate-800 text-xs mt-1">No immediate family history of cancer. M=
+aternal aunt's daughter recently diagnosed with breast cancer (likely unrel=
+ated).</p></div></div></div></div><div class=3D"bg-white p-5 rounded-lg bor=
+der border-slate-200 shadow-sm"><h3 class=3D"font-bold text-slate-800 borde=
+r-b pb-2 mb-4 flex items-center text-lg"><svg xmlns=3D"http://www.w3.org/20=
+00/svg" width=3D"24" height=3D"24" viewBox=3D"0 0 24 24" fill=3D"none" stro=
+ke=3D"currentColor" stroke-width=3D"2" stroke-linecap=3D"round" stroke-line=
+join=3D"round" class=3D"w-5 h-5 mr-2 text-purple-600"><path d=3D"M22 12h-4l=
+-3 9L9 3l-3 9H2"></path></svg> Current Medications</h3><div class=3D"grid g=
+rid-cols-1 md:grid-cols-2 gap-4"><div class=3D"bg-purple-50 p-4 rounded-lg =
+border border-purple-200"><h4 class=3D"font-bold text-purple-800 mb-3 flex =
+items-center text-sm"><svg xmlns=3D"http://www.w3.org/2000/svg" width=3D"24=
+" height=3D"24" viewBox=3D"0 0 24 24" fill=3D"none" stroke=3D"currentColor"=
+ stroke-width=3D"2" stroke-linecap=3D"round" stroke-linejoin=3D"round" clas=
+s=3D"w-4 h-4 mr-2"><path d=3D"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0=
+ 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><path d=3D"M12 9v4"></path><path d=3D"=
+M12 17h.01"></path></svg> Anti-Epileptic Therapy</h4><div class=3D"space-y-=
+2 text-sm"><div><span class=3D"block font-semibold text-purple-700">Medicat=
+ion</span><p class=3D"text-purple-600">Eptoin (Phenytoin) - partially docum=
+ented</p></div><div><span class=3D"block font-semibold text-purple-700">Cur=
+rent Regimen</span><p class=3D"text-purple-600">1 tablet morning + 1 tablet=
+ night + additional tablet</p><p class=3D"text-xs text-purple-500 mt-1">(Ch=
+anged from: 2 tablets at night)</p></div><div><span class=3D"block font-sem=
+ibold text-purple-700">Indication</span><p class=3D"text-purple-600">Seizur=
+e disorder (4-5 episodes during chemotherapy, now controlled)</p></div></di=
+v></div><div class=3D"bg-blue-50 p-4 rounded-lg border border-blue-200"><h4=
+ class=3D"font-bold text-blue-800 mb-3 flex items-center text-sm"><svg xmln=
+s=3D"http://www.w3.org/2000/svg" width=3D"24" height=3D"24" viewBox=3D"0 0 =
+24 24" fill=3D"none" stroke=3D"currentColor" stroke-width=3D"2" stroke-line=
+cap=3D"round" stroke-linejoin=3D"round" class=3D"w-4 h-4 mr-2"><path d=3D"M=
+22 12h-4l-3 9L9 3l-3 9H2"></path></svg> Active Chemotherapy Regimen</h4><di=
+v class=3D"space-y-2 text-sm"><div><span class=3D"block font-semibold text-=
+blue-700">Regimen</span><p class=3D"text-blue-600 font-bold">m.FOLFOX-6</p>=
+</div><div><span class=3D"block font-semibold text-blue-700">Components</sp=
+an><ul class=3D"text-blue-600 text-xs space-y-1 list-disc list-inside"><li>=
+5-Fluorouracil (5-FU)</li><li>Leucovorin (Folinic acid)</li><li>Oxaliplatin=
+</li></ul></div><div><span class=3D"block font-semibold text-blue-700">Prog=
+ress</span><p class=3D"text-blue-600">4 cycles completed (Cycle 4 dose-redu=
+ced post-Salmonella infection)</p></div></div></div></div><div class=3D"bg-=
+orange-50 p-3 rounded border border-orange-200 mt-4"><p class=3D"text-orang=
+e-700 text-xs flex items-start"><svg xmlns=3D"http://www.w3.org/2000/svg" w=
+idth=3D"24" height=3D"24" viewBox=3D"0 0 24 24" fill=3D"none" stroke=3D"cur=
+rentColor" stroke-width=3D"2" stroke-linecap=3D"round" stroke-linejoin=3D"r=
+ound" class=3D"w-4 h-4 mr-2 mt-0.5 flex-shrink-0"><path d=3D"m21.73 18-8-14=
+a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><path d=
+=3D"M12 9v4"></path><path d=3D"M12 17h.01"></path></svg><span><strong>Docum=
+entation Gap:</strong> Comprehensive medication list needed, including supp=
+ortive medications (anti-emetics, growth factors), Salmonella treatment ant=
+ibiotics, and complete anti-epileptic dosing schedule. Refer to discharge s=
+ummaries for detailed prescriptions.</span></p></div></div><div class=3D"bg=
+-blue-50 p-5 rounded-lg border border-blue-200 shadow-sm"><h3 class=3D"font=
+-bold text-blue-800 mb-3 flex items-center text-lg"><svg xmlns=3D"http://ww=
+w.w3.org/2000/svg" width=3D"24" height=3D"24" viewBox=3D"0 0 24 24" fill=3D=
+"none" stroke=3D"currentColor" stroke-width=3D"2" stroke-linecap=3D"round" =
+stroke-linejoin=3D"round" class=3D"w-5 h-5 mr-2"><rect width=3D"18" height=
+=3D"18" x=3D"3" y=3D"4" rx=3D"2" ry=3D"2"></rect><line x1=3D"16" x2=3D"16" =
+y1=3D"2" y2=3D"6"></line><line x1=3D"8" x2=3D"8" y1=3D"2" y2=3D"6"></line><=
+line x1=3D"3" x2=3D"21" y1=3D"10" y2=3D"10"></line></svg> Upcoming Assessme=
+nt</h3><div class=3D"grid grid-cols-1 md:grid-cols-3 gap-4 text-sm"><div><s=
+pan class=3D"block font-semibold text-blue-700">Date</span><p class=3D"text=
+-blue-600 font-bold">December 5th</p></div><div><span class=3D"block font-s=
+emibold text-blue-700">Planned</span><p class=3D"text-blue-600">CT scan to =
+assess tumor response to chemotherapy</p></div><div><span class=3D"block fo=
+nt-semibold text-blue-700">Decision Point</span><p class=3D"text-blue-600">=
+Determine next steps (surgery vs. 5th chemotherapy cycle)</p></div></div></=
+div><div class=3D"bg-white p-5 rounded-lg border border-slate-200 shadow-sm=
+"><h3 class=3D"font-bold text-slate-800 border-b pb-2 mb-4 text-lg">Key Cli=
+nical Questions &amp; Concerns</h3><div class=3D"bg-gradient-to-r from-blue=
+-50 to-indigo-50 p-4 rounded-lg border-l-4 border-blue-600 mb-4"><h4 class=
+=3D"font-bold text-blue-900 mb-2 text-base">Primary Clinical Question</h4><=
+p class=3D"text-blue-800 font-semibold mb-2">Post-neoadjuvant chemotherapy =
+management for locally advanced gastric adenocarcinoma (Stage III)</p><p cl=
+ass=3D"text-blue-700 text-sm mb-2">Given 4 cycles of FOLFOX completed (with=
+ cycle 4 dose-reduced due to Salmonella infection), and restaging CT scan s=
+cheduled December 5th:</p><ul class=3D"text-blue-700 text-sm space-y-1 list=
+-disc list-inside ml-2"><li>What are the optimal treatment options based on=
+ tumor response?</li><li>Is curative-intent surgery feasible?</li></ul></di=
+v><div class=3D"space-y-4"><div class=3D"bg-yellow-50 p-4 rounded border-l-=
+4 border-yellow-500"><h4 class=3D"font-bold text-yellow-800 mb-2">1. Minima=
+lly Invasive Surgical Approach <span class=3D"text-xs font-normal">(Primary=
+ Family Concern)</span></h4><div class=3D"text-yellow-700 text-sm space-y-2=
+"><p class=3D"font-semibold">Is laparoscopic or robotic-assisted gastrectom=
+y technically feasible given:</p><ul class=3D"list-disc list-inside ml-2 sp=
+ace-y-1"><li>Tumor location in proximity to gastroesophageal junction</li><=
+li>Locally advanced Stage III disease</li><li>Post-neoadjuvant chemotherapy=
+ setting</li></ul><p class=3D"font-semibold mt-2">Additional considerations=
+:</p><ul class=3D"list-disc list-inside ml-2 space-y-1"><li>Expected oncolo=
+gical outcomes (R0 resection, adequate lymphadenectomy) with minimally inva=
+sive approach vs. open surgery</li><li>Institutional experience and volume =
+outcomes for minimally invasive gastric cancer surgery</li></ul></div></div=
+><div class=3D"bg-purple-50 p-4 rounded border-l-4 border-purple-500"><h4 c=
+lass=3D"font-bold text-purple-800 mb-2">2. Extent of Resection</h4><div cla=
+ss=3D"text-purple-700 text-sm space-y-2"><p class=3D"font-semibold">Is tota=
+l gastrectomy the only option?</p><ul class=3D"list-disc list-inside ml-2 s=
+pace-y-1"><li>Previously discussed: Segmental/subtotal gastrectomy ruled ou=
+t due to tumor proximity to esophagus</li><li>Could this be reconsidered ba=
+sed on chemotherapy response (to be assessed December 5th)?</li><li>Feasibi=
+lity of proximal gastrectomy with adequate margins</li></ul></div></div><di=
+v class=3D"bg-red-50 p-4 rounded border-l-4 border-red-500"><h4 class=3D"fo=
+nt-bold text-red-800 mb-2">3. Perioperative Risk Assessment</h4><p class=3D=
+"text-red-700 text-sm font-semibold mb-2">Significant comorbid issues to co=
+nsider:</p><div class=3D"text-red-700 text-sm space-y-3"><div><p class=3D"f=
+ont-semibold">Seizure disorder:</p><ul class=3D"list-disc list-inside ml-2 =
+space-y-1 text-xs"><li>4-5 episodes during chemotherapy (initially attribut=
+ed to dehydration)</li><li>Now controlled on anti-epileptics (regimen chang=
+ed from 2 tablets/night to 1 morning + 1 night + additional tablet)</li><li=
+>Likely requires neurology clearance and perioperative anti-epileptic manag=
+ement</li></ul></div><div><p class=3D"font-semibold">Recent infectious comp=
+lication:</p><ul class=3D"list-disc list-inside ml-2 space-y-1 text-xs"><li=
+>Salmonella infection post-cycle 3</li><li>Required 7-day hospitalization f=
+or severe diarrhea</li><li>Led to dose reduction in cycle 4</li></ul></div>=
+<div><p class=3D"font-semibold">Nutritional status:</p><ul class=3D"list-di=
+sc list-inside ml-2 space-y-1 text-xs"><li>Weight loss from 57.8 kg =E2=86=
+=92 54 kg</li><li>May require pre-operative nutritional optimization</li></=
+ul></div><p class=3D"font-semibold mt-3">Questions:</p><ul class=3D"list-di=
+sc list-inside ml-2 space-y-1 text-xs"><li>Optimal timing for surgery post-=
+chemotherapy</li><li>Pre-surgical optimization requirements</li><li>Periope=
+rative management of anti-epileptic medications</li></ul></div></div><div c=
+lass=3D"bg-blue-50 p-4 rounded border-l-4 border-blue-500"><h4 class=3D"fon=
+t-bold text-blue-800 mb-2">4. Treatment Decision Timeline</h4><ul class=3D"=
+text-blue-700 text-sm space-y-2 list-disc list-inside"><li><strong>December=
+ 5th:</strong> Restaging CT scan to assess tumor response</li><li><strong>D=
+ecision point:</strong> Surgery vs. 5th chemotherapy cycle vs. alternative =
+strategies</li><li>Need expert opinion on surgical options before December =
+5th consultation to inform family discussions</li></ul></div><div class=3D"=
+bg-indigo-50 p-4 rounded border-l-4 border-indigo-500"><h4 class=3D"font-bo=
+ld text-indigo-800 mb-2">5. Staging Confirmation <span class=3D"text-xs fon=
+t-normal">(Documentation Gap)</span></h4><div class=3D"text-indigo-700 text=
+-sm space-y-2"><p>Official reports lack explicit staging information</p><p =
+class=3D"font-semibold">Verbal communication from treating team: "Locally a=
+dvanced Stage III"</p><p class=3D"font-semibold">Confirmed negative finding=
+s:</p><ul class=3D"list-disc list-inside ml-2 space-y-1 text-xs"><li>Diagno=
+stic laparoscopy with peritoneal wash cytology: Negative for malignant cell=
+s</li><li>CT thorax: No distant metastasis</li><li>Disease confirmed as loc=
+alized</li></ul><p class=3D"font-semibold mt-2">Need formal restaging post-=
+chemotherapy (December 5th)</p></div></div><div class=3D"bg-orange-50 p-4 r=
+ounded border-l-4 border-orange-500"><h4 class=3D"font-bold text-orange-800=
+ mb-2">6. Alternative Management Options if Surgery Not Optimal</h4><ul cla=
+ss=3D"text-orange-700 text-sm space-y-2 list-disc list-inside"><li>Role of =
+additional chemotherapy cycles beyond 4</li><li>Consideration of chemoradia=
+tion</li><li>Best supportive care vs. continued systemic therapy if unresec=
+table</li></ul></div><div class=3D"bg-green-50 p-4 rounded border-l-4 borde=
+r-green-500"><h4 class=3D"font-bold text-green-800 mb-2">7. Center of Excel=
+lence / Referral Consideration</h4><div class=3D"text-green-700 text-sm spa=
+ce-y-2"><p><strong>Current facility:</strong> MVR Hospital (laparoscopic/ro=
+botic surgery not available)</p><p class=3D"font-semibold">Family open to t=
+ransfer for better surgical outcomes:</p><ul class=3D"list-disc list-inside=
+ ml-2 space-y-1"><li>Considering centers in Bangalore (Manipal, Fortis ment=
+ioned)</li><li>Willing to travel for access to minimally invasive surgical =
+expertise</li></ul></div></div></div></div><div class=3D"grid grid-cols-1 l=
+g:grid-cols-2 gap-6"><div class=3D"bg-green-50 p-5 rounded-lg border border=
+-green-200 shadow-sm"><h3 class=3D"font-bold text-green-800 border-b border=
+-green-300 pb-2 mb-3">Family's Primary Goals</h3><ul class=3D"text-green-70=
+0 text-sm space-y-2 list-disc list-inside"><li>Explore advanced/minimally i=
+nvasive surgical options</li><li>Optimize surgical outcomes</li><li>Determi=
+ne if specialized centers (Manipal/Fortis Bangalore) offer superior surgica=
+l approaches</li></ul></div><div class=3D"bg-indigo-50 p-5 rounded-lg borde=
+r border-indigo-200 shadow-sm"><h3 class=3D"font-bold text-indigo-800 borde=
+r-b border-indigo-300 pb-2 mb-3">Action Items for Oncologist Review</h3><ul=
+ class=3D"text-indigo-700 text-sm space-y-2 list-disc list-inside"><li>Revi=
+ew case for surgical candidacy and approach options</li><li>Advise on minim=
+ally invasive surgery feasibility given tumor location</li><li>Provide guid=
+ance on specialist referrals (Kerala vs. Bangalore centers)</li><li>Assess =
+need for additional chemotherapy vs. proceeding to surgery post-December 5t=
+h imaging</li></ul></div></div></div></div></div></div></div>
+   =20
+ =20
+
+</body></html>
+------MultipartBoundary--N0VnYHEz0DEIlDSxPgyGGljp1dq1eWhDvpCfTjZNzf----
+Content-Type: image/webp
+Content-Transfer-Encoding: base64
+Content-Location: https://saarthihealth.com/wp-content/uploads/2025/08/saarthi_logo_insta.webp
+
+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
+
+------MultipartBoundary--N0VnYHEz0DEIlDSxPgyGGljp1dq1eWhDvpCfTjZNzf----
+Content-Type: text/css
+Content-Transfer-Encoding: quoted-printable
+Content-Location: https://faris.saarthihealth.com/assets/index-a4f4e638.css
+
+@charset "utf-8";
+
+*, ::before, ::after { --tw-border-spacing-x: 0; --tw-border-spacing-y: 0; =
+--tw-translate-x: 0; --tw-translate-y: 0; --tw-rotate: 0; --tw-skew-x: 0; -=
+-tw-skew-y: 0; --tw-scale-x: 1; --tw-scale-y: 1; --tw-pan-x: ; --tw-pan-y: =
+; --tw-pinch-zoom: ; --tw-scroll-snap-strictness: proximity; --tw-gradient-=
+from-position: ; --tw-gradient-via-position: ; --tw-gradient-to-position: ;=
+ --tw-ordinal: ; --tw-slashed-zero: ; --tw-numeric-figure: ; --tw-numeric-s=
+pacing: ; --tw-numeric-fraction: ; --tw-ring-inset: ; --tw-ring-offset-widt=
+h: 0px; --tw-ring-offset-color: #fff; --tw-ring-color: rgb(59 130 246 / .5)=
+; --tw-ring-offset-shadow: 0 0 #0000; --tw-ring-shadow: 0 0 #0000; --tw-sha=
+dow: 0 0 #0000; --tw-shadow-colored: 0 0 #0000; --tw-blur: ; --tw-brightnes=
+s: ; --tw-contrast: ; --tw-grayscale: ; --tw-hue-rotate: ; --tw-invert: ; -=
+-tw-saturate: ; --tw-sepia: ; --tw-drop-shadow: ; --tw-backdrop-blur: ; --t=
+w-backdrop-brightness: ; --tw-backdrop-contrast: ; --tw-backdrop-grayscale:=
+ ; --tw-backdrop-hue-rotate: ; --tw-backdrop-invert: ; --tw-backdrop-opacit=
+y: ; --tw-backdrop-saturate: ; --tw-backdrop-sepia: ; --tw-contain-size: ; =
+--tw-contain-layout: ; --tw-contain-paint: ; --tw-contain-style: ; }
+
+::backdrop { --tw-border-spacing-x: 0; --tw-border-spacing-y: 0; --tw-trans=
+late-x: 0; --tw-translate-y: 0; --tw-rotate: 0; --tw-skew-x: 0; --tw-skew-y=
+: 0; --tw-scale-x: 1; --tw-scale-y: 1; --tw-pan-x: ; --tw-pan-y: ; --tw-pin=
+ch-zoom: ; --tw-scroll-snap-strictness: proximity; --tw-gradient-from-posit=
+ion: ; --tw-gradient-via-position: ; --tw-gradient-to-position: ; --tw-ordi=
+nal: ; --tw-slashed-zero: ; --tw-numeric-figure: ; --tw-numeric-spacing: ; =
+--tw-numeric-fraction: ; --tw-ring-inset: ; --tw-ring-offset-width: 0px; --=
+tw-ring-offset-color: #fff; --tw-ring-color: rgb(59 130 246 / .5); --tw-rin=
+g-offset-shadow: 0 0 #0000; --tw-ring-shadow: 0 0 #0000; --tw-shadow: 0 0 #=
+0000; --tw-shadow-colored: 0 0 #0000; --tw-blur: ; --tw-brightness: ; --tw-=
+contrast: ; --tw-grayscale: ; --tw-hue-rotate: ; --tw-invert: ; --tw-satura=
+te: ; --tw-sepia: ; --tw-drop-shadow: ; --tw-backdrop-blur: ; --tw-backdrop=
+-brightness: ; --tw-backdrop-contrast: ; --tw-backdrop-grayscale: ; --tw-ba=
+ckdrop-hue-rotate: ; --tw-backdrop-invert: ; --tw-backdrop-opacity: ; --tw-=
+backdrop-saturate: ; --tw-backdrop-sepia: ; --tw-contain-size: ; --tw-conta=
+in-layout: ; --tw-contain-paint: ; --tw-contain-style: ; }
+
+*, ::before, ::after { box-sizing: border-box; border-width: 0px; border-st=
+yle: solid; border-color: rgb(229, 231, 235); }
+
+::before, ::after { --tw-content: ""; }
+
+html, :host { line-height: 1.5; text-size-adjust: 100%; tab-size: 4; font-f=
+amily: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI=
+ Emoji", "Segoe UI Symbol", "Noto Color Emoji"; font-feature-settings: norm=
+al; font-variation-settings: normal; -webkit-tap-highlight-color: transpare=
+nt; }
+
+body { margin: 0px; line-height: inherit; }
+
+hr { height: 0px; color: inherit; border-top-width: 1px; }
+
+abbr:where([title]) { text-decoration: underline dotted; }
+
+h1, h2, h3, h4, h5, h6 { font-size: inherit; font-weight: inherit; }
+
+a { color: inherit; text-decoration: inherit; }
+
+b, strong { font-weight: bolder; }
+
+code, kbd, samp, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Mo=
+naco, Consolas, "Liberation Mono", "Courier New", monospace; font-feature-s=
+ettings: normal; font-variation-settings: normal; font-size: 1em; }
+
+small { font-size: 80%; }
+
+sub, sup { font-size: 75%; line-height: 0; position: relative; vertical-ali=
+gn: baseline; }
+
+sub { bottom: -0.25em; }
+
+sup { top: -0.5em; }
+
+table { text-indent: 0px; border-color: inherit; border-collapse: collapse;=
+ }
+
+button, input, optgroup, select, textarea { font-family: inherit; font-feat=
+ure-settings: inherit; font-variation-settings: inherit; font-size: 100%; f=
+ont-weight: inherit; line-height: inherit; letter-spacing: inherit; color: =
+inherit; margin: 0px; padding: 0px; }
+
+button, select { text-transform: none; }
+
+button, input:where([type=3D"button"]), input:where([type=3D"reset"]), inpu=
+t:where([type=3D"submit"]) { appearance: button; background-color: transpar=
+ent; background-image: none; }
+
+progress { vertical-align: baseline; }
+
+::-webkit-inner-spin-button, ::-webkit-outer-spin-button { height: auto; }
+
+[type=3D"search"] { appearance: textfield; outline-offset: -2px; }
+
+::-webkit-search-decoration { appearance: none; }
+
+::-webkit-file-upload-button { appearance: button; font: inherit; }
+
+summary { display: list-item; }
+
+blockquote, dl, dd, h1, h2, h3, h4, h5, h6, hr, figure, p, pre { margin: 0p=
+x; }
+
+fieldset { margin: 0px; padding: 0px; }
+
+legend { padding: 0px; }
+
+ol, ul, menu { list-style: none; margin: 0px; padding: 0px; }
+
+dialog { padding: 0px; }
+
+textarea { resize: vertical; }
+
+input::placeholder, textarea::placeholder { opacity: 1; color: rgb(156, 163=
+, 175); }
+
+button, [role=3D"button"] { cursor: pointer; }
+
+:disabled { cursor: default; }
+
+img, svg, video, canvas, audio, iframe, embed, object { display: block; ver=
+tical-align: middle; }
+
+img, video { max-width: 100%; height: auto; }
+
+[hidden]:where(:not([hidden=3D"until-found"])) { display: none; }
+
+.container { width: 100%; }
+
+@media (min-width: 640px) {
+  .container { max-width: 640px; }
+}
+
+@media (min-width: 768px) {
+  .container { max-width: 768px; }
+}
+
+@media (min-width: 1024px) {
+  .container { max-width: 1024px; }
+}
+
+@media (min-width: 1280px) {
+  .container { max-width: 1280px; }
+}
+
+@media (min-width: 1536px) {
+  .container { max-width: 1536px; }
+}
+
+.fixed { position: fixed; }
+
+.absolute { position: absolute; }
+
+.relative { position: relative; }
+
+.sticky { position: sticky; }
+
+.inset-y-0 { top: 0px; bottom: 0px; }
+
+.-left-\[31px\] { left: -31px; }
+
+.bottom-6 { bottom: 1.5rem; }
+
+.left-0 { left: 0px; }
+
+.left-4 { left: 1rem; }
+
+.right-6 { right: 1.5rem; }
+
+.top-0 { top: 0px; }
+
+.top-4 { top: 1rem; }
+
+.z-40 { z-index: 40; }
+
+.z-50 { z-index: 50; }
+
+.-mx-5 { margin-left: -1.25rem; margin-right: -1.25rem; }
+
+.mx-auto { margin-left: auto; margin-right: auto; }
+
+.-mt-5 { margin-top: -1.25rem; }
+
+.mb-1 { margin-bottom: 0.25rem; }
+
+.mb-2 { margin-bottom: 0.5rem; }
+
+.mb-3 { margin-bottom: 0.75rem; }
+
+.mb-4 { margin-bottom: 1rem; }
+
+.mb-8 { margin-bottom: 2rem; }
+
+.ml-2 { margin-left: 0.5rem; }
+
+.ml-3 { margin-left: 0.75rem; }
+
+.ml-auto { margin-left: auto; }
+
+.mr-2 { margin-right: 0.5rem; }
+
+.mt-0\.5 { margin-top: 0.125rem; }
+
+.mt-1 { margin-top: 0.25rem; }
+
+.mt-10 { margin-top: 2.5rem; }
+
+.mt-2 { margin-top: 0.5rem; }
+
+.mt-3 { margin-top: 0.75rem; }
+
+.mt-4 { margin-top: 1rem; }
+
+.mt-6 { margin-top: 1.5rem; }
+
+.block { display: block; }
+
+.flex { display: flex; }
+
+.inline-flex { display: inline-flex; }
+
+.grid { display: grid; }
+
+.hidden { display: none; }
+
+.h-10 { height: 2.5rem; }
+
+.h-16 { height: 4rem; }
+
+.h-2\.5 { height: 0.625rem; }
+
+.h-3 { height: 0.75rem; }
+
+.h-4 { height: 1rem; }
+
+.h-5 { height: 1.25rem; }
+
+.h-6 { height: 1.5rem; }
+
+.h-64 { height: 16rem; }
+
+.h-8 { height: 2rem; }
+
+.h-screen { height: 100vh; }
+
+.min-h-screen { min-height: 100vh; }
+
+.w-10 { width: 2.5rem; }
+
+.w-16 { width: 4rem; }
+
+.w-2\.5 { width: 0.625rem; }
+
+.w-3 { width: 0.75rem; }
+
+.w-4 { width: 1rem; }
+
+.w-5 { width: 1.25rem; }
+
+.w-6 { width: 1.5rem; }
+
+.w-64 { width: 16rem; }
+
+.w-8 { width: 2rem; }
+
+.w-full { width: 100%; }
+
+.max-w-4xl { max-width: 56rem; }
+
+.max-w-5xl { max-width: 64rem; }
+
+.flex-1 { flex: 1 1 0%; }
+
+.flex-shrink-0 { flex-shrink: 0; }
+
+.-translate-x-full { --tw-translate-x: -100%; transform: translate(var(--tw=
+-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw=
+-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw=
+-scale-y)); }
+
+.translate-x-0 { --tw-translate-x: 0px; transform: translate(var(--tw-trans=
+late-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-=
+x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale=
+-y)); }
+
+.transform { transform: translate(var(--tw-translate-x),var(--tw-translate-=
+y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y))=
+ scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y)); }
+
+.cursor-pointer { cursor: pointer; }
+
+.list-inside { list-style-position: inside; }
+
+.list-disc { list-style-type: disc; }
+
+.grid-cols-1 { grid-template-columns: repeat(1, minmax(0px, 1fr)); }
+
+.flex-col { flex-direction: column; }
+
+.flex-wrap { flex-wrap: wrap; }
+
+.items-start { align-items: flex-start; }
+
+.items-center { align-items: center; }
+
+.justify-center { justify-content: center; }
+
+.justify-between { justify-content: space-between; }
+
+.gap-1 { gap: 0.25rem; }
+
+.gap-2 { gap: 0.5rem; }
+
+.gap-3 { gap: 0.75rem; }
+
+.gap-4 { gap: 1rem; }
+
+.gap-6 { gap: 1.5rem; }
+
+.space-x-2 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 0; mar=
+gin-right: calc(.5rem * var(--tw-space-x-reverse)); margin-left: calc(.5rem=
+ * calc(1 - var(--tw-space-x-reverse))); }
+
+.space-x-3 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 0; mar=
+gin-right: calc(.75rem * var(--tw-space-x-reverse)); margin-left: calc(.75r=
+em * calc(1 - var(--tw-space-x-reverse))); }
+
+.space-y-1 > :not([hidden]) ~ :not([hidden]) { --tw-space-y-reverse: 0; mar=
+gin-top: calc(.25rem * calc(1 - var(--tw-space-y-reverse))); margin-bottom:=
+ calc(.25rem * var(--tw-space-y-reverse)); }
+
+.space-y-2 > :not([hidden]) ~ :not([hidden]) { --tw-space-y-reverse: 0; mar=
+gin-top: calc(.5rem * calc(1 - var(--tw-space-y-reverse))); margin-bottom: =
+calc(.5rem * var(--tw-space-y-reverse)); }
+
+.space-y-3 > :not([hidden]) ~ :not([hidden]) { --tw-space-y-reverse: 0; mar=
+gin-top: calc(.75rem * calc(1 - var(--tw-space-y-reverse))); margin-bottom:=
+ calc(.75rem * var(--tw-space-y-reverse)); }
+
+.space-y-4 > :not([hidden]) ~ :not([hidden]) { --tw-space-y-reverse: 0; mar=
+gin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse))); margin-bottom: c=
+alc(1rem * var(--tw-space-y-reverse)); }
+
+.space-y-6 > :not([hidden]) ~ :not([hidden]) { --tw-space-y-reverse: 0; mar=
+gin-top: calc(1.5rem * calc(1 - var(--tw-space-y-reverse))); margin-bottom:=
+ calc(1.5rem * var(--tw-space-y-reverse)); }
+
+.space-y-8 > :not([hidden]) ~ :not([hidden]) { --tw-space-y-reverse: 0; mar=
+gin-top: calc(2rem * calc(1 - var(--tw-space-y-reverse))); margin-bottom: c=
+alc(2rem * var(--tw-space-y-reverse)); }
+
+.overflow-y-auto { overflow-y: auto; }
+
+.rounded { border-radius: 0.25rem; }
+
+.rounded-full { border-radius: 9999px; }
+
+.rounded-lg { border-radius: 0.5rem; }
+
+.rounded-md { border-radius: 0.375rem; }
+
+.rounded-r-lg { border-top-right-radius: 0.5rem; border-bottom-right-radius=
+: 0.5rem; }
+
+.rounded-t-lg { border-top-left-radius: 0.5rem; border-top-right-radius: 0.=
+5rem; }
+
+.border { border-width: 1px; }
+
+.border-4 { border-width: 4px; }
+
+.border-b { border-bottom-width: 1px; }
+
+.border-b-2 { border-bottom-width: 2px; }
+
+.border-l-2 { border-left-width: 2px; }
+
+.border-l-4 { border-left-width: 4px; }
+
+.border-t { border-top-width: 1px; }
+
+.border-dashed { border-style: dashed; }
+
+.border-blue-100 { --tw-border-opacity: 1; border-color: rgb(219 234 254 / =
+var(--tw-border-opacity, 1)); }
+
+.border-blue-200 { --tw-border-opacity: 1; border-color: rgb(191 219 254 / =
+var(--tw-border-opacity, 1)); }
+
+.border-blue-500 { --tw-border-opacity: 1; border-color: rgb(59 130 246 / v=
+ar(--tw-border-opacity, 1)); }
+
+.border-blue-600 { --tw-border-opacity: 1; border-color: rgb(37 99 235 / va=
+r(--tw-border-opacity, 1)); }
+
+.border-green-200 { --tw-border-opacity: 1; border-color: rgb(187 247 208 /=
+ var(--tw-border-opacity, 1)); }
+
+.border-green-300 { --tw-border-opacity: 1; border-color: rgb(134 239 172 /=
+ var(--tw-border-opacity, 1)); }
+
+.border-green-500 { --tw-border-opacity: 1; border-color: rgb(34 197 94 / v=
+ar(--tw-border-opacity, 1)); }
+
+.border-indigo-200 { --tw-border-opacity: 1; border-color: rgb(199 210 254 =
+/ var(--tw-border-opacity, 1)); }
+
+.border-indigo-300 { --tw-border-opacity: 1; border-color: rgb(165 180 252 =
+/ var(--tw-border-opacity, 1)); }
+
+.border-indigo-500 { --tw-border-opacity: 1; border-color: rgb(99 102 241 /=
+ var(--tw-border-opacity, 1)); }
+
+.border-orange-100 { --tw-border-opacity: 1; border-color: rgb(255 237 213 =
+/ var(--tw-border-opacity, 1)); }
+
+.border-orange-200 { --tw-border-opacity: 1; border-color: rgb(254 215 170 =
+/ var(--tw-border-opacity, 1)); }
+
+.border-orange-500 { --tw-border-opacity: 1; border-color: rgb(249 115 22 /=
+ var(--tw-border-opacity, 1)); }
+
+.border-purple-200 { --tw-border-opacity: 1; border-color: rgb(233 213 255 =
+/ var(--tw-border-opacity, 1)); }
+
+.border-purple-300 { --tw-border-opacity: 1; border-color: rgb(216 180 254 =
+/ var(--tw-border-opacity, 1)); }
+
+.border-purple-500 { --tw-border-opacity: 1; border-color: rgb(168 85 247 /=
+ var(--tw-border-opacity, 1)); }
+
+.border-red-100 { --tw-border-opacity: 1; border-color: rgb(254 226 226 / v=
+ar(--tw-border-opacity, 1)); }
+
+.border-red-500 { --tw-border-opacity: 1; border-color: rgb(239 68 68 / var=
+(--tw-border-opacity, 1)); }
+
+.border-slate-100 { --tw-border-opacity: 1; border-color: rgb(241 245 249 /=
+ var(--tw-border-opacity, 1)); }
+
+.border-slate-200 { --tw-border-opacity: 1; border-color: rgb(226 232 240 /=
+ var(--tw-border-opacity, 1)); }
+
+.border-slate-50 { --tw-border-opacity: 1; border-color: rgb(248 250 252 / =
+var(--tw-border-opacity, 1)); }
+
+.border-slate-700 { --tw-border-opacity: 1; border-color: rgb(51 65 85 / va=
+r(--tw-border-opacity, 1)); }
+
+.border-yellow-500 { --tw-border-opacity: 1; border-color: rgb(234 179 8 / =
+var(--tw-border-opacity, 1)); }
+
+.bg-black { --tw-bg-opacity: 1; background-color: rgb(0 0 0 / var(--tw-bg-o=
+pacity, 1)); }
+
+.bg-blue-50 { --tw-bg-opacity: 1; background-color: rgb(239 246 255 / var(-=
+-tw-bg-opacity, 1)); }
+
+.bg-blue-600 { --tw-bg-opacity: 1; background-color: rgb(37 99 235 / var(--=
+tw-bg-opacity, 1)); }
+
+.bg-green-50 { --tw-bg-opacity: 1; background-color: rgb(240 253 244 / var(=
+--tw-bg-opacity, 1)); }
+
+.bg-green-600 { --tw-bg-opacity: 1; background-color: rgb(22 163 74 / var(-=
+-tw-bg-opacity, 1)); }
+
+.bg-indigo-50 { --tw-bg-opacity: 1; background-color: rgb(238 242 255 / var=
+(--tw-bg-opacity, 1)); }
+
+.bg-orange-50 { --tw-bg-opacity: 1; background-color: rgb(255 247 237 / var=
+(--tw-bg-opacity, 1)); }
+
+.bg-purple-50 { --tw-bg-opacity: 1; background-color: rgb(250 245 255 / var=
+(--tw-bg-opacity, 1)); }
+
+.bg-red-50 { --tw-bg-opacity: 1; background-color: rgb(254 242 242 / var(--=
+tw-bg-opacity, 1)); }
+
+.bg-slate-50 { --tw-bg-opacity: 1; background-color: rgb(248 250 252 / var(=
+--tw-bg-opacity, 1)); }
+
+.bg-white { --tw-bg-opacity: 1; background-color: rgb(255 255 255 / var(--t=
+w-bg-opacity, 1)); }
+
+.bg-yellow-50 { --tw-bg-opacity: 1; background-color: rgb(254 252 232 / var=
+(--tw-bg-opacity, 1)); }
+
+.bg-gradient-to-r { background-image: linear-gradient(to right,var(--tw-gra=
+dient-stops)); }
+
+.from-blue-50 { --tw-gradient-from: #eff6ff var(--tw-gradient-from-position=
+); --tw-gradient-to: rgb(239 246 255 / 0) var(--tw-gradient-to-position); -=
+-tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+
+.from-green-50 { --tw-gradient-from: #f0fdf4 var(--tw-gradient-from-positio=
+n); --tw-gradient-to: rgb(240 253 244 / 0) var(--tw-gradient-to-position); =
+--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+
+.from-slate-50 { --tw-gradient-from: #f8fafc var(--tw-gradient-from-positio=
+n); --tw-gradient-to: rgb(248 250 252 / 0) var(--tw-gradient-to-position); =
+--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+
+.from-slate-900 { --tw-gradient-from: #0f172a var(--tw-gradient-from-positi=
+on); --tw-gradient-to: rgb(15 23 42 / 0) var(--tw-gradient-to-position); --=
+tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+
+.to-blue-100 { --tw-gradient-to: #dbeafe var(--tw-gradient-to-position); }
+
+.to-emerald-50 { --tw-gradient-to: #ecfdf5 var(--tw-gradient-to-position); =
+}
+
+.to-indigo-50 { --tw-gradient-to: #eef2ff var(--tw-gradient-to-position); }
+
+.to-slate-100 { --tw-gradient-to: #f1f5f9 var(--tw-gradient-to-position); }
+
+.to-slate-800 { --tw-gradient-to: #1e293b var(--tw-gradient-to-position); }
+
+.p-2 { padding: 0.5rem; }
+
+.p-3 { padding: 0.75rem; }
+
+.p-4 { padding: 1rem; }
+
+.p-5 { padding: 1.25rem; }
+
+.p-6 { padding: 1.5rem; }
+
+.p-8 { padding: 2rem; }
+
+.px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+
+.px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
+
+.px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+
+.py-0\.5 { padding-top: 0.125rem; padding-bottom: 0.125rem; }
+
+.py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+
+.py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+
+.py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+
+.pb-2 { padding-bottom: 0.5rem; }
+
+.pl-6 { padding-left: 1.5rem; }
+
+.pr-2 { padding-right: 0.5rem; }
+
+.pt-12 { padding-top: 3rem; }
+
+.pt-3 { padding-top: 0.75rem; }
+
+.pt-6 { padding-top: 1.5rem; }
+
+.text-left { text-align: left; }
+
+.text-center { text-align: center; }
+
+.text-right { text-align: right; }
+
+.font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Cons=
+olas, "Liberation Mono", "Courier New", monospace; }
+
+.font-sans { font-family: ui-sans-serif, system-ui, sans-serif, "Apple Colo=
+r Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; }
+
+.text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+
+.text-base { font-size: 1rem; line-height: 1.5rem; }
+
+.text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+
+.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+
+.text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+
+.text-xs { font-size: 0.75rem; line-height: 1rem; }
+
+.font-bold { font-weight: 700; }
+
+.font-medium { font-weight: 500; }
+
+.font-normal { font-weight: 400; }
+
+.font-semibold { font-weight: 600; }
+
+.uppercase { text-transform: uppercase; }
+
+.italic { font-style: italic; }
+
+.leading-relaxed { line-height: 1.625; }
+
+.tracking-wider { letter-spacing: 0.05em; }
+
+.text-blue-500 { --tw-text-opacity: 1; color: rgb(59 130 246 / var(--tw-tex=
+t-opacity, 1)); }
+
+.text-blue-600 { --tw-text-opacity: 1; color: rgb(37 99 235 / var(--tw-text=
+-opacity, 1)); }
+
+.text-blue-700 { --tw-text-opacity: 1; color: rgb(29 78 216 / var(--tw-text=
+-opacity, 1)); }
+
+.text-blue-800 { --tw-text-opacity: 1; color: rgb(30 64 175 / var(--tw-text=
+-opacity, 1)); }
+
+.text-blue-900 { --tw-text-opacity: 1; color: rgb(30 58 138 / var(--tw-text=
+-opacity, 1)); }
+
+.text-green-600 { --tw-text-opacity: 1; color: rgb(22 163 74 / var(--tw-tex=
+t-opacity, 1)); }
+
+.text-green-700 { --tw-text-opacity: 1; color: rgb(21 128 61 / var(--tw-tex=
+t-opacity, 1)); }
+
+.text-green-800 { --tw-text-opacity: 1; color: rgb(22 101 52 / var(--tw-tex=
+t-opacity, 1)); }
+
+.text-green-900 { --tw-text-opacity: 1; color: rgb(20 83 45 / var(--tw-text=
+-opacity, 1)); }
+
+.text-indigo-700 { --tw-text-opacity: 1; color: rgb(67 56 202 / var(--tw-te=
+xt-opacity, 1)); }
+
+.text-indigo-800 { --tw-text-opacity: 1; color: rgb(55 48 163 / var(--tw-te=
+xt-opacity, 1)); }
+
+.text-orange-600 { --tw-text-opacity: 1; color: rgb(234 88 12 / var(--tw-te=
+xt-opacity, 1)); }
+
+.text-orange-700 { --tw-text-opacity: 1; color: rgb(194 65 12 / var(--tw-te=
+xt-opacity, 1)); }
+
+.text-orange-800 { --tw-text-opacity: 1; color: rgb(154 52 18 / var(--tw-te=
+xt-opacity, 1)); }
+
+.text-purple-500 { --tw-text-opacity: 1; color: rgb(168 85 247 / var(--tw-t=
+ext-opacity, 1)); }
+
+.text-purple-600 { --tw-text-opacity: 1; color: rgb(147 51 234 / var(--tw-t=
+ext-opacity, 1)); }
+
+.text-purple-700 { --tw-text-opacity: 1; color: rgb(126 34 206 / var(--tw-t=
+ext-opacity, 1)); }
+
+.text-purple-800 { --tw-text-opacity: 1; color: rgb(107 33 168 / var(--tw-t=
+ext-opacity, 1)); }
+
+.text-red-500 { --tw-text-opacity: 1; color: rgb(239 68 68 / var(--tw-text-=
+opacity, 1)); }
+
+.text-red-600 { --tw-text-opacity: 1; color: rgb(220 38 38 / var(--tw-text-=
+opacity, 1)); }
+
+.text-red-700 { --tw-text-opacity: 1; color: rgb(185 28 28 / var(--tw-text-=
+opacity, 1)); }
+
+.text-red-800 { --tw-text-opacity: 1; color: rgb(153 27 27 / var(--tw-text-=
+opacity, 1)); }
+
+.text-slate-100 { --tw-text-opacity: 1; color: rgb(241 245 249 / var(--tw-t=
+ext-opacity, 1)); }
+
+.text-slate-300 { --tw-text-opacity: 1; color: rgb(203 213 225 / var(--tw-t=
+ext-opacity, 1)); }
+
+.text-slate-400 { --tw-text-opacity: 1; color: rgb(148 163 184 / var(--tw-t=
+ext-opacity, 1)); }
+
+.text-slate-500 { --tw-text-opacity: 1; color: rgb(100 116 139 / var(--tw-t=
+ext-opacity, 1)); }
+
+.text-slate-600 { --tw-text-opacity: 1; color: rgb(71 85 105 / var(--tw-tex=
+t-opacity, 1)); }
+
+.text-slate-700 { --tw-text-opacity: 1; color: rgb(51 65 85 / var(--tw-text=
+-opacity, 1)); }
+
+.text-slate-800 { --tw-text-opacity: 1; color: rgb(30 41 59 / var(--tw-text=
+-opacity, 1)); }
+
+.text-slate-900 { --tw-text-opacity: 1; color: rgb(15 23 42 / var(--tw-text=
+-opacity, 1)); }
+
+.text-white { --tw-text-opacity: 1; color: rgb(255 255 255 / var(--tw-text-=
+opacity, 1)); }
+
+.text-yellow-700 { --tw-text-opacity: 1; color: rgb(161 98 7 / var(--tw-tex=
+t-opacity, 1)); }
+
+.text-yellow-800 { --tw-text-opacity: 1; color: rgb(133 77 14 / var(--tw-te=
+xt-opacity, 1)); }
+
+.opacity-50 { opacity: 0.5; }
+
+.shadow-lg { --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px =
+rgb(0 0 0 / .1); --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-colo=
+r), 0 4px 6px -4px var(--tw-shadow-color); box-shadow: var(--tw-ring-offset=
+-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow); }
+
+.shadow-md { --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rg=
+b(0 0 0 / .1); --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), =
+0 2px 4px -2px var(--tw-shadow-color); box-shadow: var(--tw-ring-offset-sha=
+dow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow); }
+
+.shadow-sm { --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / .05); --tw-shadow-colored=
+: 0 1px 2px 0 var(--tw-shadow-color); box-shadow: var(--tw-ring-offset-shad=
+ow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow); }
+
+.ring { --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-o=
+ffset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-i=
+nset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color); b=
+ox-shadow: var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shad=
+ow, 0 0 #0000); }
+
+.transition { transition-property: color, background-color, border-color, t=
+ext-decoration-color, fill, stroke, opacity, box-shadow, transform, filter,=
+ backdrop-filter; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);=
+ transition-duration: 0.15s; }
+
+.transition-all { transition-property: all; transition-timing-function: cub=
+ic-bezier(0.4, 0, 0.2, 1); transition-duration: 0.15s; }
+
+.transition-colors { transition-property: color, background-color, border-c=
+olor, text-decoration-color, fill, stroke; transition-timing-function: cubi=
+c-bezier(0.4, 0, 0.2, 1); transition-duration: 0.15s; }
+
+.transition-shadow { transition-property: box-shadow; transition-timing-fun=
+ction: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 0.15s; }
+
+.transition-transform { transition-property: transform; transition-timing-f=
+unction: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 0.15s; }
+
+.duration-200 { transition-duration: 0.2s; }
+
+.ease-in-out { transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+
+.animate-fadeIn { animation: 0.5s ease-out 0s 1 normal forwards running fad=
+eIn; }
+
+@keyframes fadeIn {=20
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0px); }
+}
+
+.last\:border-0:last-child { border-width: 0px; }
+
+.hover\:scale-105:hover { --tw-scale-x: 1.05; --tw-scale-y: 1.05; transform=
+: translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-ro=
+tate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale=
+-x)) scaleY(var(--tw-scale-y)); }
+
+.hover\:bg-blue-100:hover { --tw-bg-opacity: 1; background-color: rgb(219 2=
+34 254 / var(--tw-bg-opacity, 1)); }
+
+.hover\:bg-blue-50:hover { --tw-bg-opacity: 1; background-color: rgb(239 24=
+6 255 / var(--tw-bg-opacity, 1)); }
+
+.hover\:bg-blue-700:hover { --tw-bg-opacity: 1; background-color: rgb(29 78=
+ 216 / var(--tw-bg-opacity, 1)); }
+
+.hover\:bg-green-700:hover { --tw-bg-opacity: 1; background-color: rgb(21 1=
+28 61 / var(--tw-bg-opacity, 1)); }
+
+.hover\:bg-purple-50:hover { --tw-bg-opacity: 1; background-color: rgb(250 =
+245 255 / var(--tw-bg-opacity, 1)); }
+
+.hover\:bg-slate-50:hover { --tw-bg-opacity: 1; background-color: rgb(248 2=
+50 252 / var(--tw-bg-opacity, 1)); }
+
+.hover\:bg-slate-900:hover { --tw-bg-opacity: 1; background-color: rgb(15 2=
+3 42 / var(--tw-bg-opacity, 1)); }
+
+.hover\:text-blue-900:hover { --tw-text-opacity: 1; color: rgb(30 58 138 / =
+var(--tw-text-opacity, 1)); }
+
+.hover\:text-purple-900:hover { --tw-text-opacity: 1; color: rgb(88 28 135 =
+/ var(--tw-text-opacity, 1)); }
+
+.hover\:text-white:hover { --tw-text-opacity: 1; color: rgb(255 255 255 / v=
+ar(--tw-text-opacity, 1)); }
+
+.hover\:shadow-lg:hover { --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 =
+4px 6px -4px rgb(0 0 0 / .1); --tw-shadow-colored: 0 10px 15px -3px var(--t=
+w-shadow-color), 0 4px 6px -4px var(--tw-shadow-color); box-shadow: var(--t=
+w-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-=
+shadow); }
+
+.hover\:shadow-md:hover { --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / .1), 0 2p=
+x 4px -2px rgb(0 0 0 / .1); --tw-shadow-colored: 0 4px 6px -1px var(--tw-sh=
+adow-color), 0 2px 4px -2px var(--tw-shadow-color); box-shadow: var(--tw-ri=
+ng-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shad=
+ow); }
+
+.hover\:shadow-xl:hover { --tw-shadow: 0 20px 25px -5px rgb(0 0 0 / .1), 0 =
+8px 10px -6px rgb(0 0 0 / .1); --tw-shadow-colored: 0 20px 25px -5px var(--=
+tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color); box-shadow: var(-=
+-tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--t=
+w-shadow); }
+
+.disabled\:opacity-50:disabled { opacity: 0.5; }
+
+.group:hover .group-hover\:scale-110 { --tw-scale-x: 1.1; --tw-scale-y: 1.1=
+; transform: translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(=
+var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var=
+(--tw-scale-x)) scaleY(var(--tw-scale-y)); }
+
+.group:hover .group-hover\:text-blue-700 { --tw-text-opacity: 1; color: rgb=
+(29 78 216 / var(--tw-text-opacity, 1)); }
+
+.group:hover .group-hover\:opacity-100 { opacity: 1; }
+
+@media (min-width: 640px) {
+  .sm\:inline { display: inline; }
+  .sm\:flex-row { flex-direction: row; }
+}
+
+@media (min-width: 768px) {
+  .md\:mt-0 { margin-top: 0px; }
+  .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0px, 1fr)); }
+  .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0px, 1fr)); }
+  .md\:flex-row { flex-direction: row; }
+  .md\:items-center { align-items: center; }
+}
+
+@media (min-width: 1024px) {
+  .lg\:static { position: static; }
+  .lg\:hidden { display: none; }
+  .lg\:translate-x-0 { --tw-translate-x: 0px; transform: translate(var(--tw=
+-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw=
+-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw=
+-scale-y)); }
+  .lg\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0px, 1fr)); }
+  .lg\:p-8 { padding: 2rem; }
+  .lg\:pl-0 { padding-left: 0px; }
+  .lg\:pt-0 { padding-top: 0px; }
+}
+
+@media print {
+  .print\:hidden { display: none; }
+}
+------MultipartBoundary--N0VnYHEz0DEIlDSxPgyGGljp1dq1eWhDvpCfTjZNzf----
+Content-Type: text/css
+Content-Transfer-Encoding: quoted-printable
+Content-Location: cid:css-debbbe6e-fe21-4007-8657-0d17e0edbee7@mhtml.blink
+
+@charset "utf-8";
+
+html { --lumo-font-family: -apple-system, BlinkMacSystemFont, 'Roboto', 'Se=
+goe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji=
+', 'Segoe UI Symbol'; --lumo-font-size-xxs: 0.75rem; --lumo-font-size-xs: 0=
+.8125rem; --lumo-font-size-s: 0.875rem; --lumo-font-size-m: 1rem; --lumo-fo=
+nt-size-l: 1.125rem; --lumo-font-size-xl: 1.375rem; --lumo-font-size-xxl: 1=
+.75rem; --lumo-font-size-xxxl: 2.5rem; --lumo-line-height-xs: 1.25; --lumo-=
+line-height-s: 1.375; --lumo-line-height-m: 1.625; }
+------MultipartBoundary--N0VnYHEz0DEIlDSxPgyGGljp1dq1eWhDvpCfTjZNzf----
+Content-Type: text/css
+Content-Transfer-Encoding: quoted-printable
+Content-Location: cid:css-6207923a-f56f-4a88-8deb-1e38e569afe7@mhtml.blink
+
+@charset "utf-8";
+
+html { --lumo-border-radius-s: 0.25em; --lumo-border-radius-m: var(--lumo-b=
+order-radius, 0.25em); --lumo-border-radius-l: 0.5em; --lumo-border-radius:=
+ 0.25em; --lumo-box-shadow-xs: 0 1px 4px -1px var(--lumo-shade-50pct); --lu=
+mo-box-shadow-s: 0 2px 4px -1px var(--lumo-shade-20pct), 0 3px 12px -1px va=
+r(--lumo-shade-30pct); --lumo-box-shadow-m: 0 2px 6px -1px var(--lumo-shade=
+-20pct), 0 8px 24px -4px var(--lumo-shade-40pct); --lumo-box-shadow-l: 0 3p=
+x 18px -2px var(--lumo-shade-20pct), 0 12px 48px -6px var(--lumo-shade-40pc=
+t); --lumo-box-shadow-xl: 0 4px 24px -3px var(--lumo-shade-20pct), 0 18px 6=
+4px -8px var(--lumo-shade-40pct); --lumo-clickable-cursor: default; }
+------MultipartBoundary--N0VnYHEz0DEIlDSxPgyGGljp1dq1eWhDvpCfTjZNzf----
+Content-Type: text/css
+Content-Transfer-Encoding: quoted-printable
+Content-Location: cid:css-d82545e6-c709-4399-991d-1c3c37b83e2b@mhtml.blink
+
+@charset "utf-8";
+
+html { --lumo-space-xs: 0.25rem; --lumo-space-s: 0.5rem; --lumo-space-m: 1r=
+em; --lumo-space-l: 1.5rem; --lumo-space-xl: 2.5rem; --lumo-space-wide-xs: =
+calc(var(--lumo-space-xs) / 2) var(--lumo-space-xs); --lumo-space-wide-s: c=
+alc(var(--lumo-space-s) / 2) var(--lumo-space-s); --lumo-space-wide-m: calc=
+(var(--lumo-space-m) / 2) var(--lumo-space-m); --lumo-space-wide-l: calc(va=
+r(--lumo-space-l) / 2) var(--lumo-space-l); --lumo-space-wide-xl: calc(var(=
+--lumo-space-xl) / 2) var(--lumo-space-xl); --lumo-space-tall-xs: var(--lum=
+o-space-xs) calc(var(--lumo-space-xs) / 2); --lumo-space-tall-s: var(--lumo=
+-space-s) calc(var(--lumo-space-s) / 2); --lumo-space-tall-m: var(--lumo-sp=
+ace-m) calc(var(--lumo-space-m) / 2); --lumo-space-tall-l: var(--lumo-space=
+-l) calc(var(--lumo-space-l) / 2); --lumo-space-tall-xl: var(--lumo-space-x=
+l) calc(var(--lumo-space-xl) / 2); }
+------MultipartBoundary--N0VnYHEz0DEIlDSxPgyGGljp1dq1eWhDvpCfTjZNzf----
+Content-Type: text/css
+Content-Transfer-Encoding: quoted-printable
+Content-Location: cid:css-c12bdfd6-b8ad-4ce5-bce2-f1e2b696235a@mhtml.blink
+
+@charset "utf-8";
+
+html { --lumo-size-xs: 1.625rem; --lumo-size-s: 1.875rem; --lumo-size-m: 2.=
+25rem; --lumo-size-l: 2.75rem; --lumo-size-xl: 3.5rem; --lumo-icon-size-s: =
+1.25em; --lumo-icon-size-m: 1.5em; --lumo-icon-size-l: 2.25em; --lumo-icon-=
+size: var(--lumo-icon-size-m); }
+------MultipartBoundary--N0VnYHEz0DEIlDSxPgyGGljp1dq1eWhDvpCfTjZNzf----
+Content-Type: text/css
+Content-Transfer-Encoding: quoted-printable
+Content-Location: cid:css-58498d5f-6348-4317-a97b-15067c174e84@mhtml.blink
+
+@charset "utf-8";
+
+@font-face { font-family: lumo-icons; src: url("data:application/font-woff;=
+charset=3Dutf-8;base64,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
+rW8N3FbHn/QC444j0AA=3D=3D") format("woff"); font-weight: normal; font-style=
+: normal; }
+
+html { --lumo-icons-align-center: "\ea01"; --lumo-icons-align-left: "\ea02"=
+; --lumo-icons-align-right: "\ea03"; --lumo-icons-angle-down: "\ea04"; --lu=
+mo-icons-angle-left: "\ea05"; --lumo-icons-angle-right: "\ea06"; --lumo-ico=
+ns-angle-up: "\ea07"; --lumo-icons-arrow-down: "\ea08"; --lumo-icons-arrow-=
+left: "\ea09"; --lumo-icons-arrow-right: "\ea0a"; --lumo-icons-arrow-up: "\=
+ea0b"; --lumo-icons-bar-chart: "\ea0c"; --lumo-icons-bell: "\ea0d"; --lumo-=
+icons-calendar: "\ea0e"; --lumo-icons-checkmark: "\ea0f"; --lumo-icons-chev=
+ron-down: "\ea10"; --lumo-icons-chevron-left: "\ea11"; --lumo-icons-chevron=
+-right: "\ea12"; --lumo-icons-chevron-up: "\ea13"; --lumo-icons-clock: "\ea=
+14"; --lumo-icons-cog: "\ea15"; --lumo-icons-cross: "\ea16"; --lumo-icons-d=
+ownload: "\ea17"; --lumo-icons-dropdown: "\ea18"; --lumo-icons-edit: "\ea19=
+"; --lumo-icons-error: "\ea1a"; --lumo-icons-eye: "\ea1b"; --lumo-icons-eye=
+-disabled: "\ea1c"; --lumo-icons-menu: "\ea1d"; --lumo-icons-minus: "\ea1e"=
+; --lumo-icons-ordered-list: "\ea1f"; --lumo-icons-phone: "\ea20"; --lumo-i=
+cons-photo: "\ea21"; --lumo-icons-play: "\ea22"; --lumo-icons-plus: "\ea23"=
+; --lumo-icons-redo: "\ea24"; --lumo-icons-reload: "\ea25"; --lumo-icons-se=
+arch: "\ea26"; --lumo-icons-undo: "\ea27"; --lumo-icons-unordered-list: "\e=
+a28"; --lumo-icons-upload: "\ea29"; --lumo-icons-user: "\ea2a"; }
+------MultipartBoundary--N0VnYHEz0DEIlDSxPgyGGljp1dq1eWhDvpCfTjZNzf----
+Content-Type: text/css
+Content-Transfer-Encoding: quoted-printable
+Content-Location: cid:css-417cedd0-21cd-44c0-ae35-59e2709e0209@mhtml.blink
+
+@charset "utf-8";
+
+html { --lumo-base-color: #fff; --lumo-tint-5pct: hsla(0, 0%, 100%, 0.3); -=
+-lumo-tint-10pct: hsla(0, 0%, 100%, 0.37); --lumo-tint-20pct: hsla(0, 0%, 1=
+00%, 0.44); --lumo-tint-30pct: hsla(0, 0%, 100%, 0.5); --lumo-tint-40pct: h=
+sla(0, 0%, 100%, 0.57); --lumo-tint-50pct: hsla(0, 0%, 100%, 0.64); --lumo-=
+tint-60pct: hsla(0, 0%, 100%, 0.7); --lumo-tint-70pct: hsla(0, 0%, 100%, 0.=
+77); --lumo-tint-80pct: hsla(0, 0%, 100%, 0.84); --lumo-tint-90pct: hsla(0,=
+ 0%, 100%, 0.9); --lumo-tint: #fff; --lumo-shade-5pct: hsla(214, 61%, 25%, =
+0.05); --lumo-shade-10pct: hsla(214, 57%, 24%, 0.1); --lumo-shade-20pct: hs=
+la(214, 53%, 23%, 0.16); --lumo-shade-30pct: hsla(214, 50%, 22%, 0.26); --l=
+umo-shade-40pct: hsla(214, 47%, 21%, 0.38); --lumo-shade-50pct: hsla(214, 4=
+5%, 20%, 0.52); --lumo-shade-60pct: hsla(214, 43%, 19%, 0.6); --lumo-shade-=
+70pct: hsla(214, 42%, 18%, 0.69); --lumo-shade-80pct: hsla(214, 41%, 17%, 0=
+.83); --lumo-shade-90pct: hsla(214, 40%, 16%, 0.94); --lumo-shade: hsl(214,=
+ 35%, 15%); --lumo-contrast-5pct: var(--lumo-shade-5pct); --lumo-contrast-1=
+0pct: var(--lumo-shade-10pct); --lumo-contrast-20pct: var(--lumo-shade-20pc=
+t); --lumo-contrast-30pct: var(--lumo-shade-30pct); --lumo-contrast-40pct: =
+var(--lumo-shade-40pct); --lumo-contrast-50pct: var(--lumo-shade-50pct); --=
+lumo-contrast-60pct: var(--lumo-shade-60pct); --lumo-contrast-70pct: var(--=
+lumo-shade-70pct); --lumo-contrast-80pct: var(--lumo-shade-80pct); --lumo-c=
+ontrast-90pct: var(--lumo-shade-90pct); --lumo-contrast: var(--lumo-shade);=
+ --lumo-header-text-color: var(--lumo-contrast); --lumo-body-text-color: va=
+r(--lumo-contrast-90pct); --lumo-secondary-text-color: var(--lumo-contrast-=
+70pct); --lumo-tertiary-text-color: var(--lumo-contrast-50pct); --lumo-disa=
+bled-text-color: var(--lumo-contrast-30pct); --lumo-primary-color: hsl(214,=
+ 100%, 48%); --lumo-primary-color-50pct: hsla(214, 100%, 49%, 0.76); --lumo=
+-primary-color-10pct: hsla(214, 100%, 60%, 0.13); --lumo-primary-text-color=
+: hsl(214, 100%, 43%); --lumo-primary-contrast-color: #fff; --lumo-error-co=
+lor: hsl(3, 85%, 48%); --lumo-error-color-50pct: hsla(3, 85%, 49%, 0.5); --=
+lumo-error-color-10pct: hsla(3, 85%, 49%, 0.1); --lumo-error-text-color: hs=
+l(3, 89%, 42%); --lumo-error-contrast-color: #fff; --lumo-success-color: hs=
+l(145, 72%, 30%); --lumo-success-color-50pct: hsla(145, 72%, 31%, 0.5); --l=
+umo-success-color-10pct: hsla(145, 72%, 31%, 0.1); --lumo-success-text-colo=
+r: hsl(145, 85%, 25%); --lumo-success-contrast-color: #fff; }
+------MultipartBoundary--N0VnYHEz0DEIlDSxPgyGGljp1dq1eWhDvpCfTjZNzf----
+Content-Type: text/css
+Content-Transfer-Encoding: quoted-printable
+Content-Location: cid:css-922f1705-4c1b-4214-875c-3c2756906606@mhtml.blink
+
+@charset "utf-8";
+
+:root { --litepicker-container-months-color-bg: #fff; --litepicker-containe=
+r-months-box-shadow-color: #ddd; --litepicker-footer-color-bg: #fafafa; --l=
+itepicker-footer-box-shadow-color: #ddd; --litepicker-tooltip-color-bg: #ff=
+f; --litepicker-month-header-color: #333; --litepicker-button-prev-month-co=
+lor: #9e9e9e; --litepicker-button-next-month-color: #9e9e9e; --litepicker-b=
+utton-prev-month-color-hover: #2196f3; --litepicker-button-next-month-color=
+-hover: #2196f3; --litepicker-month-width: calc(var(--litepicker-day-width)=
+ * 7); --litepicker-month-weekday-color: #9e9e9e; --litepicker-month-week-n=
+umber-color: #9e9e9e; --litepicker-day-width: 38px; --litepicker-day-color:=
+ #333; --litepicker-day-color-hover: #2196f3; --litepicker-is-today-color: =
+#f44336; --litepicker-is-in-range-color: #bbdefb; --litepicker-is-locked-co=
+lor: #9e9e9e; --litepicker-is-start-color: #fff; --litepicker-is-start-colo=
+r-bg: #2196f3; --litepicker-is-end-color: #fff; --litepicker-is-end-color-b=
+g: #2196f3; --litepicker-button-cancel-color: #fff; --litepicker-button-can=
+cel-color-bg: #9e9e9e; --litepicker-button-apply-color: #fff; --litepicker-=
+button-apply-color-bg: #2196f3; --litepicker-button-reset-color: #909090; -=
+-litepicker-button-reset-color-hover: #2196f3; --litepicker-highlighted-day=
+-color: #333; --litepicker-highlighted-day-color-bg: #ffeb3b; }
+
+.show-week-numbers { --litepicker-month-width: calc(var(--litepicker-day-wi=
+dth) * 8); }
+
+.litepicker { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", R=
+oboto, "Helvetica Neue", Arial, sans-serif; font-size: 0.8em; display: none=
+; }
+
+.litepicker button { border: none; background: none; }
+
+.litepicker .container__main { display: flex; }
+
+.litepicker .container__months { display: flex; flex-wrap: wrap; background=
+-color: var(--litepicker-container-months-color-bg); border-radius: 5px; bo=
+x-shadow: 0 0 5px var(--litepicker-container-months-box-shadow-color); widt=
+h: calc(var(--litepicker-month-width) + 10px); box-sizing: content-box; }
+
+.litepicker .container__months.columns-2 { width: calc((var(--litepicker-mo=
+nth-width) * 2) + 20px); }
+
+.litepicker .container__months.columns-3 { width: calc((var(--litepicker-mo=
+nth-width) * 3) + 30px); }
+
+.litepicker .container__months.columns-4 { width: calc((var(--litepicker-mo=
+nth-width) * 4) + 40px); }
+
+.litepicker .container__months.split-view .month-item-header .button-previo=
+us-month, .litepicker .container__months.split-view .month-item-header .but=
+ton-next-month { visibility: visible; }
+
+.litepicker .container__months .month-item { padding: 5px; width: var(--lit=
+epicker-month-width); box-sizing: content-box; }
+
+.litepicker .container__months .month-item-header { display: flex; -webkit-=
+box-pack: justify; justify-content: space-between; font-weight: 500; paddin=
+g: 10px 5px; text-align: center; -webkit-box-align: center; align-items: ce=
+nter; color: var(--litepicker-month-header-color); }
+
+.litepicker .container__months .month-item-header div { -webkit-box-flex: 1=
+; flex: 1 1 0%; }
+
+.litepicker .container__months .month-item-header div > .month-item-name { =
+margin-right: 5px; }
+
+.litepicker .container__months .month-item-header div > .month-item-year { =
+padding: 0px; }
+
+.litepicker .container__months .month-item-header .reset-button { color: va=
+r(--litepicker-button-reset-color); }
+
+.litepicker .container__months .month-item-header .reset-button > svg { fil=
+l: var(--litepicker-button-reset-color); }
+
+.litepicker .container__months .month-item-header .reset-button * { pointer=
+-events: none; }
+
+.litepicker .container__months .month-item-header .reset-button:hover { col=
+or: var(--litepicker-button-reset-color-hover); }
+
+.litepicker .container__months .month-item-header .reset-button:hover > svg=
+ { fill: var(--litepicker-button-reset-color-hover); }
+
+.litepicker .container__months .month-item-header .button-previous-month, .=
+litepicker .container__months .month-item-header .button-next-month { visib=
+ility: hidden; text-decoration: none; padding: 3px 5px; border-radius: 3px;=
+ transition: color 0.3s, border 0.3s; cursor: default; }
+
+.litepicker .container__months .month-item-header .button-previous-month *,=
+ .litepicker .container__months .month-item-header .button-next-month * { p=
+ointer-events: none; }
+
+.litepicker .container__months .month-item-header .button-previous-month { =
+color: var(--litepicker-button-prev-month-color); }
+
+.litepicker .container__months .month-item-header .button-previous-month > =
+svg, .litepicker .container__months .month-item-header .button-previous-mon=
+th > img { fill: var(--litepicker-button-prev-month-color); }
+
+.litepicker .container__months .month-item-header .button-previous-month:ho=
+ver { color: var(--litepicker-button-prev-month-color-hover); }
+
+.litepicker .container__months .month-item-header .button-previous-month:ho=
+ver > svg { fill: var(--litepicker-button-prev-month-color-hover); }
+
+.litepicker .container__months .month-item-header .button-next-month { colo=
+r: var(--litepicker-button-next-month-color); }
+
+.litepicker .container__months .month-item-header .button-next-month > svg,=
+ .litepicker .container__months .month-item-header .button-next-month > img=
+ { fill: var(--litepicker-button-next-month-color); }
+
+.litepicker .container__months .month-item-header .button-next-month:hover =
+{ color: var(--litepicker-button-next-month-color-hover); }
+
+.litepicker .container__months .month-item-header .button-next-month:hover =
+> svg { fill: var(--litepicker-button-next-month-color-hover); }
+
+.litepicker .container__months .month-item-weekdays-row { display: flex; ju=
+stify-self: center; -webkit-box-pack: start; justify-content: flex-start; c=
+olor: var(--litepicker-month-weekday-color); }
+
+.litepicker .container__months .month-item-weekdays-row > div { padding: 5p=
+x 0px; font-size: 85%; -webkit-box-flex: 1; flex: 1 1 0%; width: var(--lite=
+picker-day-width); text-align: center; }
+
+.litepicker .container__months .month-item:first-child .button-previous-mon=
+th { visibility: visible; }
+
+.litepicker .container__months .month-item:last-child .button-next-month { =
+visibility: visible; }
+
+.litepicker .container__months .month-item.no-previous-month .button-previo=
+us-month { visibility: hidden; }
+
+.litepicker .container__months .month-item.no-next-month .button-next-month=
+ { visibility: hidden; }
+
+.litepicker .container__days { display: flex; flex-wrap: wrap; justify-self=
+: center; -webkit-box-pack: start; justify-content: flex-start; text-align:=
+ center; box-sizing: content-box; }
+
+.litepicker .container__days > div, .litepicker .container__days > a { padd=
+ing: 5px 0px; width: var(--litepicker-day-width); }
+
+.litepicker .container__days .day-item { color: var(--litepicker-day-color)=
+; text-align: center; text-decoration: none; border-radius: 3px; transition=
+: color 0.3s, border 0.3s; cursor: default; }
+
+.litepicker .container__days .day-item:hover { color: var(--litepicker-day-=
+color-hover); box-shadow: inset 0 0 0 1px var(--litepicker-day-color-hover)=
+; }
+
+.litepicker .container__days .day-item.is-today { color: var(--litepicker-i=
+s-today-color); }
+
+.litepicker .container__days .day-item.is-locked { color: var(--litepicker-=
+is-locked-color); }
+
+.litepicker .container__days .day-item.is-locked:hover { color: var(--litep=
+icker-is-locked-color); box-shadow: none; cursor: default; }
+
+.litepicker .container__days .day-item.is-in-range { background-color: var(=
+--litepicker-is-in-range-color); border-radius: 0px; }
+
+.litepicker .container__days .day-item.is-start-date { color: var(--litepic=
+ker-is-start-color); background-color: var(--litepicker-is-start-color-bg);=
+ border-radius: 5px 0px 0px 5px; }
+
+.litepicker .container__days .day-item.is-start-date.is-flipped { border-ra=
+dius: 0px 5px 5px 0px; }
+
+.litepicker .container__days .day-item.is-end-date { color: var(--litepicke=
+r-is-end-color); background-color: var(--litepicker-is-end-color-bg); borde=
+r-radius: 0px 5px 5px 0px; }
+
+.litepicker .container__days .day-item.is-end-date.is-flipped { border-radi=
+us: 5px 0px 0px 5px; }
+
+.litepicker .container__days .day-item.is-start-date.is-end-date { border-r=
+adius: 5px; }
+
+.litepicker .container__days .day-item.is-highlighted { color: var(--litepi=
+cker-highlighted-day-color); background-color: var(--litepicker-highlighted=
+-day-color-bg); }
+
+.litepicker .container__days .week-number { display: flex; -webkit-box-alig=
+n: center; align-items: center; -webkit-box-pack: center; justify-content: =
+center; color: var(--litepicker-month-week-number-color); font-size: 85%; }
+
+.litepicker .container__footer { text-align: right; padding: 10px 5px; marg=
+in: 0px 5px; background-color: var(--litepicker-footer-color-bg); box-shado=
+w: inset 0px 3px 3px 0px var(--litepicker-footer-box-shadow-color); border-=
+bottom-left-radius: 5px; border-bottom-right-radius: 5px; }
+
+.litepicker .container__footer .preview-date-range { margin-right: 10px; fo=
+nt-size: 90%; }
+
+.litepicker .container__footer .button-cancel { background-color: var(--lit=
+epicker-button-cancel-color-bg); color: var(--litepicker-button-cancel-colo=
+r); border: 0px; padding: 3px 7px 4px; border-radius: 3px; }
+
+.litepicker .container__footer .button-cancel * { pointer-events: none; }
+
+.litepicker .container__footer .button-apply { background-color: var(--lite=
+picker-button-apply-color-bg); color: var(--litepicker-button-apply-color);=
+ border: 0px; padding: 3px 7px 4px; border-radius: 3px; margin-left: 10px; =
+margin-right: 10px; }
+
+.litepicker .container__footer .button-apply:disabled { opacity: 0.7; }
+
+.litepicker .container__footer .button-apply * { pointer-events: none; }
+
+.litepicker .container__tooltip { position: absolute; margin-top: -4px; pad=
+ding: 4px 8px; border-radius: 4px; background-color: var(--litepicker-toolt=
+ip-color-bg); box-shadow: rgba(0, 0, 0, 0.25) 0px 1px 3px; white-space: now=
+rap; font-size: 11px; pointer-events: none; visibility: hidden; }
+
+.litepicker .container__tooltip::before { position: absolute; bottom: -5px;=
+ left: calc(50% - 5px); border-top: 5px solid rgba(0, 0, 0, 0.12); border-r=
+ight: 5px solid transparent; border-left: 5px solid transparent; content: "=
+"; }
+
+.litepicker .container__tooltip::after { position: absolute; bottom: -4px; =
+left: calc(50% - 4px); border-top: 4px solid var(--litepicker-tooltip-color=
+-bg); border-right: 4px solid transparent; border-left: 4px solid transpare=
+nt; content: ""; }
+------MultipartBoundary--N0VnYHEz0DEIlDSxPgyGGljp1dq1eWhDvpCfTjZNzf----
+Content-Type: text/css
+Content-Transfer-Encoding: quoted-printable
+Content-Location: cid:css-855312e8-8aea-4ed6-a6b0-ea4acba877b4@mhtml.blink
+
+@charset "utf-8";
+
+body { transition: opacity 0.2s ease-in; }
+
+body[unresolved] { opacity: 0; display: block; overflow: hidden; position: =
+relative; }
+------MultipartBoundary--N0VnYHEz0DEIlDSxPgyGGljp1dq1eWhDvpCfTjZNzf------

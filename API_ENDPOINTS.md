@@ -2,7 +2,11 @@
 
 Complete reference for all API endpoints in the Saarthi Clinical Platform.
 
-**Base URL:** `http://localhost:8787/api/v1` (development)
+## Base URLs
+
+- **Production:** `https://process.saarthihq.com/api/v1`
+- **Staging:** `https://staging.saarthihq.com/api/v1`
+- **Local Development:** `http://localhost:8787/api/v1`
 
 ---
 
@@ -18,14 +22,82 @@ GET /api/v1/health
 {
   "success": true,
   "message": "Saarthi Clinical Platform is running",
-  "timestamp": "2025-11-30T10:00:00.000Z",
-  "environment": "development",
+  "timestamp": "2025-12-03T10:00:00.000Z",
+  "environment": "production",
   "services": {
     "database": true,
     "storage": true,
     "cache": true,
-    "gemini": true
+    "gemini": true,
+    "openai": true
   }
+}
+```
+
+### Database Diagnostic
+```
+GET /api/v1/health/db
+```
+
+---
+
+## 🔐 Authentication
+
+### Verify Firebase Token
+```
+POST /api/v1/auth/verify
+```
+
+**Request Body:**
+```json
+{
+  "idToken": "firebase-id-token"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "user": {
+      "id": "usr_abc123",
+      "firebase_uid": "firebase_uid_here",
+      "email": "user@example.com",
+      "role": "user"
+    }
+  }
+}
+```
+
+### Get Current User
+```
+GET /api/v1/auth/me
+Authorization: Bearer <firebase-token>
+```
+
+### Send Phone OTP (Backend - Limited)
+```
+POST /api/v1/auth/phone/send
+```
+
+**Request Body:**
+```json
+{
+  "phoneNumber": "+1234567890"
+}
+```
+
+### Verify Phone OTP
+```
+POST /api/v1/auth/phone/verify
+```
+
+**Request Body:**
+```json
+{
+  "sessionInfo": "session-info-from-send",
+  "code": "123456"
 }
 ```
 
@@ -33,9 +105,10 @@ GET /api/v1/health
 
 ## 👥 Patients
 
-### Create Patient (Manual Entry)
+### Create Patient
 ```
 POST /api/v1/patients
+Authorization: Bearer <token>
 ```
 
 **Request Body:**
@@ -43,7 +116,14 @@ POST /api/v1/patients
 {
   "name": "John Doe",
   "age": 65,
-  "gender": "male",
+  "age_unit": "years",
+  "sex": "male",
+  "dob": "1957-10-08",
+  "patient_id_uhid": "UHID-12345",
+  "patient_id_ipd": "IPD-12345",
+  "primary_oncologist": "Dr. Smith",
+  "primary_center": "City Hospital",
+  "current_status": "on_treatment",
   "caregiver": {
     "name": "Jane Doe",
     "relation": "daughter",
@@ -60,104 +140,40 @@ POST /api/v1/patients
     "id": "pt_abc123",
     "name": "John Doe",
     "age": 65,
-    "gender": "male",
-    "caregiver_name": "Jane Doe",
-    "caregiver_relation": "daughter",
-    "caregiver_contact": "+91-9999999999",
-    "status": "active",
-    "created_at": 1638360000,
-    "updated_at": 1638360000
+    "sex": "male",
+    "created_at": 1638360000
   }
 }
 ```
 
----
-
 ### List All Patients
 ```
-GET /api/v1/patients
+GET /api/v1/patients?status=active&limit=20&offset=0
+Authorization: Bearer <token>
 ```
 
-**Response:**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": "pt_abc123",
-      "name": "John Doe",
-      "age": 65,
-      "gender": "male",
-      "caregiver": {
-        "name": "Jane Doe",
-        "relation": "daughter",
-        "contact": "+91-9999999999"
-      },
-      "created_at": 1638360000
-    }
-  ],
-  "total": 1
-}
-```
-
----
+**Query Parameters:**
+- `status` (string, optional) - Filter by current_status
+- `oncologist` (string, optional) - Filter by primary_oncologist
+- `limit` (number, optional) - Default 20
+- `offset` (number, optional) - For pagination
 
 ### Get Patient by ID
 ```
 GET /api/v1/patients/:id
+Authorization: Bearer <token>
 ```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "id": "pt_abc123",
-    "name": "John Doe",
-    "age": 65,
-    "gender": "male",
-    "caregiver_name": "Jane Doe",
-    "caregiver_relation": "daughter",
-    "caregiver_contact": "+91-9999999999",
-    "status": "active",
-    "created_at": 1638360000,
-    "updated_at": 1638360000
-  }
-}
-```
-
----
 
 ### Update Patient
 ```
 PATCH /api/v1/patients/:id
+Authorization: Bearer <token>
 ```
-
-**Request Body:**
-```json
-{
-  "name": "John Updated Doe",
-  "age": 66,
-  "caregiver": {
-    "name": "Jane Updated",
-    "contact": "+91-8888888888"
-  }
-}
-```
-
----
 
 ### Delete Patient
 ```
 DELETE /api/v1/patients/:id
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Patient deleted successfully"
-}
+Authorization: Bearer <token>
 ```
 
 ---
@@ -166,185 +182,95 @@ DELETE /api/v1/patients/:id
 
 ### Upload Documents (Multi-File)
 ```
-POST /api/v1/patients/:patientId/documents/
+POST /api/v1/patients/:patientId/documents
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
 ```
 
 **Form Data:**
 - `files` (File[], required) - Multiple files
-- `document_type` (string, optional) - pathology, imaging, lab, consultation, gp_notes, other
+- `category` (string, optional) - pathology, radiology, discharge_summary, consultation, lab_report, operative_note, other
+- `subcategory` (string, optional) - biopsy, ct, mri, pet, etc.
 - `document_date` (string, optional) - YYYY-MM-DD format
-- `process_immediately` (boolean, optional) - true/false
-
-**Example (cURL):**
-```bash
-curl -X POST http://localhost:8787/api/v1/patients/pt_abc123/documents/ \
-  -F "files=@report1.pdf" \
-  -F "files=@report2.pdf" \
-  -F "document_type=pathology" \
-  -F "process_immediately=true"
-```
+- `process_immediately` (boolean, optional) - Default true
+- `provider` (string, optional) - gemini or openai
 
 **Response (202 Accepted):**
 ```json
 {
   "success": true,
-  "case_pack_id": "cp_xyz789",
   "documents_uploaded": 2,
   "processing_status": "processing",
-  "message": "2 document(s) uploaded successfully. Processing started.",
-  "data": {
-    "case_pack_id": "cp_xyz789",
-    "documents": [
-      {
-        "id": "doc_123",
-        "patient_id": "pt_abc123",
-        "filename": "report1.pdf",
-        "file_type": "pdf",
-        "document_type": "pathology",
-        "file_size": 245678,
-        "mime_type": "application/pdf",
-        "processing_status": "pending",
-        "created_at": 1638360000,
-        "updated_at": 1638360000
-      }
-    ]
-  }
+  "data": [{
+    "id": "doc_123",
+    "filename": "report1.pdf",
+    "processing_status": "pending",
+    "vectorize_status": "pending"
+  }]
 }
 ```
-
----
 
 ### List Patient Documents
 ```
-GET /api/v1/patients/:patientId/documents/
+GET /api/v1/patients/:patientId/documents?category=pathology&sort=date_desc
+Authorization: Bearer <token>
 ```
 
-**Response:**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": "doc_123",
-      "patient_id": "pt_abc123",
-      "filename": "pathology_report.pdf",
-      "file_type": "pdf",
-      "document_type": "pathology",
-      "document_date": "2025-01-15",
-      "file_size": 245678,
-      "processing_status": "completed",
-      "medical_highlight": "Biopsy confirms invasive ductal carcinoma, Grade 2, ER+/PR+/HER2-",
-      "created_at": 1638360000,
-      "updated_at": 1638360000
-    }
-  ],
-  "total": 1
-}
-```
-
----
+**Query Parameters:**
+- `category` (string, optional) - Filter by category
+- `from` (date, optional) - Documents from date
+- `to` (date, optional) - Documents to date
+- `reviewed` (boolean, optional) - Filter by reviewed status
+- `sort` (string, optional) - date_desc, date_asc, case_pack_order
 
 ### Get Document Metadata
 ```
 GET /api/v1/patients/:patientId/documents/:docId
+Authorization: Bearer <token>
 ```
 
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "id": "doc_123",
-    "filename": "pathology_report.pdf",
-    "document_type": "pathology",
-    "processing_status": "completed",
-    "medical_highlight": "Biopsy confirms invasive ductal carcinoma...",
-    "created_at": 1638360000
-  }
-}
+### Update Document Metadata
 ```
-
----
-
-### Download Document File
-```
-GET /api/v1/patients/:patientId/documents/:docId/download
-```
-
-**Response:** Binary file stream with headers:
-```
-Content-Type: application/pdf
-Content-Disposition: attachment; filename="pathology_report.pdf"
-Content-Length: 245678
-```
-
----
-
-### Delete Document
-```
-DELETE /api/v1/patients/:patientId/documents/:docId
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Document deleted successfully"
-}
-```
-
----
-
-## 📦 Case-Packs
-
-### Get Case-Pack with Documents
-```
-GET /api/v1/patients/:patientId/case-pack/
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "case_pack": {
-      "id": "cp_xyz789",
-      "patient_id": "pt_abc123",
-      "title": "pt_abc123 - Case Documents",
-      "description": "Auto-generated case pack for patient documents",
-      "created_at": 1638360000,
-      "updated_at": 1638360000
-    },
-    "documents": [
-      {
-        "id": "doc_123",
-        "filename": "pathology_report.pdf",
-        "document_type": "pathology",
-        "document_date": "2025-01-15",
-        "medical_highlight": "Biopsy confirms invasive ductal carcinoma, Grade 2, ER+/PR+/HER2-",
-        "processing_status": "completed",
-        "file_size": 245678,
-        "created_at": 1638360000,
-        "added_to_case_pack": 1638360000
-      }
-    ],
-    "total_documents": 1
-  }
-}
-```
-
----
-
-### Update Case-Pack Metadata
-```
-PUT /api/v1/patients/:patientId/case-pack/
+PATCH /api/v1/patients/:patientId/documents/:docId
+Authorization: Bearer <token>
 ```
 
 **Request Body:**
 ```json
 {
-  "title": "Lung Cancer Diagnosis - January 2025",
-  "description": "Complete diagnostic workup for lung cancer"
+  "title": "Primary Biopsy",
+  "category": "pathology",
+  "reviewed_status": "reviewed",
+  "case_pack_order": 1
+}
+```
+
+### Download Document
+```
+GET /api/v1/patients/:patientId/documents/:docId/download
+Authorization: Bearer <token>
+```
+
+**Response:** Binary file stream
+
+### Delete Document
+```
+DELETE /api/v1/patients/:patientId/documents/:docId
+Authorization: Bearer <token>
+```
+
+### Search Documents (RAG)
+```
+POST /api/v1/patients/:patientId/documents/search
+Authorization: Bearer <token>
+```
+
+**Request Body:**
+```json
+{
+  "query": "What was the HER2 status?",
+  "top_k": 5,
+  "category_filter": ["pathology"]
 }
 ```
 
@@ -353,36 +279,31 @@ PUT /api/v1/patients/:patientId/case-pack/
 {
   "success": true,
   "data": {
-    "id": "cp_xyz789",
-    "patient_id": "pt_abc123",
-    "title": "Lung Cancer Diagnosis - January 2025",
-    "description": "Complete diagnostic workup for lung cancer",
-    "created_at": 1638360000,
-    "updated_at": 1638360100
+    "results": [{
+      "document_id": "doc_123",
+      "chunk_text": "HER2 status: Negative (Score 1+)...",
+      "relevance_score": 0.92
+    }]
   }
 }
 ```
 
----
-
-### Remove Document from Case-Pack
+### Reprocess Document
 ```
-DELETE /api/v1/patients/:patientId/case-pack/:docId
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Document removed from case-pack"
-}
+POST /api/v1/patients/:patientId/documents/:docId/reprocess?provider=openai
+Authorization: Bearer <token>
 ```
 
----
-
-### Reorder Documents in Case-Pack
+### Vectorize Document
 ```
-POST /api/v1/patients/:patientId/case-pack/reorder
+POST /api/v1/patients/:patientId/documents/:docId/vectorize
+Authorization: Bearer <token>
+```
+
+### Reorder Documents
+```
+POST /api/v1/patients/:patientId/documents/reorder
+Authorization: Bearer <token>
 ```
 
 **Request Body:**
@@ -392,44 +313,14 @@ POST /api/v1/patients/:patientId/case-pack/reorder
 }
 ```
 
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Documents reordered successfully"
-}
-```
-
 ---
 
-## ⚙️ Processing
+## 🔬 Diagnosis & Staging
 
-### Process Document
+### Get Diagnosis
 ```
-POST /api/v1/patients/:patientId/processing/documents/:docId/process
-```
-
-**Request Body (optional):**
-```json
-{
-  "mode": "incremental"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Document processing started",
-  "document_id": "doc_123"
-}
-```
-
----
-
-### Get Processing Status
-```
-GET /api/v1/patients/:patientId/processing/status
+GET /api/v1/patients/:id/diagnosis
+Authorization: Bearer <token>
 ```
 
 **Response:**
@@ -437,43 +328,439 @@ GET /api/v1/patients/:patientId/processing/status
 {
   "success": true,
   "data": {
-    "pending": 2,
-    "processing": 1,
-    "completed": 5,
-    "failed": 0
+    "cancer_type": "Gastric adenocarcinoma",
+    "cancer_site_primary": "Stomach",
+    "histology": "Adenocarcinoma",
+    "diagnosis_date": "2025-09-22",
+    "her2_status": "negative",
+    "her2_score": "1+"
   }
 }
 ```
 
----
-
-### Get Processing Log
+### Update Diagnosis (Admin Only)
 ```
-GET /api/v1/patients/:patientId/processing/log
+PUT /api/v1/patients/:id/diagnosis
+Authorization: Bearer <token>
 ```
 
-**Query Parameters:**
-- `limit` (number, optional) - Number of log entries to return
+Creates version history entry for all changes.
+
+### Get Staging
+```
+GET /api/v1/patients/:id/staging
+Authorization: Bearer <token>
+```
 
 **Response:**
 ```json
 {
   "success": true,
-  "data": [
-    {
-      "id": "log_123",
-      "patient_id": "pt_abc123",
-      "action": "document_processing_incremental",
-      "documents_processed": ["doc_123"],
-      "tokens_used": 1500,
-      "processing_time_ms": 2340,
-      "status": "success",
-      "created_at": 1638360000
+  "data": {
+    "staging_system": "AJCC 8th Edition",
+    "staging_type": "clinical",
+    "tnm_clinical": {
+      "t": "cT3",
+      "n": "cN2",
+      "m": "cM0",
+      "stage": "IIIA"
     }
-  ],
-  "total": 1
+  }
 }
 ```
+
+### Update Staging (Admin Only)
+```
+PUT /api/v1/patients/:id/staging
+Authorization: Bearer <token>
+```
+
+---
+
+## 💊 Treatment
+
+### Get Treatment Overview
+```
+GET /api/v1/patients/:id/treatment
+Authorization: Bearer <token>
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "treatment_intent": "neoadjuvant",
+    "regimen_name": "mFOLFOX-6",
+    "regimen_components": ["5-Fluorouracil", "Leucovorin", "Oxaliplatin"],
+    "cycles_completed": 4,
+    "cycles_planned": 6
+  }
+}
+```
+
+### Update Treatment (Admin Only)
+```
+PUT /api/v1/patients/:id/treatment
+Authorization: Bearer <token>
+```
+
+### Get Treatment Cycles
+```
+GET /api/v1/patients/:id/treatment/cycles
+Authorization: Bearer <token>
+```
+
+### Get Single Cycle
+```
+GET /api/v1/patients/:id/treatment/cycles/:cycleNumber
+Authorization: Bearer <token>
+```
+
+### Add Treatment Cycle
+```
+POST /api/v1/patients/:id/treatment/cycles
+Authorization: Bearer <token>
+```
+
+### Update Treatment Cycle
+```
+PUT /api/v1/patients/:id/treatment/cycles/:cycleNumber
+Authorization: Bearer <token>
+```
+
+---
+
+## 💉 Medications
+
+### Get Medications
+```
+GET /api/v1/patients/:id/medications
+Authorization: Bearer <token>
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "medications": [{
+      "id": "med_001",
+      "generic_name": "Phenytoin",
+      "brand_name": "Eptoin",
+      "dose_value": 100,
+      "dose_unit": "mg",
+      "frequency": "1 morning + 1 night",
+      "route": "oral",
+      "status": "active"
+    }]
+  }
+}
+```
+
+### Add Medication
+```
+POST /api/v1/patients/:id/medications
+Authorization: Bearer <token>
+```
+
+### Update Medication
+```
+PUT /api/v1/patients/:id/medications/:medId
+Authorization: Bearer <token>
+```
+
+### Delete Medication
+```
+DELETE /api/v1/patients/:id/medications/:medId
+Authorization: Bearer <token>
+```
+
+### Get Drug Interactions
+```
+GET /api/v1/patients/:id/medications/interactions
+Authorization: Bearer <token>
+```
+
+---
+
+## ⚠️ Alerts
+
+### Get All Alerts
+```
+GET /api/v1/patients/:id/alerts?severity=high&status=active
+Authorization: Bearer <token>
+```
+
+**Query Parameters:**
+- `severity` (string, optional) - high, medium, low
+- `category` (string, optional) - neurological, infection, nutrition, treatment, lab, allergy
+- `status` (string, optional) - active, resolved
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "alerts": [{
+      "alert_id": "alert_001",
+      "category": "neurological",
+      "title": "Seizure Disorder",
+      "severity": "high",
+      "status": "active_controlled"
+    }],
+    "counts": {
+      "total": 5,
+      "high": 1,
+      "medium": 2
+    }
+  }
+}
+```
+
+### Create Alert
+```
+POST /api/v1/patients/:id/alerts
+Authorization: Bearer <token>
+```
+
+### Update Alert
+```
+PUT /api/v1/patients/:id/alerts/:alertId
+Authorization: Bearer <token>
+```
+
+### Delete Alert
+```
+DELETE /api/v1/patients/:id/alerts/:alertId
+Authorization: Bearer <token>
+```
+
+---
+
+## 🧪 Labs
+
+### Get Latest Labs
+```
+GET /api/v1/patients/:id/labs/latest
+Authorization: Bearer <token>
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "date": "2025-11-21",
+    "hemoglobin": {"value": 10.2, "unit": "g/dL", "flag": "low"},
+    "wbc": {"value": 5.8, "unit": "x10^9/L", "flag": "normal"},
+    "platelets": {"value": 180, "unit": "x10^9/L", "flag": "normal"}
+  }
+}
+```
+
+### Get Lab Trends
+```
+GET /api/v1/patients/:id/labs/trends?marker=hemoglobin&from=2025-01-01&to=2025-12-31
+Authorization: Bearer <token>
+```
+
+**Query Parameters:**
+- `marker` (string, required) - hemoglobin, anc, platelets, creatinine, etc.
+- `from` (date, optional) - Start date
+- `to` (date, optional) - End date
+
+### Get Tumor Markers
+```
+GET /api/v1/patients/:id/tumor-markers
+Authorization: Bearer <token>
+```
+
+### Get Tumor Marker Trends
+```
+GET /api/v1/patients/:id/tumor-markers/trends?marker=cea
+Authorization: Bearer <token>
+```
+
+### Add Lab Result
+```
+POST /api/v1/patients/:id/labs
+Authorization: Bearer <token>
+```
+
+---
+
+## 📅 Timeline
+
+### Get Patient Timeline
+```
+GET /api/v1/patients/:id/timeline?from=2025-01-01&to=2025-12-31&category=diagnosis
+Authorization: Bearer <token>
+```
+
+**Query Parameters:**
+- `from` (date, optional) - Start date
+- `to` (date, optional) - End date
+- `category` (string, optional) - diagnosis, imaging, treatment, complication, hospitalization
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "events": [{
+      "id": "evt_001",
+      "date": "2025-09-12",
+      "category": "imaging",
+      "title": "CT Abdomen",
+      "description": "Wall thickening (2.1cm)",
+      "document_id": "doc_ct_sept"
+    }]
+  }
+}
+```
+
+### Add Timeline Event
+```
+POST /api/v1/patients/:id/timeline
+Authorization: Bearer <token>
+```
+
+---
+
+## 📋 History
+
+### Get Medical History
+```
+GET /api/v1/patients/:id/history/medical
+Authorization: Bearer <token>
+```
+
+### Update Medical History
+```
+PUT /api/v1/patients/:id/history/medical
+Authorization: Bearer <token>
+```
+
+### Get Surgical History
+```
+GET /api/v1/patients/:id/history/surgical
+Authorization: Bearer <token>
+```
+
+### Update Surgical History
+```
+PUT /api/v1/patients/:id/history/surgical
+Authorization: Bearer <token>
+```
+
+### Get Family History
+```
+GET /api/v1/patients/:id/history/family
+Authorization: Bearer <token>
+```
+
+### Update Family History
+```
+PUT /api/v1/patients/:id/history/family
+Authorization: Bearer <token>
+```
+
+### Get Social History
+```
+GET /api/v1/patients/:id/history/social
+Authorization: Bearer <token>
+```
+
+### Update Social History
+```
+PUT /api/v1/patients/:id/history/social
+Authorization: Bearer <token>
+```
+
+---
+
+## 🧠 Decisions & Clinical Questions
+
+### Get Clinical Decisions
+```
+GET /api/v1/patients/:id/decisions
+Authorization: Bearer <token>
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "primary_clinical_question": "Post-neoadjuvant chemotherapy management",
+    "surgical_considerations": ["Minimally invasive approach feasibility"],
+    "decision_timeline": {
+      "date": "2025-12-05",
+      "event": "CT response assessment",
+      "decision": "Surgery vs 5th cycle"
+    }
+  }
+}
+```
+
+### Update Decisions
+```
+PUT /api/v1/patients/:id/decisions
+Authorization: Bearer <token>
+```
+
+### Get MDT Discussions
+```
+GET /api/v1/patients/:id/decisions/mdt
+Authorization: Bearer <token>
+```
+
+### Add MDT Discussion
+```
+POST /api/v1/patients/:id/decisions/mdt
+Authorization: Bearer <token>
+```
+
+---
+
+## ⚙️ Processing
+
+### Get Processing Status
+```
+GET /api/v1/patients/:id/processing/status
+Authorization: Bearer <token>
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "documents": {
+      "pending": 2,
+      "processing": 1,
+      "completed": 23,
+      "failed": 0
+    },
+    "vectorization": {
+      "pending": 2,
+      "completed": 23,
+      "failed": 0
+    }
+  }
+}
+```
+
+### Get Processing Log
+```
+GET /api/v1/patients/:id/processing/log?limit=20&type=extraction
+Authorization: Bearer <token>
+```
+
+**Query Parameters:**
+- `limit` (number, optional) - Default 20
+- `type` (string, optional) - extraction, vectorization, all
 
 ---
 
@@ -482,119 +769,33 @@ GET /api/v1/patients/:patientId/processing/log
 ### Get Patient Summary
 ```
 GET /api/v1/patients/:patientId/summary
+Authorization: Bearer <token>
 ```
 
 **Response:**
 ```json
 {
   "success": true,
-  "patient": {
-    "id": "pt_abc123",
-    "name": "John Doe",
-    "age": 65
-  },
+  "patient_id": "pt_abc123",
+  "patient_name": "John Doe",
   "sections": {
     "diagnosis_staging": {
       "summary": "Stage IIA Adenocarcinoma",
       "last_updated": 1638360000
-    },
-    "imaging_findings": {
-      "summary": "3.2cm mass in right upper lobe",
-      "last_updated": 1638360000
-    },
-    "lab_results": {
-      "summary": "Mild anemia, otherwise WNL",
-      "last_updated": 1638360000
     }
-  }
+  },
+  "document_count": 5,
+  "timeline_event_count": 12
 }
 ```
-
----
 
 ### Get Detailed Section
 ```
 GET /api/v1/patients/:patientId/detailed/:section
+Authorization: Bearer <token>
 ```
 
 **Sections:** diagnosis_staging, imaging_findings, lab_results, consultation_notes, general_findings
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "section_type": "diagnosis_staging",
-    "summary_content": "Stage IIA Adenocarcinoma",
-    "detailed_content": {
-      "primary_diagnosis": {
-        "cancer_type": "Lung Adenocarcinoma",
-        "histology": "Adenocarcinoma",
-        "grade": "Grade 2",
-        "location": "Right upper lobe"
-      },
-      "staging": {
-        "pathological_stage": "T2N1M0",
-        "stage_group": "IIA"
-      }
-    },
-    "last_processed_at": 1638360000
-  }
-}
-```
-
----
-
-## ⏱️ Timeline
-
-### Get Patient Timeline
-```
-GET /api/v1/patients/:patientId/timeline
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "patient": {
-    "id": "pt_abc123",
-    "name": "John Doe"
-  },
-  "timeline": [
-    {
-      "date": "2025-01-15",
-      "events": [
-        {
-          "id": "evt_123",
-          "event_type": "diagnosis",
-          "title": "Biopsy Confirmation",
-          "description": "Invasive ductal carcinoma confirmed",
-          "source_document_id": "doc_123"
-        }
-      ]
-    }
-  ]
-}
-```
-
----
-
-### Get Timeline Tracks
-```
-GET /api/v1/patients/:patientId/timeline/tracks
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "tracks": {
-    "diagnosis": ["evt_123", "evt_456"],
-    "treatment": ["evt_789"],
-    "imaging": ["evt_234"]
-  }
-}
-```
 
 ---
 
@@ -603,25 +804,17 @@ GET /api/v1/patients/:patientId/timeline/tracks
 ### Create Patient from Documents
 ```
 POST /api/v1/intake
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
 ```
 
 **Form Data:**
 - `files` (File[], required) - Clinical documents
-- `document_type` (string, optional) - Type of documents
-- `caregiver_name` (string, required) - Caregiver name
-- `caregiver_relation` (string, required) - Relation to patient
-- `caregiver_contact` (string, required) - Contact number
-
-**Example:**
-```bash
-curl -X POST http://localhost:8787/api/v1/intake \
-  -F "files=@pathology_report.pdf" \
-  -F "files=@ct_scan.pdf" \
-  -F "document_type=pathology" \
-  -F "caregiver_name=Jane Doe" \
-  -F "caregiver_relation=daughter" \
-  -F "caregiver_contact=+91-9999999999"
-```
+- `caregiver_name` (string, required)
+- `caregiver_relation` (string, required)
+- `caregiver_contact` (string, required)
+- `primary_oncologist` (string, optional)
+- `primary_center` (string, optional)
 
 **Response:**
 ```json
@@ -632,25 +825,20 @@ curl -X POST http://localhost:8787/api/v1/intake \
     "patient": {
       "id": "pt_abc123",
       "name": "John Doe",
-      "age": 65,
-      "gender": "male",
-      "caregiver_name": "Jane Doe",
-      "caregiver_relation": "daughter",
-      "caregiver_contact": "+91-9999999999"
+      "extracted_from_documents": true
     },
     "documents_uploaded": 2,
-    "documents_processed": 1
+    "processing_status": "processing"
   }
 }
 ```
 
 ---
 
-## 📝 Error Responses
+## ❌ Error Responses
 
 All endpoints return consistent error responses:
 
-### 404 Not Found
 ```json
 {
   "success": false,
@@ -660,97 +848,47 @@ All endpoints return consistent error responses:
 }
 ```
 
-### 400 Bad Request
-```json
-{
-  "success": false,
-  "error": "Validation Error",
-  "message": "Patient ID is required",
-  "statusCode": 400
-}
-```
-
-### 500 Internal Server Error
-```json
-{
-  "success": false,
-  "error": "Internal Server Error",
-  "message": "An unexpected error occurred",
-  "statusCode": 500
-}
-```
-
 ---
 
 ## 🔑 Authentication
 
-Currently, the API does not require authentication (development mode).
+All protected endpoints require a Firebase ID token in the Authorization header:
+
+```
+Authorization: Bearer <firebase-id-token>
+```
 
 **CORS Allowed Origins:**
 - http://localhost:3000
 - http://localhost:5000
 - http://localhost:8000
+- https://process.saarthihq.com
+- https://staging.saarthihq.com
 
 ---
 
-## 📊 Rate Limits
+## 📊 Endpoint Summary
 
-No rate limits are currently enforced in development mode.
-
----
-
-## 🗂️ Endpoint Summary
-
-| Category | Endpoints | Total |
-|----------|-----------|-------|
-| Health | 1 | 1 |
-| Patients | 5 | 5 |
-| Documents | 5 | 5 |
-| Case-Packs | 4 | 4 |
-| Processing | 3 | 3 |
-| Views | 2 | 2 |
-| Timeline | 2 | 2 |
-| Intake | 1 | 1 |
-| **Total** | | **23** |
-
----
-
-## 🚀 Quick Start Examples
-
-### Upload and Process Multiple Documents
-```bash
-curl -X POST http://localhost:8787/api/v1/patients/pt_abc123/documents/ \
-  -F "files=@biopsy.pdf" \
-  -F "files=@ct_scan.pdf" \
-  -F "files=@blood_work.pdf" \
-  -F "document_type=pathology" \
-  -F "process_immediately=true"
-```
-
-### Get Complete Patient View
-```bash
-# Get summary
-curl http://localhost:8787/api/v1/patients/pt_abc123/summary
-
-# Get timeline
-curl http://localhost:8787/api/v1/patients/pt_abc123/timeline
-
-# Get case-pack with all documents
-curl http://localhost:8787/api/v1/patients/pt_abc123/case-pack
-```
-
-### Create Patient from Documents
-```bash
-curl -X POST http://localhost:8787/api/v1/intake \
-  -F "files=@report1.pdf" \
-  -F "files=@report2.pdf" \
-  -F "caregiver_name=Jane Doe" \
-  -F "caregiver_relation=daughter" \
-  -F "caregiver_contact=+91-9999999999"
-```
+| Category | Endpoints | Description |
+|----------|-----------|-------------|
+| Health | 2 | Health check and diagnostics |
+| Auth | 4 | Authentication and user management |
+| Patients | 5 | Patient CRUD operations |
+| Documents | 9 | Document upload, search, vectorization |
+| Diagnosis & Staging | 4 | Clinical diagnosis and TNM staging |
+| Treatment | 6 | Treatment regimens and cycles |
+| Medications | 5 | Medication management |
+| Alerts | 4 | Clinical alerts and risk factors |
+| Labs | 5 | Lab results and tumor markers |
+| Timeline | 2 | Medical timeline events |
+| History | 8 | Medical, surgical, family, social history |
+| Decisions | 4 | Clinical decisions and MDT |
+| Processing | 2 | Document processing status |
+| Views | 2 | Patient summary and detailed views |
+| Intake | 1 | Document-first patient creation |
+| **Total** | **63** | |
 
 ---
 
-**Last Updated:** 2025-11-30
+**Last Updated:** 2025-12-03  
 **API Version:** v1
-**Base URL:** http://localhost:8787/api/v1

@@ -11,6 +11,13 @@ processing.post('/documents/:docId/process', async (c) => {
     const providerFromQuery = c.req.query('provider');
     let providerFromBody = null;
 
+    console.log(`📝 Manual processing request:`, {
+      patientId,
+      docId,
+      path: c.req.path,
+      method: c.req.method
+    });
+
     try {
       const body = await c.req.json();
       providerFromBody = body?.provider || body?.model_provider;
@@ -26,8 +33,34 @@ processing.post('/documents/:docId/process', async (c) => {
     `).bind(docId, patientId).first();
     
     if (!doc) {
+      console.error(`❌ Document not found for manual processing:`, {
+        docId,
+        patientId,
+        query: 'SELECT * FROM documents WHERE id = ? AND patient_id = ?'
+      });
+
+      // Check if document exists without patient filter
+      const docAnyPatient = await c.env.DB.prepare(`
+        SELECT id, patient_id, filename FROM documents WHERE id = ?
+      `).bind(docId).first();
+
+      if (docAnyPatient) {
+        console.error(`⚠️ Document exists but with different patient_id:`, {
+          requested_patient: patientId,
+          actual_patient: docAnyPatient.patient_id,
+          filename: docAnyPatient.filename
+        });
+        throw new NotFoundError(`Document belongs to different patient`);
+      }
+
       throw new NotFoundError('Document');
     }
+
+    console.log(`✅ Document found, starting manual processing:`, {
+      filename: doc.filename,
+      current_status: doc.processing_status,
+      storage_key: doc.storage_key
+    });
     
     // Process document
     const processor = new DocumentProcessor(c.env, { provider });
@@ -98,6 +131,31 @@ processing.get('/log', async (c) => {
     
   } catch (error) {
     console.error('Error getting processing log:', error);
+    return c.json(errorResponse(error), 500);
+  }
+});
+
+// Debug endpoint - List all documents for a patient
+processing.get('/documents', async (c) => {
+  try {
+    const { patientId } = c.req.param();
+    
+    const result = await c.env.DB.prepare(`
+      SELECT id, filename, processing_status, storage_key, created_at, updated_at
+      FROM documents
+      WHERE patient_id = ?
+      ORDER BY created_at DESC
+    `).bind(patientId).all();
+    
+    return c.json({
+      success: true,
+      patient_id: patientId,
+      count: result.results.length,
+      documents: result.results
+    });
+    
+  } catch (error) {
+    console.error('Error listing documents for processing:', error);
     return c.json(errorResponse(error), 500);
   }
 });

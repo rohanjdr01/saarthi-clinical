@@ -9,6 +9,7 @@
  */
 
 import { GeminiService } from '../gemini/client.js';
+import { FileSearchService } from '../gemini/file-search.js';
 import { OpenAIService } from '../openai/client.js';
 import { vectorizeDocument } from '../vectorize/indexer.js';
 import { Diagnosis } from '../../models/diagnosis.js';
@@ -22,12 +23,16 @@ import { validateExtractedData } from './extraction-schema.js';
 export class DocumentProcessor {
   constructor(env, options = {}) {
     this.env = env;
-    this.provider = options.provider || 'gemini';
+    // Default provider: OpenAI (gpt-5) for full processing.
+    // Gemini can be selected explicitly via ?provider=gemini when needed.
+    this.provider = options.provider || 'openai';
 
     this.services = {};
 
     if (env.GEMINI_API_KEY) {
       this.services.gemini = new GeminiService(env.GEMINI_API_KEY);
+      // Dedicated File Search service (used regardless of extraction provider)
+      this.fileSearchService = new FileSearchService(env.GEMINI_API_KEY);
     }
 
     if (env.OPENAI_API_KEY) {
@@ -36,7 +41,7 @@ export class DocumentProcessor {
   }
 
   getService(providerOverride) {
-    const provider = (providerOverride || this.provider || 'gemini').toLowerCase();
+    const provider = (providerOverride || this.provider || 'openai').toLowerCase();
     
     if (this.services[provider]) {
       return { provider, service: this.services[provider] };
@@ -74,16 +79,32 @@ export class DocumentProcessor {
       ).bind(documentId).first();
 
       if (!doc) {
-        throw new Error('Document not found');
+        throw new Error(`Document not found in database: ${documentId}`);
       }
+
+      console.log(`🔍 Fast processing document:`, {
+        id: doc.id,
+        filename: doc.filename,
+        storage_key: doc.storage_key,
+        patient_id: doc.patient_id,
+        status: doc.processing_status
+      });
 
       await this.updateStatus(documentId, 'processing');
 
       // 2. Get file from R2
+      console.log(`📥 Fetching from R2: ${doc.storage_key}`);
       const object = await this.env.DOCUMENTS.get(doc.storage_key);
       if (!object) {
-        throw new Error('Document file not found in storage');
+        console.error(`❌ Document not found in R2:`, {
+          storage_key: doc.storage_key,
+          document_id: documentId,
+          patient_id: doc.patient_id
+        });
+        throw new Error(`Document file not found in R2 storage at key: ${doc.storage_key}. The file may not have been uploaded successfully.`);
       }
+
+      console.log(`✅ Retrieved from R2: ${object.size} bytes`);
 
       // 3. Read file buffer once
       const fileBuffer = await object.arrayBuffer();
@@ -118,13 +139,13 @@ export class DocumentProcessor {
       let fileSearchDocumentName = null;
       let fileSearchStoreName = null;
 
-      // Try File Search first if enabled
-      const fileSearchEnabled = this.env.FILE_SEARCH_ENABLED !== 'false' && this.env.GEMINI_API_KEY;
+      // Try File Search first if enabled (uses Gemini File Search even when OpenAI is the extractor)
+      const fileSearchEnabled = this.env.FILE_SEARCH_ENABLED !== 'false' && !!this.fileSearchService;
       
-      if (fileSearchEnabled && service.fileSearch) {
+      if (fileSearchEnabled) {
         try {
           console.log(`📤 Uploading to File Search: ${doc.filename}`);
-          fileSearchDocumentName = await service.fileSearch.uploadDocumentToFileSearch(
+          fileSearchDocumentName = await this.fileSearchService.uploadDocumentToFileSearch(
             doc.patient_id,
             documentId,
             fileBuffer,
@@ -133,7 +154,7 @@ export class DocumentProcessor {
           );
           
           // Get store name for tracking
-          fileSearchStoreName = await service.fileSearch.createFileSearchStore(doc.patient_id);
+          fileSearchStoreName = await this.fileSearchService.createFileSearchStore(doc.patient_id);
           
           vectorizeStatus = 'completed';
           await this.updateFileSearchStatus(documentId, 'completed', fileSearchStoreName, fileSearchDocumentName);
@@ -225,16 +246,32 @@ export class DocumentProcessor {
       ).bind(documentId).first();
 
       if (!doc) {
-        throw new Error('Document not found');
+        throw new Error(`Document not found in database: ${documentId}`);
       }
+
+      console.log(`🔍 Full processing document:`, {
+        id: doc.id,
+        filename: doc.filename,
+        storage_key: doc.storage_key,
+        patient_id: doc.patient_id,
+        status: doc.processing_status
+      });
 
       await this.updateStatus(documentId, 'processing');
 
       // 2. Get file from R2
+      console.log(`📥 Fetching from R2: ${doc.storage_key}`);
       const object = await this.env.DOCUMENTS.get(doc.storage_key);
       if (!object) {
-        throw new Error('Document file not found in storage');
+        console.error(`❌ Document not found in R2:`, {
+          storage_key: doc.storage_key,
+          document_id: documentId,
+          patient_id: doc.patient_id
+        });
+        throw new Error(`Document file not found in R2 storage at key: ${doc.storage_key}. The file may not have been uploaded successfully.`);
       }
+
+      console.log(`✅ Retrieved from R2: ${object.size} bytes`);
 
       // 3. Read file buffer once
       const fileBuffer = await object.arrayBuffer();
@@ -321,13 +358,13 @@ export class DocumentProcessor {
       let fileSearchDocumentName = null;
       let fileSearchStoreName = null;
 
-      // Try File Search first if enabled
-      const fileSearchEnabled = this.env.FILE_SEARCH_ENABLED !== 'false' && this.env.GEMINI_API_KEY;
+      // Try File Search first if enabled (uses Gemini File Search even when OpenAI is the extractor)
+      const fileSearchEnabled = this.env.FILE_SEARCH_ENABLED !== 'false' && !!this.fileSearchService;
       
-      if (fileSearchEnabled && service.fileSearch) {
+      if (fileSearchEnabled) {
         try {
           console.log(`📤 Uploading to File Search: ${doc.filename}`);
-          fileSearchDocumentName = await service.fileSearch.uploadDocumentToFileSearch(
+          fileSearchDocumentName = await this.fileSearchService.uploadDocumentToFileSearch(
             doc.patient_id,
             documentId,
             fileBuffer,
@@ -336,7 +373,7 @@ export class DocumentProcessor {
           );
           
           // Get store name for tracking
-          fileSearchStoreName = await service.fileSearch.createFileSearchStore(doc.patient_id);
+          fileSearchStoreName = await this.fileSearchService.createFileSearchStore(doc.patient_id);
           
           vectorizeStatus = 'completed';
           await this.updateFileSearchStatus(documentId, 'completed', fileSearchStoreName, fileSearchDocumentName);
@@ -1174,9 +1211,28 @@ Data: ${JSON.stringify(extractedData)}`;
   determineMedicationType(medication, treatment) {
     // If part of chemo regimen
     if (treatment?.drugs && Array.isArray(treatment.drugs)) {
-      const chemoDrugs = treatment.drugs.map(d => d.toLowerCase());
-      if (chemoDrugs.includes(medication.generic_name?.toLowerCase()) ||
-          chemoDrugs.includes(medication.brand_name?.toLowerCase())) {
+      // Normalize drugs list – can be array of strings or objects
+      const chemoDrugs = treatment.drugs
+        .map((d) => {
+          if (!d) return null;
+          if (typeof d === 'string') return d.toLowerCase();
+          // Handle structured drug entries from extraction
+          const name =
+            d.generic_name ||
+            d.brand_name ||
+            d.name ||
+            d.drug_name ||
+            d.drug ||
+            null;
+          return typeof name === 'string' ? name.toLowerCase() : null;
+        })
+        .filter(Boolean);
+
+      const medGeneric = medication.generic_name?.toLowerCase();
+      const medBrand = medication.brand_name?.toLowerCase();
+
+      if ((medGeneric && chemoDrugs.includes(medGeneric)) ||
+          (medBrand && chemoDrugs.includes(medBrand))) {
         return 'chemotherapy';
       }
     }
