@@ -1,0 +1,31 @@
+
+ RUN  v1.6.1 /Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical
+
+stdout | src/tests/setup.js:6:9
+🧪 Test Environment Setup
+
+stdout | src/tests/setup.js:7:9
+API Base URL: http://localhost:8787/api/v1
+
+stdout | src/tests/setup.js:6:9
+🧪 Test Environment Setup
+
+stdout | src/tests/setup.js:7:9
+API Base URL: http://localhost:8787/api/v1
+
+stdout | src/tests/setup.js:8:9
+Running tests...
+
+
+stdout | src/tests/setup.js:8:9
+Running tests...
+
+
+ ✓ src/tests/api/triage-categories.test.js  (7 tests) 3ms
+ ✓ src/tests/api/documents-filter.test.js  (9 tests) 3ms
+
+ Test Files  2 passed (2)
+      Tests  16 passed (16)
+   Start at  21:41:48
+   Duration  204ms (transform 20ms, setup 8ms, collect 24ms, tests 6ms, environment 0ms, prepare 87ms)
+

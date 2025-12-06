@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { MedicationRepository } from '../repositories/medication.repository.js';
 import { NotFoundError, ValidationError, errorResponse } from '../utils/errors.js';
 import { requireAdmin } from '../middleware/auth.js';
+import { getCurrentTimestamp } from '../utils/helpers.js';
 
 const medications = new Hono();
 
@@ -16,13 +17,78 @@ medications.get('/', async (c) => {
   try {
     const { patientId } = c.req.param();
     const medRepo = MedicationRepository(c.env.DB);
-    const { grouped, flat } = await medRepo.findByPatientId(patientId);
+    const { by_status, flat } = await medRepo.findByPatientId(patientId);
+
+    // Get document IDs from medications for source standardization
+    const documentIds = new Set();
+    flat.forEach(med => {
+      if (med.data_sources) {
+        try {
+          const dataSources = typeof med.data_sources === 'string' 
+            ? JSON.parse(med.data_sources) 
+            : med.data_sources;
+          if (dataSources && dataSources.source && dataSources.source !== 'manual_override') {
+            documentIds.add(dataSources.source);
+          }
+        } catch (e) {
+          // Skip invalid data_sources
+        }
+      }
+    });
+
+    // Fetch document filenames and dates
+    const documentMap = {};
+    if (documentIds.size > 0) {
+      const placeholders = Array.from(documentIds).map(() => '?').join(',');
+      const docs = await c.env.DB.prepare(`
+        SELECT id, filename, document_date FROM documents WHERE id IN (${placeholders})
+      `).bind(...Array.from(documentIds)).all();
+      
+      docs.results.forEach(doc => {
+        documentMap[doc.id] = {
+          filename: doc.filename,
+          document_date: doc.document_date
+        };
+      });
+    }
+
+    // Standardize medication responses with source format
+    const standardizeMed = (med) => {
+      const { data_sources, ...restMed } = med;
+      
+      let source = null;
+      if (data_sources) {
+        try {
+          const ds = typeof data_sources === 'string' ? JSON.parse(data_sources) : data_sources;
+          if (ds && ds.source && ds.source !== 'manual_override') {
+            const doc = documentMap[ds.source];
+            source = {
+              document_id: ds.source,
+              filename: doc?.filename || null,
+              document_date: doc?.document_date || null
+            };
+          }
+        } catch (e) {
+          // Skip invalid data_sources
+        }
+      }
+      
+      return {
+        ...restMed,
+        source: source || undefined
+      };
+    };
+
+    const standardizedByStatus = {
+      active: by_status.active.map(standardizeMed),
+      discontinued: by_status.discontinued.map(standardizeMed)
+    };
 
     return c.json({ 
       success: true, 
-      data: grouped,
+      data: standardizedByStatus,
       // Also return flat list for backward compatibility
-      flat
+      flat: flat.map(standardizeMed)
     });
   } catch (error) {
     console.error('Error listing medications:', error);

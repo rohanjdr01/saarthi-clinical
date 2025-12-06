@@ -4,11 +4,13 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    setupFiles: ['./src/tests/setup.js'],
+    setupFiles: ['./tests/src/setup.js'],
     testTimeout: 30000,
     include: [
-      'src/tests/**/*.test.js',
-      'src/tests/unit/**/*.test.js'
+      'tests/src/**/*.test.js',
+      'tests/src/unit/**/*.test.js',
+      'tests/src/api/**/*.test.js',
+      'tests/src/integration/**/*.test.js'
     ],
     coverage: {
       provider: 'v8',
@@ -22,7 +24,7 @@ export default defineConfig({
         'node_modules/**',
         'dist/**',
         '**/*.config.js',
-        'src/tests/**'
+        'tests/**'
       ],
       thresholds: {
         lines: 50,

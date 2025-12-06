@@ -1,0 +1,555 @@
+# Document Category Framework for Indian Oncology
+
+> **Version**: 1.0  
+> **Last Updated**: 2025-12-06  
+> **Status**: Ready for Implementation
+
+---
+
+## Design Principles
+
+1. **Match what Indian hospitals actually produce** — not theoretical document types
+2. **GP can classify in <3 seconds** — categories must be intuitive
+3. **Extraction pipeline can use category** — to apply right extraction logic
+4. **Works across hospital tiers** — from AIIMS to district hospital
+
+---
+
+## Proposed Framework
+
+### Level 1: Primary Category (7 categories)
+
+| Category | Code | What It Includes | Indian Context |
+|----------|------|------------------|----------------|
+| **Pathology** | `pathology` | Biopsy, histopathology, cytology, IHC, molecular reports | FNAC very common; IHC often separate from biopsy |
+| **Imaging** | `imaging` | CT, MRI, PET-CT, X-ray, USG, mammography | Often handwritten reports from smaller centers |
+| **Laboratory** | `laboratory` | CBC, LFT, KFT, tumor markers, coagulation | Thyrocare/Lal Path labs common; inconsistent formats |
+| **Clinical Notes** | `clinical` | OPD notes, discharge summary, case summary, referral letters | Handwritten OPD chits still common |
+| **Treatment Records** | `treatment` | Chemo charts, RT plans, drug charts, consent forms | Chemo daycare sheets often handwritten |
+| **Surgical** | `surgical` | OT notes, operative findings, post-op notes | Government hospitals: handwritten; private: typed |
+| **Administrative** | `admin` | Insurance, Ayushman Bharat, bills, ID proofs | CGHS/ECHS forms, hospital registration |
+
+---
+
+### Level 2: Subcategory (Within Each Primary)
+
+#### Pathology (`pathology`)
+
+| Subcategory | Code | Notes |
+|-------------|------|-------|
+| Biopsy / Histopathology | `biopsy` | Core, excision, incision biopsy reports |
+| FNAC | `fnac` | Very common in India as first-line investigation |
+| Cytology | `cytology` | Pap smear, fluid cytology, brushings |
+| IHC / Molecular | `ihc` | ER/PR/HER2, Ki-67, PDL1, gene panels |
+| HPE Review | `hpe_review` | Second opinion / referred slides |
+| Frozen Section | `frozen` | Intra-operative pathology |
+
+#### Imaging (`imaging`)
+
+| Subcategory | Code | Notes |
+|-------------|------|-------|
+| CT Scan | `ct` | CECT most common for staging |
+| PET-CT | `pet` | Often from referral centers (not all hospitals have) |
+| MRI | `mri` | Brain, spine, pelvis staging |
+| X-Ray | `xray` | Chest X-ray very common |
+| Ultrasound | `usg` | Abdomen, pelvis, guided procedures |
+| Mammography | `mammo` | Screening and diagnostic |
+| Bone Scan | `bone_scan` | Nuclear medicine |
+| 2D Echo | `echo` | Pre-chemo cardiac clearance |
+| Endoscopy | `endoscopy` | OGD, colonoscopy — often has images |
+
+#### Laboratory (`laboratory`)
+
+| Subcategory | Code | Notes |
+|-------------|------|-------|
+| Complete Blood Count | `cbc` | Pre-chemo, monitoring |
+| Liver Function | `lft` | Hepatotoxicity monitoring |
+| Kidney Function | `kft` | Nephrotoxicity, hydration status |
+| Tumor Markers | `tumor_marker` | CEA, CA-125, AFP, PSA, CA 19-9 |
+| Coagulation | `coag` | PT/INR, aPTT — pre-surgery |
+| Thyroid | `thyroid` | T3, T4, TSH |
+| Viral Markers | `viral` | HBsAg, HCV, HIV — pre-chemo mandatory |
+| Blood Sugar | `sugar` | RBS, FBS, HbA1c |
+| Electrolytes | `electrolytes` | Na, K, Ca, Mg |
+| Urine | `urine` | Routine, 24-hr protein |
+| Other Labs | `lab_other` | Catch-all |
+
+#### Clinical Notes (`clinical`)
+
+| Subcategory | Code | Notes |
+|-------------|------|-------|
+| Discharge Summary | `discharge` | Most comprehensive document usually |
+| OPD Notes | `opd` | Often handwritten, brief |
+| Case Summary | `case_summary` | Consolidated summary for referral |
+| Referral Letter | `referral` | From one doctor/hospital to another |
+| Tumor Board Notes | `tumor_board` | MDT discussion — premium centers only |
+| Second Opinion | `second_opinion` | From another oncologist |
+| Admission Notes | `admission` | Initial workup on admission |
+| Progress Notes | `progress` | Daily inpatient notes |
+| Death Summary | `death_summary` | If applicable |
+
+#### Treatment Records (`treatment`)
+
+| Subcategory | Code | Notes |
+|-------------|------|-------|
+| Chemotherapy Chart | `chemo_chart` | Drug doses, dates, signatures |
+| Chemotherapy Protocol | `chemo_protocol` | Planned regimen document |
+| Radiation Plan | `rt_plan` | RT prescription, dose fractionation |
+| Radiation Summary | `rt_summary` | Post-RT completion summary |
+| Drug Chart | `drug_chart` | In-patient medication chart |
+| Transfusion Record | `transfusion` | Blood products given |
+| Consent Form | `consent` | Chemo/surgery/procedure consent |
+| Supportive Care | `supportive` | G-CSF, antiemetics, pain management |
+
+#### Surgical (`surgical`)
+
+| Subcategory | Code | Notes |
+|-------------|------|-------|
+| Operative Notes | `op_notes` | Detailed surgical findings |
+| OT Summary | `ot_summary` | Brief operative summary |
+| Anesthesia Record | `anesthesia` | Pre-op assessment, intra-op vitals |
+| Post-Op Notes | `postop` | Recovery, complications |
+| Procedure Notes | `procedure` | Minor procedures (port insertion, biopsy) |
+
+#### Administrative (`admin`)
+
+| Subcategory | Code | Notes |
+|-------------|------|-------|
+| Insurance Claim | `insurance` | Mediclaim, group insurance |
+| Ayushman Bharat | `ayushman` | PMJAY forms |
+| CGHS/ECHS | `cghs` | Government employee schemes |
+| Hospital Bill | `bill` | Cost details |
+| ID Documents | `id` | Aadhaar, patient registration |
+| Prescription | `prescription` | Pharmacy prescription (if standalone) |
+
+---
+
+## Classification Priority for Extraction
+
+Not all categories need full extraction. Priority based on clinical value:
+
+| Priority | Categories | Extraction Depth |
+|----------|-----------|------------------|
+| **P0 — Critical** | `pathology/*`, `imaging/ct`, `imaging/pet`, `clinical/discharge`, `treatment/chemo_chart` | Full extraction |
+| **P1 — Important** | `imaging/mri`, `clinical/case_summary`, `surgical/op_notes`, `laboratory/tumor_marker` | Full extraction |
+| **P2 — Supporting** | `laboratory/cbc`, `laboratory/lft`, `laboratory/kft`, `clinical/opd` | Key values only |
+| **P3 — Reference** | `admin/*`, `treatment/consent`, `clinical/referral` | Metadata only |
+
+---
+
+## AI Classification Prompt
+
+```markdown
+You are classifying Indian medical documents for cancer care.
+
+## Classification Output
+Return JSON:
+{
+  "category": "pathology",           // Primary category
+  "subcategory": "biopsy",           // Subcategory
+  "classification": "cancer_core",   // cancer_core | cancer_adjacent | non_cancer
+  "confidence": 0.92,
+  "reason": "Histopathology report showing adenocarcinoma",
+  "document_date": "2025-09-29",
+  "facility": "Tata Memorial Hospital"
+}
+
+## Category Definitions
+
+### pathology
+- Biopsy, FNAC, histopathology, cytology, IHC, molecular reports
+- Keywords: "microscopy", "histopathology", "FNAC", "biopsy", "IHC", "ER/PR", "HER2"
+
+### imaging  
+- CT, MRI, PET-CT, X-ray, USG, mammography, bone scan, endoscopy
+- Keywords: "CECT", "MRI", "PET-CT", "impression", "findings", "BIRADS", "RECIST"
+
+### laboratory
+- Blood tests, tumor markers, urine tests
+- Keywords: "CBC", "LFT", "KFT", "CEA", "CA-125", "reference range", "normal"
+
+### clinical
+- Discharge summary, OPD notes, case summary, referral, tumor board
+- Keywords: "discharge", "OPD", "chief complaint", "diagnosis", "advised", "follow-up"
+
+### treatment
+- Chemo charts, RT plans, drug charts, consent
+- Keywords: "cycle", "regimen", "FOLFOX", "Gray", "fractions", "consent"
+
+### surgical
+- OT notes, operative findings, anesthesia, post-op
+- Keywords: "operative", "incision", "resection", "anesthesia", "intra-operative"
+
+### admin
+- Insurance, bills, ID, Ayushman Bharat
+- Keywords: "claim", "premium", "Ayushman", "CGHS", "bill", "registration"
+
+## Indian-Specific Patterns
+
+1. **Handwritten documents**: Often OPD notes, chemo charts from government hospitals
+2. **FNAC common**: First-line investigation before biopsy
+3. **Thyrocare/Lal Path/SRL**: Common lab chains — `laboratory` category
+4. **Discharge summary**: Usually the most comprehensive document
+5. **Ayushman Bharat / PMJAY**: Government insurance — `admin/ayushman`
+6. **CGHS/ECHS**: Government employee healthcare — `admin/cghs`
+
+## Subcategory Selection
+
+Always provide the most specific subcategory. Examples:
+- CT scan of abdomen → category: `imaging`, subcategory: `ct`
+- CEA report from Thyrocare → category: `laboratory`, subcategory: `tumor_marker`
+- Discharge summary from TMH → category: `clinical`, subcategory: `discharge`
+- FNAC of lymph node → category: `pathology`, subcategory: `fnac`
+```
+
+---
+
+## Database Schema Update
+
+```sql
+-- Update documents table
+ALTER TABLE documents ADD COLUMN category TEXT;
+ALTER TABLE documents ADD COLUMN subcategory TEXT;
+ALTER TABLE documents ADD COLUMN facility TEXT;  -- Hospital/lab name
+
+-- Create reference table for valid categories
+CREATE TABLE document_categories (
+  category TEXT NOT NULL,
+  subcategory TEXT NOT NULL,
+  display_name TEXT,
+  extraction_priority TEXT,  -- 'P0', 'P1', 'P2', 'P3'
+  PRIMARY KEY (category, subcategory)
+);
+
+-- Populate reference data
+INSERT INTO document_categories VALUES
+  ('pathology', 'biopsy', 'Biopsy / Histopathology', 'P0'),
+  ('pathology', 'fnac', 'FNAC', 'P0'),
+  ('pathology', 'cytology', 'Cytology', 'P1'),
+  ('pathology', 'ihc', 'IHC / Molecular', 'P0'),
+  ('pathology', 'hpe_review', 'HPE Review', 'P1'),
+  ('pathology', 'frozen', 'Frozen Section', 'P1'),
+  ('imaging', 'ct', 'CT Scan', 'P0'),
+  ('imaging', 'pet', 'PET-CT', 'P0'),
+  ('imaging', 'mri', 'MRI', 'P1'),
+  ('imaging', 'xray', 'X-Ray', 'P2'),
+  ('imaging', 'usg', 'Ultrasound', 'P2'),
+  ('imaging', 'mammo', 'Mammography', 'P1'),
+  ('imaging', 'bone_scan', 'Bone Scan', 'P1'),
+  ('imaging', 'echo', '2D Echo', 'P2'),
+  ('imaging', 'endoscopy', 'Endoscopy', 'P1'),
+  ('laboratory', 'cbc', 'Complete Blood Count', 'P2'),
+  ('laboratory', 'lft', 'Liver Function', 'P2'),
+  ('laboratory', 'kft', 'Kidney Function', 'P2'),
+  ('laboratory', 'tumor_marker', 'Tumor Markers', 'P1'),
+  ('laboratory', 'coag', 'Coagulation', 'P2'),
+  ('laboratory', 'thyroid', 'Thyroid', 'P2'),
+  ('laboratory', 'viral', 'Viral Markers', 'P2'),
+  ('laboratory', 'sugar', 'Blood Sugar', 'P3'),
+  ('laboratory', 'electrolytes', 'Electrolytes', 'P2'),
+  ('laboratory', 'urine', 'Urine', 'P3'),
+  ('laboratory', 'lab_other', 'Other Labs', 'P3'),
+  ('clinical', 'discharge', 'Discharge Summary', 'P0'),
+  ('clinical', 'opd', 'OPD Notes', 'P2'),
+  ('clinical', 'case_summary', 'Case Summary', 'P1'),
+  ('clinical', 'referral', 'Referral Letter', 'P3'),
+  ('clinical', 'tumor_board', 'Tumor Board Notes', 'P0'),
+  ('clinical', 'second_opinion', 'Second Opinion', 'P1'),
+  ('clinical', 'admission', 'Admission Notes', 'P2'),
+  ('clinical', 'progress', 'Progress Notes', 'P2'),
+  ('clinical', 'death_summary', 'Death Summary', 'P1'),
+  ('treatment', 'chemo_chart', 'Chemotherapy Chart', 'P0'),
+  ('treatment', 'chemo_protocol', 'Chemotherapy Protocol', 'P0'),
+  ('treatment', 'rt_plan', 'Radiation Plan', 'P0'),
+  ('treatment', 'rt_summary', 'Radiation Summary', 'P1'),
+  ('treatment', 'drug_chart', 'Drug Chart', 'P2'),
+  ('treatment', 'transfusion', 'Transfusion Record', 'P2'),
+  ('treatment', 'consent', 'Consent Form', 'P3'),
+  ('treatment', 'supportive', 'Supportive Care', 'P2'),
+  ('surgical', 'op_notes', 'Operative Notes', 'P1'),
+  ('surgical', 'ot_summary', 'OT Summary', 'P1'),
+  ('surgical', 'anesthesia', 'Anesthesia Record', 'P2'),
+  ('surgical', 'postop', 'Post-Op Notes', 'P2'),
+  ('surgical', 'procedure', 'Procedure Notes', 'P2'),
+  ('admin', 'insurance', 'Insurance Claim', 'P3'),
+  ('admin', 'ayushman', 'Ayushman Bharat', 'P3'),
+  ('admin', 'cghs', 'CGHS/ECHS', 'P3'),
+  ('admin', 'bill', 'Hospital Bill', 'P3'),
+  ('admin', 'id', 'ID Documents', 'P3'),
+  ('admin', 'prescription', 'Prescription', 'P3');
+
+CREATE INDEX idx_documents_category ON documents(patient_id, category, subcategory);
+```
+
+---
+
+## API Response Update
+
+### Triage Queue with Categories
+
+```json
+{
+  "success": true,
+  "data": {
+    "summary": {
+      "total": 42,
+      "by_category": {
+        "pathology": 5,
+        "imaging": 8,
+        "laboratory": 15,
+        "clinical": 6,
+        "treatment": 4,
+        "surgical": 2,
+        "admin": 2
+      },
+      "by_classification": {
+        "cancer_core": 14,
+        "cancer_adjacent": 18,
+        "non_cancer": 10
+      }
+    },
+    "documents": {
+      "cancer_core": [
+        {
+          "id": "doc_xxx",
+          "filename": "biopsy_tmc_sep2025.pdf",
+          "category": "pathology",
+          "subcategory": "biopsy",
+          "category_display": "Biopsy / Histopathology",
+          "facility": "Tata Memorial Centre",
+          "document_date": "2025-09-29",
+          "classification_confidence": 0.95,
+          "extraction_priority": "P0"
+        },
+        {
+          "id": "doc_yyy",
+          "filename": "pet_scan_oct2025.pdf",
+          "category": "imaging",
+          "subcategory": "pet",
+          "category_display": "PET-CT",
+          "facility": "Jaslok Hospital",
+          "document_date": "2025-10-15",
+          "classification_confidence": 0.92,
+          "extraction_priority": "P0"
+        }
+      ],
+      "cancer_adjacent": [
+        {
+          "id": "doc_zzz",
+          "filename": "cbc_nov2025.pdf",
+          "category": "laboratory",
+          "subcategory": "cbc",
+          "category_display": "Complete Blood Count",
+          "facility": "Thyrocare",
+          "document_date": "2025-11-01",
+          "classification_confidence": 0.88,
+          "extraction_priority": "P2"
+        }
+      ],
+      "non_cancer": [
+        {
+          "id": "doc_aaa",
+          "filename": "dental_xray.pdf",
+          "category": "admin",
+          "subcategory": "other",
+          "category_display": "Other",
+          "document_date": "2024-06-15",
+          "classification_confidence": 0.95,
+          "extraction_priority": "P3"
+        }
+      ]
+    }
+  }
+}
+```
+
+### Document List with Category Filter
+
+```
+GET /patients/:id/documents?category=pathology&subcategory=biopsy
+```
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "doc_xxx",
+      "filename": "biopsy_tmc_sep2025.pdf",
+      "category": "pathology",
+      "subcategory": "biopsy",
+      "category_display": "Biopsy / Histopathology",
+      "facility": "Tata Memorial Centre",
+      "document_date": "2025-09-29",
+      "classification": "cancer_core",
+      "extraction_priority": "P0",
+      "processing_status": "processed"
+    }
+  ]
+}
+```
+
+---
+
+## Common Indian Document Patterns
+
+### What You'll See Most Often
+
+| Rank | Document Type | Typical Source | Quality |
+|------|--------------|----------------|---------|
+| 1 | Discharge Summary | All hospitals | Usually typed, comprehensive |
+| 2 | Lab Reports (CBC, LFT, KFT) | Thyrocare, Lal Path, hospital labs | Typed, structured |
+| 3 | CT/MRI Reports | Radiology centers, hospitals | Typed, sometimes images attached |
+| 4 | Biopsy/FNAC Reports | Pathology labs, hospitals | Typed, detailed |
+| 5 | OPD Slips | Government hospitals | Often handwritten, brief |
+| 6 | Chemo Charts | Oncology daycare | Mixed — typed or handwritten |
+| 7 | Prescription Slips | Doctors | Handwritten, hard to read |
+
+### Common Indian Lab Chains
+
+| Lab Chain | What to Expect |
+|-----------|----------------|
+| Thyrocare | Structured PDF, consistent format |
+| Dr. Lal PathLabs | Structured PDF, good quality |
+| SRL Diagnostics | Structured PDF |
+| Metropolis | Structured PDF |
+| Apollo Diagnostics | Structured PDF |
+| Hospital in-house labs | Variable — typed or handwritten |
+
+### Common Hospital Document Formats
+
+| Hospital Type | Document Quality |
+|---------------|------------------|
+| Tata Memorial, AIIMS, CMC Vellore | Typed, structured, comprehensive |
+| Private corporate (Apollo, Fortis, Max) | Typed, structured |
+| State government hospitals | Mixed — often handwritten |
+| District hospitals | Often handwritten |
+| Nursing homes | Variable |
+
+---
+
+## Handling Handwritten Documents
+
+For MVP, flag but don't block:
+
+```json
+{
+  "category": "clinical",
+  "subcategory": "opd",
+  "is_handwritten": true,
+  "extraction_confidence": "low",
+  "reason": "Handwritten OPD notes - may require manual review"
+}
+```
+
+### Detection Heuristics
+
+- Low text extraction confidence from OCR
+- Document from government hospital OPD
+- Subcategory is `opd`, `chemo_chart`, or `prescription`
+- AI confidence < 0.7 with unclear structure
+
+---
+
+## Facility Name Normalization
+
+Common variations to normalize:
+
+| Variations | Normalized Name |
+|------------|-----------------|
+| TMH, Tata Memorial, Tata Hospital | Tata Memorial Hospital |
+| AIIMS, AIIMS Delhi, All India Institute | AIIMS Delhi |
+| CMC, CMC Vellore, Christian Medical College | CMC Vellore |
+| Apollo Chennai, Apollo Hospital Chennai | Apollo Hospitals Chennai |
+| Thyrocare, Thyrocare Labs | Thyrocare |
+| Lal Path, Dr Lal PathLabs, Lal PathLabs | Dr. Lal PathLabs |
+
+---
+
+## Questions to Answer Before Implementation
+
+1. **Are you seeing Ayushman Bharat patients?** If yes, those forms have specific fields we could extract (procedure codes, package rates).
+
+2. **How many handwritten docs are you getting?** This affects whether we need OCR preprocessing.
+
+3. **Should `prescription` be under `treatment` or `admin`?** Currently under `admin` since it's usually a standalone pharmacy slip.
+
+4. **Regional language documents?** Are you seeing reports in Hindi, Marathi, Malayalam, etc.? This affects extraction approach.
+
+5. **Do you need facility-level analytics?** (e.g., "How many patients from TMH vs Apollo?")
+
+---
+
+## Implementation Checklist
+
+- [ ] Add `category`, `subcategory`, `facility` columns to documents table
+- [ ] Create `document_categories` reference table with seed data
+- [ ] Update classification prompt with category/subcategory logic
+- [ ] Update triage queue response to include category grouping
+- [ ] Add category/subcategory filters to document list endpoint
+- [ ] Update extraction pipeline to use `extraction_priority` for processing depth
+- [ ] Add `is_handwritten` detection (optional for MVP)
+- [ ] Add facility name normalization (optional for MVP)
+
+---
+
+## Appendix: Full Category Reference
+
+### Quick Lookup Table
+
+| Category | Subcategory | Code | Priority |
+|----------|-------------|------|----------|
+| pathology | Biopsy / Histopathology | `pathology/biopsy` | P0 |
+| pathology | FNAC | `pathology/fnac` | P0 |
+| pathology | Cytology | `pathology/cytology` | P1 |
+| pathology | IHC / Molecular | `pathology/ihc` | P0 |
+| pathology | HPE Review | `pathology/hpe_review` | P1 |
+| pathology | Frozen Section | `pathology/frozen` | P1 |
+| imaging | CT Scan | `imaging/ct` | P0 |
+| imaging | PET-CT | `imaging/pet` | P0 |
+| imaging | MRI | `imaging/mri` | P1 |
+| imaging | X-Ray | `imaging/xray` | P2 |
+| imaging | Ultrasound | `imaging/usg` | P2 |
+| imaging | Mammography | `imaging/mammo` | P1 |
+| imaging | Bone Scan | `imaging/bone_scan` | P1 |
+| imaging | 2D Echo | `imaging/echo` | P2 |
+| imaging | Endoscopy | `imaging/endoscopy` | P1 |
+| laboratory | Complete Blood Count | `laboratory/cbc` | P2 |
+| laboratory | Liver Function | `laboratory/lft` | P2 |
+| laboratory | Kidney Function | `laboratory/kft` | P2 |
+| laboratory | Tumor Markers | `laboratory/tumor_marker` | P1 |
+| laboratory | Coagulation | `laboratory/coag` | P2 |
+| laboratory | Thyroid | `laboratory/thyroid` | P2 |
+| laboratory | Viral Markers | `laboratory/viral` | P2 |
+| laboratory | Blood Sugar | `laboratory/sugar` | P3 |
+| laboratory | Electrolytes | `laboratory/electrolytes` | P2 |
+| laboratory | Urine | `laboratory/urine` | P3 |
+| laboratory | Other Labs | `laboratory/lab_other` | P3 |
+| clinical | Discharge Summary | `clinical/discharge` | P0 |
+| clinical | OPD Notes | `clinical/opd` | P2 |
+| clinical | Case Summary | `clinical/case_summary` | P1 |
+| clinical | Referral Letter | `clinical/referral` | P3 |
+| clinical | Tumor Board Notes | `clinical/tumor_board` | P0 |
+| clinical | Second Opinion | `clinical/second_opinion` | P1 |
+| clinical | Admission Notes | `clinical/admission` | P2 |
+| clinical | Progress Notes | `clinical/progress` | P2 |
+| clinical | Death Summary | `clinical/death_summary` | P1 |
+| treatment | Chemotherapy Chart | `treatment/chemo_chart` | P0 |
+| treatment | Chemotherapy Protocol | `treatment/chemo_protocol` | P0 |
+| treatment | Radiation Plan | `treatment/rt_plan` | P0 |
+| treatment | Radiation Summary | `treatment/rt_summary` | P1 |
+| treatment | Drug Chart | `treatment/drug_chart` | P2 |
+| treatment | Transfusion Record | `treatment/transfusion` | P2 |
+| treatment | Consent Form | `treatment/consent` | P3 |
+| treatment | Supportive Care | `treatment/supportive` | P2 |
+| surgical | Operative Notes | `surgical/op_notes` | P1 |
+| surgical | OT Summary | `surgical/ot_summary` | P1 |
+| surgical | Anesthesia Record | `surgical/anesthesia` | P2 |
+| surgical | Post-Op Notes | `surgical/postop` | P2 |
+| surgical | Procedure Notes | `surgical/procedure` | P2 |
+| admin | Insurance Claim | `admin/insurance` | P3 |
+| admin | Ayushman Bharat | `admin/ayushman` | P3 |
+| admin | CGHS/ECHS | `admin/cghs` | P3 |
+| admin | Hospital Bill | `admin/bill` | P3 |
+| admin | ID Documents | `admin/id` | P3 |
+| admin | Prescription | `admin/prescription` | P3 |

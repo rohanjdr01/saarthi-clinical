@@ -72,11 +72,16 @@ export class GeminiService {
    * Process document (PDF, image, etc.) with Gemini 3 Pro
    * Gemini 3 handles documents natively - no text extraction needed
    */
-  async processDocument({ fileBuffer, mimeType, documentType, thinkingLevel = 'low' }) {
+  async processDocument({ fileBuffer, mimeType, documentType, thinkingLevel = 'low', customPrompt = null, firstPageOnly = false }) {
     const url = `${this.baseUrl}/${this.model}:generateContent?key=${this.apiKey}`;
     const base64Data = this.toBase64(fileBuffer);
 
-    const prompt = this.getExtractionPrompt(documentType);
+    let prompt = customPrompt || this.getExtractionPrompt(documentType);
+
+    // Add first-page-only instruction for PDFs
+    if (firstPageOnly && mimeType === 'application/pdf') {
+      prompt += '\n\nIMPORTANT: Focus only on the FIRST PAGE of this document for classification. You do not need to analyze subsequent pages.';
+    }
 
     const requestBody = {
       contents: [{

@@ -13,6 +13,19 @@ timeline.get('/', async (c) => {
     const timelineRepo = TimelineRepository(c.env.DB);
     const events = await timelineRepo.findByPatientId(patientId, { from, to, types });
     
+    // Get document filenames for source documents
+    const documentIds = [...new Set(events.map(e => e.source_document_id).filter(Boolean))];
+    const documentSources = {};
+    if (documentIds.length > 0) {
+      const placeholders = documentIds.map(() => '?').join(',');
+      const docs = await c.env.DB.prepare(`
+        SELECT id, filename FROM documents WHERE id IN (${placeholders})
+      `).bind(...documentIds).all();
+      docs.results.forEach(doc => {
+        documentSources[doc.id] = doc.filename;
+      });
+    }
+    
     // Group events by date
     const eventsByDate = {};
     const trackAssignment = {};
@@ -36,6 +49,7 @@ timeline.get('/', async (c) => {
         description: event.description,
         track: event.event_type,
         source_document_id: event.source_document_id,
+        source_document_filename: event.source_document_id ? documentSources[event.source_document_id] : null,
         confidence_score: event.confidence_score
       });
     });

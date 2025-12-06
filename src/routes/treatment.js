@@ -32,9 +32,58 @@ treatment.get('/:id/treatment', async (c) => {
       });
     }
 
+    const treatmentData = treatmentRecord.toJSON();
+    const dataSources = treatmentData.data_sources || {};
+
+    // Get document IDs from data_sources
+    const documentIds = new Set();
+    Object.values(dataSources).forEach(source => {
+      if (source && source.source && source.source !== 'manual_override' && source.source !== 'ai_inferred') {
+        documentIds.add(source.source);
+      }
+    });
+
+    // Fetch document filenames and dates
+    const documentMap = {};
+    if (documentIds.size > 0) {
+      const placeholders = Array.from(documentIds).map(() => '?').join(',');
+      const docs = await c.env.DB.prepare(`
+        SELECT id, filename, document_date FROM documents WHERE id IN (${placeholders})
+      `).bind(...Array.from(documentIds)).all();
+      
+      docs.results.forEach(doc => {
+        documentMap[doc.id] = {
+          filename: doc.filename,
+          document_date: doc.document_date
+        };
+      });
+    }
+
+    // Build standardized field-level source mapping
+    const sources = {};
+    Object.entries(dataSources).forEach(([field, source]) => {
+      if (source && source.source && source.source !== 'manual_override' && source.source !== 'ai_inferred') {
+        const doc = documentMap[source.source];
+        if (!sources[field]) {
+          sources[field] = [];
+        }
+        sources[field].push({
+          document_id: source.source,
+          filename: doc?.filename || null,
+          document_date: doc?.document_date || null
+        });
+      }
+    });
+
+    // Remove data_sources from response, add standardized sources
+    const { data_sources, ...restTreatmentData } = treatmentData;
+
     return c.json({
       success: true,
-      data: treatmentRecord.toJSON()
+      data: {
+        ...restTreatmentData,
+        sources: Object.keys(sources).length > 0 ? sources : undefined
+      }
     });
 
   } catch (error) {
@@ -169,9 +218,57 @@ treatment.get('/:id/treatment/cycles', async (c) => {
     // Get all cycles for this treatment
     const cycles = await TreatmentCycle.getByTreatmentId(c.env, treatmentRecord.id);
 
+    // Get document IDs from cycles for source standardization
+    const documentIds = new Set();
+    cycles.forEach(cycle => {
+      const cycleData = cycle.toJSON();
+      const dataSources = cycleData.data_sources;
+      if (dataSources && typeof dataSources === 'object' && dataSources.source) {
+        documentIds.add(dataSources.source);
+      }
+    });
+
+    // Fetch document filenames and dates
+    const documentMap = {};
+    if (documentIds.size > 0) {
+      const placeholders = Array.from(documentIds).map(() => '?').join(',');
+      const docs = await c.env.DB.prepare(`
+        SELECT id, filename, document_date FROM documents WHERE id IN (${placeholders})
+      `).bind(...Array.from(documentIds)).all();
+      
+      docs.results.forEach(doc => {
+        documentMap[doc.id] = {
+          filename: doc.filename,
+          document_date: doc.document_date
+        };
+      });
+    }
+
+    // Standardize cycle responses
+    const standardizedCycles = cycles.map(cycle => {
+      const cycleData = cycle.toJSON();
+      const { data_sources, ...restCycleData } = cycleData;
+      
+      // Transform data_sources to standardized source format
+      let source = null;
+      if (data_sources && typeof data_sources === 'object' && data_sources.source) {
+        const doc = documentMap[data_sources.source];
+        source = {
+          document_id: data_sources.source,
+          filename: doc?.filename || null,
+          document_date: doc?.document_date || data_sources.document_date || null
+        };
+      }
+      
+      return {
+        ...restCycleData,
+        source: source || undefined
+      };
+    });
+
     return c.json({
       success: true,
-      data: cycles.map(cycle => cycle.toJSON())
+      data: standardizedCycles
     });
 
   } catch (error) {

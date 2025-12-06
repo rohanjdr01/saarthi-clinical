@@ -1,0 +1,20 @@
+
+ RUN  v1.6.1 /Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical
+
+stdout | src/tests/setup.js:6:9
+🧪 Test Environment Setup
+
+stdout | src/tests/setup.js:7:9
+API Base URL: http://localhost:8787/api/v1
+
+stdout | src/tests/setup.js:8:9
+Running tests...
+
+
+ ✓ src/tests/api/document-endpoints.test.js  (12 tests) 2ms
+
+ Test Files  1 passed (1)
+      Tests  12 passed (12)
+   Start at  21:47:29
+   Duration  200ms (transform 15ms, setup 4ms, collect 9ms, tests 2ms, environment 0ms, prepare 44ms)
+

@@ -7,27 +7,32 @@ import { getCurrentTimestamp } from '../utils/helpers.js';
 
 export const MedicationRepository = (db) => ({
   /**
-   * Find all medications for a patient, grouped by treatment_context
+   * Find all medications for a patient, grouped by status
    */
   findByPatientId: async (patientId) => {
     const result = await db.prepare(`
       SELECT * FROM medications
       WHERE patient_id = ?
-      ORDER BY treatment_context, created_at DESC
+      ORDER BY medication_status, created_at DESC
     `).bind(patientId).all();
 
-    // Group by treatment_context
-    const grouped = result.results.reduce((acc, med) => {
-      const context = med.treatment_context || 'Other Medications';
-      if (!acc[context]) {
-        acc[context] = [];
+    // Group by medication_status (active/discontinued)
+    const byStatus = {
+      active: [],
+      discontinued: []
+    };
+
+    result.results.forEach(med => {
+      const status = med.medication_status || 'active';
+      if (status === 'discontinued' || status === 'stopped') {
+        byStatus.discontinued.push(med);
+      } else {
+        byStatus.active.push(med);
       }
-      acc[context].push(med);
-      return acc;
-    }, {});
+    });
 
     return {
-      grouped,
+      by_status: byStatus,
       flat: result.results
     };
   },

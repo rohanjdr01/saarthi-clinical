@@ -29,6 +29,7 @@ export const DocumentRepository = (db) => ({
   findByPatientId: async (patientId, filters = {}) => {
     const {
       category,
+      subcategory,
       start_date,
       end_date,
       reviewed_status,
@@ -43,6 +44,11 @@ export const DocumentRepository = (db) => ({
     if (category) {
       query += ' AND category = ?';
       bindings.push(category);
+    }
+
+    if (subcategory) {
+      query += ' AND subcategory = ?';
+      bindings.push(subcategory);
     }
 
     if (start_date) {
@@ -88,15 +94,15 @@ export const DocumentRepository = (db) => ({
     const result = await db.prepare(`
       INSERT INTO documents (
         id, patient_id, filename, file_type, mime_type, file_size, storage_key,
-        document_type, document_subtype, category, subcategory, title, document_date,
+        document_type, document_subtype, category, subcategory, title, document_date, facility,
         case_pack_order, processing_status, vectorize_status, reviewed_status,
         created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       document.id, document.patient_id, document.filename, document.file_type,
       document.mime_type, document.file_size, document.storage_key,
       document.document_type || 'other', document.document_subtype,
-      document.category, document.subcategory, document.title, document.document_date,
+      document.category, document.subcategory, document.title, document.document_date, document.facility,
       document.case_pack_order, document.processing_status,
       document.vectorize_status, document.reviewed_status,
       document.created_at, document.updated_at
@@ -288,4 +294,3 @@ export const DocumentRepository = (db) => ({
     return true;
   }
 });
-

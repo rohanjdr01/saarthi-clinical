@@ -9,6 +9,7 @@ import { Document } from '../models/document.js';
 import { DocumentRepository } from '../repositories/document.repository.js';
 import { PatientRepository } from '../repositories/patient.repository.js';
 import { DocumentProcessor } from '../services/processing/processor.js';
+import { DocumentClassifier } from '../services/classification/classifier.js';
 import { searchDocuments } from '../services/vectorize/indexer.js';
 import { GeminiService } from '../services/gemini/client.js';
 import { NotFoundError, ValidationError, errorResponse } from '../utils/errors.js';
@@ -128,6 +129,20 @@ documents.post('/', async (c) => {
 
       // Queue processing (always process in fast or full mode)
       processingTasks.push({ id: document.id, mode: processMode });
+
+      // Trigger async classification (non-blocking)
+      c.executionCtx.waitUntil(
+        (async () => {
+          try {
+            const classifier = new DocumentClassifier(c.env);
+            await classifier.classifyDocument(patientId, document.id);
+            console.log(`✅ Classified document ${document.id}: ${document.filename}`);
+          } catch (error) {
+            console.error(`Error classifying document ${document.id}:`, error);
+            // Don't fail upload if classification fails
+          }
+        })()
+      );
     }
 
     // Trigger processing
@@ -253,6 +268,7 @@ documents.get('/', async (c) => {
     const { patientId } = c.req.param();
     const {
       category,
+      subcategory,
       start_date,
       end_date,
       reviewed_status,
@@ -263,6 +279,7 @@ documents.get('/', async (c) => {
     const docRepo = DocumentRepository(c.env.DB);
     const documentList = await docRepo.findByPatientId(patientId, {
       category,
+      subcategory,
       start_date,
       end_date,
       reviewed_status,
@@ -281,6 +298,7 @@ documents.get('/', async (c) => {
       total: documentList.length,
       filters: {
         category,
+        subcategory,
         start_date,
         end_date,
         reviewed_status,
@@ -291,6 +309,99 @@ documents.get('/', async (c) => {
 
   } catch (error) {
     console.error('Error listing documents:', error);
+    return c.json(errorResponse(error), 500);
+  }
+});
+
+// ============================================================================
+// GET TRIAGE QUEUE (must be before /:docId to avoid route conflict)
+// ============================================================================
+
+documents.get('/triage', async (c) => {
+  try {
+    const { patientId } = c.req.param();
+    const status = c.req.query('status') || 'pending';
+
+    let query = `
+      SELECT d.id, d.filename, d.category, d.subcategory, d.facility,
+             dc.display_name AS category_display, dc.extraction_priority,
+             d.classification, d.classification_confidence,
+             d.classification_reason, d.document_date, d.gp_reviewed, d.gp_approved_for_extraction,
+             d.created_at
+      FROM documents d
+      LEFT JOIN document_categories dc ON dc.category = d.category AND dc.subcategory = d.subcategory
+      WHERE d.patient_id = ?
+    `;
+
+    if (status === 'pending') {
+      query += ` AND (gp_reviewed = 0 OR gp_reviewed IS NULL)`;
+    } else if (status === 'reviewed') {
+      query += ` AND gp_reviewed = 1`;
+    }
+    // 'all' shows everything
+
+    query += ` ORDER BY created_at DESC`;
+
+    const result = await c.env.DB.prepare(query).bind(patientId).all();
+    const docs = result.results;
+
+    // Group by classification
+    const grouped = {
+      cancer_core: [],
+      cancer_adjacent: [],
+      non_cancer: [],
+      classification_failed: [],
+      uncertain: [],
+      pending: []
+    };
+
+    docs.forEach(doc => {
+      const classification = doc.classification || 'pending';
+      const confidence = doc.classification_confidence || 0;
+
+      if (classification === 'pending' || classification === null) {
+        grouped.pending.push(doc);
+      } else if (classification === 'classification_failed') {
+        grouped.classification_failed.push(doc);
+      } else if (confidence < 0.6) {
+        grouped.uncertain.push(doc);
+      } else if (grouped[classification]) {
+        grouped[classification].push(doc);
+      }
+    });
+
+    const byCategory = docs.reduce((acc, doc) => {
+      const cat = doc.category || 'uncategorized';
+      acc[cat] = (acc[cat] || 0) + 1;
+      return acc;
+    }, {});
+
+    // Calculate summary
+    const summary = {
+      total: docs.length,
+      pending_review: docs.filter(d => !d.gp_reviewed || d.gp_reviewed === 0).length,
+      reviewed: docs.filter(d => d.gp_reviewed === 1).length,
+      by_classification: {
+        cancer_core: grouped.cancer_core.length,
+        cancer_adjacent: grouped.cancer_adjacent.length,
+        non_cancer: grouped.non_cancer.length,
+        classification_failed: grouped.classification_failed.length,
+        uncertain: grouped.uncertain.length,
+        pending: grouped.pending.length
+      },
+      by_category: byCategory
+    };
+
+    return c.json({
+      success: true,
+      data: {
+        patient_id: patientId,
+        summary,
+        documents: grouped
+      }
+    });
+  } catch (error) {
+    console.error('Error getting triage queue:', error);
     return c.json(errorResponse(error), 500);
   }
 });
@@ -836,6 +947,347 @@ documents.post('/:docId/reprocess', async (c) => {
 
   } catch (error) {
     console.error('Error reprocessing document:', error);
+    return c.json(errorResponse(error), error.statusCode || 500);
+  }
+});
+
+// ============================================================================
+// DOCUMENT TRIAGE & CLASSIFICATION
+// ============================================================================
+
+// Classify a single document
+documents.post('/:documentId/classify', async (c) => {
+  try {
+    const { patientId, documentId } = c.req.param();
+    const body = await c.req.json().catch(() => ({}));
+    const force = body.force || false;
+
+    const docRepo = DocumentRepository(c.env.DB);
+    const doc = await docRepo.findById(documentId, patientId);
+
+    if (!doc || doc.patient_id !== patientId) {
+      throw new NotFoundError('Document');
+    }
+
+    // If already classified and not forcing, return existing
+    if (!force && doc.classification && doc.classification !== 'pending') {
+      return c.json({
+        success: true,
+        data: {
+          document_id: documentId,
+          classification: doc.classification,
+          confidence: doc.classification_confidence,
+          reason: doc.classification_reason,
+          document_category: doc.document_category,
+          document_date: doc.document_date
+        }
+      });
+    }
+
+    const provider = c.req.query('provider') || body.provider;
+    const classifier = new DocumentClassifier(c.env, { provider });
+    const result = await classifier.classifyDocument(patientId, documentId, provider);
+
+    return c.json({
+      success: true,
+      data: result
+    });
+  } catch (error) {
+    console.error('Error classifying document:', error);
+    return c.json(errorResponse(error), error.statusCode || 500);
+  }
+});
+
+// Bulk classify documents
+documents.post('/classify', async (c) => {
+  try {
+    const { patientId } = c.req.param();
+    const body = await c.req.json().catch(() => ({}));
+    const force = body.force || false;
+    const documentIds = body.document_ids || null;
+    const provider = c.req.query('provider') || body.provider;
+
+    const classifier = new DocumentClassifier(c.env, { provider });
+    
+    // If forcing, we need to classify all documents, not just pending
+    if (force && !documentIds) {
+      // Get all documents for patient
+      const allDocs = await c.env.DB.prepare(`
+        SELECT id FROM documents WHERE patient_id = ?
+      `).bind(patientId).all();
+      const ids = allDocs.results.map(d => d.id);
+      const result = await classifier.classifyDocumentsBulk(patientId, ids, provider);
+      return c.json({ success: true, data: result });
+    }
+
+    const result = await classifier.classifyDocumentsBulk(patientId, documentIds, provider);
+
+    return c.json({
+      success: true,
+      data: result
+    });
+  } catch (error) {
+    console.error('Error in bulk classification:', error);
+    return c.json(errorResponse(error), error.statusCode || 500);
+  }
+});
+
+// Update document classification (GP review)
+documents.patch('/:documentId/classification', async (c) => {
+  try {
+    const { patientId, documentId } = c.req.param();
+    const body = await c.req.json();
+
+    if (!body.classification) {
+      throw new ValidationError('classification is required');
+    }
+
+    const validClassifications = ['cancer_core', 'cancer_adjacent', 'non_cancer'];
+    if (!validClassifications.includes(body.classification)) {
+      throw new ValidationError(`classification must be one of: ${validClassifications.join(', ')}`);
+    }
+
+    const docRepo = DocumentRepository(c.env.DB);
+    const doc = await docRepo.findById(documentId, patientId);
+
+    if (!doc || doc.patient_id !== patientId) {
+      throw new NotFoundError('Document');
+    }
+
+    // Get current user (from auth middleware - placeholder for now)
+    const userId = c.get('user')?.id || 'system';
+
+    // Store original classification if it's being changed
+    const originalClassification = doc.classification;
+    const classificationChanged = originalClassification && originalClassification !== body.classification;
+
+    // Update document
+    await c.env.DB.prepare(`
+      UPDATE documents
+      SET classification = ?,
+          gp_reviewed = 1,
+          gp_approved_for_extraction = ?,
+          gp_reviewed_at = ?,
+          gp_reviewed_by = ?,
+          gp_classification_override = ?,
+          updated_at = ?
+      WHERE id = ?
+    `).bind(
+      body.classification,
+      body.approved_for_extraction ? 1 : 0,
+      Date.now(),
+      userId,
+      classificationChanged ? originalClassification : null,
+      Date.now(),
+      documentId
+    ).run();
+
+    return c.json({
+      success: true,
+      data: {
+        document_id: documentId,
+        classification: body.classification,
+        previous_classification: classificationChanged ? originalClassification : null,
+        gp_reviewed: true,
+        gp_approved_for_extraction: body.approved_for_extraction || false,
+        gp_reviewed_at: Date.now()
+      }
+    });
+  } catch (error) {
+    console.error('Error updating document classification:', error);
+    return c.json(errorResponse(error), error.statusCode || 500);
+  }
+});
+
+// Bulk update classifications (GP batch review)
+documents.post('/triage/batch', async (c) => {
+  try {
+    const { patientId } = c.req.param();
+    const body = await c.req.json();
+
+    if (!body.updates || !Array.isArray(body.updates)) {
+      throw new ValidationError('updates array is required');
+    }
+
+    const userId = c.get('user')?.id || 'system';
+    const results = [];
+    let approvedCount = 0;
+
+    for (const update of body.updates) {
+      if (!update.document_id || !update.classification) {
+        results.push({
+          document_id: update.document_id,
+          status: 'error',
+          error: 'document_id and classification are required'
+        });
+        continue;
+      }
+
+      try {
+        const docRepo = DocumentRepository(c.env.DB);
+        const doc = await docRepo.findById(update.document_id, patientId);
+
+        if (!doc || doc.patient_id !== patientId) {
+          results.push({
+            document_id: update.document_id,
+            status: 'error',
+            error: 'Document not found or does not belong to patient'
+          });
+          continue;
+        }
+
+        const originalClassification = doc.classification;
+        const classificationChanged = originalClassification && originalClassification !== update.classification;
+
+        await c.env.DB.prepare(`
+          UPDATE documents
+          SET classification = ?,
+              gp_reviewed = 1,
+              gp_approved_for_extraction = ?,
+              gp_reviewed_at = ?,
+              gp_reviewed_by = ?,
+              gp_classification_override = ?,
+              updated_at = ?
+          WHERE id = ?
+        `).bind(
+          update.classification,
+          update.approved_for_extraction ? 1 : 0,
+          Date.now(),
+          userId,
+          classificationChanged ? originalClassification : null,
+          Date.now(),
+          update.document_id
+        ).run();
+
+        if (update.approved_for_extraction) {
+          approvedCount++;
+        }
+
+        results.push({
+          document_id: update.document_id,
+          status: 'updated'
+        });
+      } catch (error) {
+        console.error(`Error updating document ${update.document_id}:`, error);
+        results.push({
+          document_id: update.document_id,
+          status: 'error',
+          error: error.message
+        });
+      }
+    }
+
+    return c.json({
+      success: true,
+      data: {
+        updated: results.filter(r => r.status === 'updated').length,
+        approved_for_extraction: approvedCount,
+        results
+      }
+    });
+  } catch (error) {
+    console.error('Error in batch classification update:', error);
+    return c.json(errorResponse(error), error.statusCode || 500);
+  }
+});
+
+// Process approved documents
+documents.post('/process-approved', async (c) => {
+  try {
+    const { patientId } = c.req.param();
+    const body = await c.req.json().catch(() => ({}));
+    const processMode = body.process_mode || 'full';
+    const provider = body.provider || c.req.query('provider');
+
+    // Get all GP-approved documents that haven't been processed yet
+    const approvedDocs = await c.env.DB.prepare(`
+      SELECT id, filename, processing_status
+      FROM documents
+      WHERE patient_id = ?
+        AND gp_approved_for_extraction = 1
+        AND (processing_status IS NULL OR processing_status = 'pending' OR processing_status = 'failed')
+    `).bind(patientId).all();
+
+    if (approvedDocs.results.length === 0) {
+      return c.json({
+        success: true,
+        data: {
+          queued: 0,
+          documents: [],
+          message: 'No approved documents to process'
+        }
+      });
+    }
+
+    const queued = [];
+    const processor = new DocumentProcessor(c.env, { provider });
+
+    for (const doc of approvedDocs.results) {
+      try {
+        if (processMode === 'fast') {
+          // Fast mode: process in background
+          c.executionCtx.waitUntil(
+            (async () => {
+              try {
+                await processor.processDocumentFast(doc.id, { provider });
+              } catch (error) {
+                console.error(`Error processing approved document ${doc.id}:`, error);
+                const docRepo = DocumentRepository(c.env.DB);
+                await docRepo.updateProcessingStatus(doc.id, 'failed', error.message);
+              }
+            })()
+          );
+        } else {
+          // Full mode: queue for processing
+          if (c.env.DOCUMENT_PROCESSING_QUEUE) {
+            await c.env.DOCUMENT_PROCESSING_QUEUE.send({
+              documentId: doc.id,
+              mode: 'full',
+              provider: provider
+            }, {
+              delaySeconds: 3
+            });
+          } else {
+            // Fallback to waitUntil
+            c.executionCtx.waitUntil(
+              (async () => {
+                try {
+                  await processor.processDocument(doc.id, { mode: 'full', provider });
+                } catch (error) {
+                  console.error(`Error processing approved document ${doc.id}:`, error);
+                  const docRepo = DocumentRepository(c.env.DB);
+                  await docRepo.updateProcessingStatus(doc.id, 'failed', error.message);
+                }
+              })()
+            );
+          }
+        }
+
+        queued.push({
+          id: doc.id,
+          filename: doc.filename,
+          status: 'processing'
+        });
+      } catch (error) {
+        console.error(`Error queueing document ${doc.id}:`, error);
+        queued.push({
+          id: doc.id,
+          filename: doc.filename,
+          status: 'error',
+          error: error.message
+        });
+      }
+    }
+
+    return c.json({
+      success: true,
+      data: {
+        queued: queued.length,
+        documents: queued
+      }
+    }, 202);
+  } catch (error) {
+    console.error('Error processing approved documents:', error);
     return c.json(errorResponse(error), error.statusCode || 500);
   }
 });

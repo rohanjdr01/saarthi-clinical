@@ -14,8 +14,11 @@ import { OpenAIService } from '../openai/client.js';
 import { vectorizeDocument } from '../vectorize/indexer.js';
 import { Diagnosis } from '../../models/diagnosis.js';
 import { Treatment } from '../../models/treatment.js';
+import { TreatmentCycle } from '../../models/treatment-cycle.js';
 import { PatientRepository } from '../../repositories/patient.repository.js';
 import { DocumentRepository } from '../../repositories/document.repository.js';
+import { StagingSnapshotRepository } from '../../repositories/staging-snapshot.repository.js';
+import { DecisionRepository } from '../../repositories/decision.repository.js';
 import { trackFieldSource, parseDataSources, serializeDataSources } from '../../utils/data-source.js';
 import { getCurrentTimestamp } from '../../utils/helpers.js';
 import { validateExtractedData } from './extraction-schema.js';
@@ -344,11 +347,17 @@ export class DocumentProcessor {
       // 9. Sync diagnosis (auto-upsert if extracted)
       await this.syncDiagnosisFromExtraction(doc.patient_id, documentId, extractedData);
 
+      // 9.5. Sync staging (create snapshot, never overwrite)
+      await this.syncStagingFromExtraction(doc.patient_id, documentId, extractedData);
+
       // 10. Sync treatment (auto-upsert if extracted)
       await this.syncTreatmentFromExtraction(doc.patient_id, documentId, extractedData);
 
       // 11. Sync medications (auto-upsert if extracted)
       await this.syncMedicationsFromExtraction(doc.patient_id, documentId, extractedData);
+
+      // 11.5. Sync clinical decisions (auto-upsert if extracted)
+      await this.syncClinicalDecisionsFromExtraction(doc.patient_id, documentId, extractedData);
 
       // 12. Extract timeline events
       await this.extractTimelineEvents(service, doc.patient_id, extractedData, documentId);
@@ -866,22 +875,37 @@ export class DocumentProcessor {
 
   async extractTimelineEvents(service, patientId, extractedData, sourceDocumentId) {
     try {
-      const prompt = `Extract timeline events from this medical data. Return JSON array:
+      // First, check if timeline_events are already provided in extracted data
+      const providedEvents = extractedData?.timeline_events;
+      
+      let events = [];
+      
+      if (Array.isArray(providedEvents) && providedEvents.length > 0) {
+        // Use provided timeline events directly
+        console.log(`📅 Using ${providedEvents.length} provided timeline events`);
+        events = providedEvents;
+      } else {
+        // Fall back to LLM extraction if no events provided
+        console.log('📅 No timeline_events provided, falling back to LLM extraction');
+        const prompt = `Extract timeline events from this medical data. Return JSON array:
 [{"date": "YYYY-MM-DD", "event_type": "diagnosis|procedure|treatment|imaging|lab", "title": "", "description": ""}]
 
 Data: ${JSON.stringify(extractedData)}`;
 
-      const result = await service.generateContent({ prompt, temperature: 0.1 });
+        const result = await service.generateContent({ prompt, temperature: 0.1 });
 
-      let events = [];
-      try {
-        events = JSON.parse(result.text);
-      } catch {
-        return;
+        try {
+          events = JSON.parse(result.text);
+        } catch {
+          console.warn('Failed to parse LLM timeline response');
+          return;
+        }
       }
 
       if (!Array.isArray(events)) return;
 
+      console.log(`📅 Inserting ${events.length} timeline events`);
+      
       for (const event of events) {
         const eventId = `evt_${Date.now().toString(36)}${Math.random().toString(36).substring(2, 9)}`;
         await this.env.DB.prepare(`
@@ -891,13 +915,15 @@ Data: ${JSON.stringify(extractedData)}`;
           eventId,
           patientId,
           event.date || new Date().toISOString().split('T')[0],
-          event.event_type || 'other',
-          event.title || 'Event',
-          event.description || '',
+          event.event_type || event.type || 'other',
+          event.event || event.title || 'Event',
+          event.details || event.description || '',
           sourceDocumentId,
           getCurrentTimestamp()
         ).run();
       }
+      
+      console.log(`✅ Inserted ${events.length} timeline events`);
     } catch (error) {
       console.warn('Timeline extraction failed:', error.message);
     }
@@ -916,37 +942,190 @@ Data: ${JSON.stringify(extractedData)}`;
       primary_cancer_subtype: diag.primary_cancer_subtype || null,
       icd_code: diag.icd_code || null,
       diagnosis_date: diag.diagnosis_date || extractedData.document_date || null,
-      tumor_location: diag.location || null,
-      tumor_laterality: diag.laterality || null,
+      tumor_location: diag.cancer_site_primary || diag.location || diag.tumor_location || null,
+      tumor_laterality: diag.laterality || diag.tumor_laterality || null,
       tumor_size_cm: diag.tumor_size_cm || null,
       tumor_grade: diag.grade || diag.tumor_grade || null,
-      histology: diag.histology || null,
+      histology: diag.morphology || diag.histology || diag.histology_subtype || null,
       biomarkers: diag.biomarkers || null,
       genetic_mutations: diag.genetic_mutations || null,
       metastatic_sites: diag.metastatic_sites || null
+      // Note: diagnosis.notes from extraction is not persisted as the table lacks a notes column
     };
 
-    // Track sources per field
-    let sources = existing?.data_sources ? parseDataSources(existing.data_sources) : {};
-    for (const [field, value] of Object.entries(mapped)) {
-      if (value !== null && value !== undefined) {
-        sources = trackFieldSource(sources, field, value, documentId);
+    // Parse existing sources or start fresh
+    let sources = {};
+    try {
+      const parsed = existing?.data_sources ? parseDataSources(existing.data_sources) : {};
+      // Convert parsed sources to array format if needed
+      // Handle both old format (arrays) and new format (objects with {value, source, timestamp})
+      for (const [key, value] of Object.entries(parsed)) {
+        if (Array.isArray(value)) {
+          sources[key] = value;
+        } else if (value && typeof value === 'object' && value.source) {
+          // Convert new format to array: extract document IDs
+          sources[key] = [value.source];
+        } else {
+          sources[key] = [];
+        }
+      }
+    } catch (e) {
+      sources = {};
+    }
+
+    const diagnosisFields = [
+      'primary_cancer_type',
+      'primary_cancer_subtype',
+      'icd_code',
+      'diagnosis_date',
+      'tumor_location',
+      'tumor_laterality',
+      'tumor_size_cm',
+      'tumor_grade',
+      'histology',
+      'genetic_mutations',
+      'metastatic_sites'
+    ];
+
+    const updates = {};
+
+    // Additive logic: empty fields get filled, existing fields get source appended
+    for (const field of diagnosisFields) {
+      const newValue = mapped[field];
+      if (!newValue) continue; // Nothing extracted for this field
+
+      const existingValue = existing?.[field];
+
+      if (!existingValue) {
+        // Empty field → fill it
+        updates[field] = newValue;
+        sources[field] = [documentId];
+      } else if (existingValue === newValue || String(existingValue) === String(newValue)) {
+        // Same value → append source if not already there
+        if (!Array.isArray(sources[field])) sources[field] = [];
+        if (!sources[field].includes(documentId)) {
+          sources[field].push(documentId);
+        }
+      } else {
+        // Different value → keep existing, but note the source
+        // (Doctor can review if needed via document search)
+        if (!Array.isArray(sources[field])) sources[field] = [];
+        if (!sources[field].includes(documentId)) {
+          sources[field].push(documentId);
+        }
+        // Log for debugging
+        console.log(`Diagnosis field ${field}: keeping "${existingValue}", doc ${documentId} had "${newValue}"`);
       }
     }
+
+    // Handle biomarkers separately (merge objects)
+    if (mapped.biomarkers) {
+      const existingBiomarkers = existing?.biomarkers ? (typeof existing.biomarkers === 'string' ? JSON.parse(existing.biomarkers) : existing.biomarkers) : {};
+      const newBiomarkers = typeof mapped.biomarkers === 'string' ? JSON.parse(mapped.biomarkers) : mapped.biomarkers;
+      updates.biomarkers = JSON.stringify({
+        ...existingBiomarkers,
+        ...newBiomarkers  // New values overwrite for biomarkers
+      });
+      if (!Array.isArray(sources.biomarkers)) sources.biomarkers = [];
+      if (!sources.biomarkers.includes(documentId)) {
+        sources.biomarkers.push(documentId);
+      }
+    }
+
+    updates.data_sources = serializeDataSources(sources);
 
     if (!existing) {
       await Diagnosis.create(this.env, {
         patient_id: patientId,
-        ...mapped,
-        data_sources: serializeDataSources(sources)
+        ...updates
       });
       return;
     }
 
-    await Diagnosis.update(this.env, existing.id, {
-      ...mapped,
-      data_sources: serializeDataSources(sources)
-    });
+    // Only update if we have changes beyond data_sources
+    if (Object.keys(updates).length > 1) {
+      await Diagnosis.update(this.env, existing.id, updates);
+    } else if (updates.data_sources) {
+      // Just update data_sources if no other changes
+      await Diagnosis.update(this.env, existing.id, { data_sources: updates.data_sources });
+    }
+  }
+
+  async syncStagingFromExtraction(patientId, documentId, extractedData) {
+    if (!extractedData) return;
+
+    const staging = extractedData.staging || {};
+    
+    // Check if there's any staging content to save (expanded criteria)
+    const hasContent = staging.overall_stage || staging.clinical_tnm || staging.clinical_t ||
+      staging.pathological_stage || staging.pathological_tnm || staging.pathological_t ||
+      staging.metastatic !== undefined || staging.notes || staging.nodes ||
+      staging.clinical_stage || staging.pathologic_stage;
+    
+    if (!hasContent) {
+      return; // No staging info to save
+    }
+
+    const stagingRepo = StagingSnapshotRepository(this.env.DB);
+
+    // Check if we already have snapshots for this patient
+    const existingSnapshots = await stagingRepo.findByPatientId(patientId);
+    
+    // Determine staging type
+    let stagingType = 'initial';
+    if (existingSnapshots.length > 0) {
+      stagingType = staging.staging_type || 'restaging';
+    }
+
+    // Format TNM - derive M from metastatic boolean if not provided
+    const formatTNM = (t, n, m) => {
+      if (!t && !n && !m) return null;
+      const parts = [
+        t || '?',
+        n || '?',
+        m || '?'
+      ];
+      return parts.join('');
+    };
+
+    // Derive M stage from metastatic boolean if not explicitly provided
+    const derivedM = staging.metastatic === true ? 'M1' : (staging.metastatic === false ? 'M0' : null);
+
+    const clinicalTNM = formatTNM(
+      staging.clinical_t || staging.t,
+      staging.clinical_n || staging.n,
+      staging.clinical_m || staging.m || derivedM
+    );
+
+    const pathologicalTNM = formatTNM(
+      staging.pathological_t || staging.pt,
+      staging.pathological_n || staging.pn,
+      staging.pathological_m || staging.pm || derivedM
+    );
+
+    // Generate snapshot ID
+    const snapshotId = `stg_${Date.now().toString(36)}${Math.random().toString(36).substring(2, 9)}`;
+
+    // Combine notes from various sources
+    const notesArray = [staging.notes, staging.nodes].filter(Boolean);
+    const combinedNotes = notesArray.length > 0 ? notesArray.join('; ') : null;
+
+    const snapshot = {
+      id: snapshotId,
+      patient_id: patientId,
+      document_id: documentId,
+      staging_type: stagingType,
+      staging_date: staging.staging_date || extractedData.document_date || extractedData.document_info?.document_date || null,
+      staging_system: staging.staging_system || 'AJCC 8th Edition',
+      clinical_tnm: clinicalTNM,
+      pathological_tnm: pathologicalTNM,
+      overall_stage: staging.overall_stage || staging.clinical_stage || staging.pathological_stage || staging.pathologic_stage || null,
+      notes: combinedNotes,
+      created_at: getCurrentTimestamp()
+    };
+
+    await stagingRepo.create(snapshot);
+    console.log(`✅ Created staging snapshot ${snapshotId} (${stagingType}) for patient ${patientId}`);
   }
 
   async updateVectorizeStatus(documentId, status) {
@@ -1016,9 +1195,9 @@ Data: ${JSON.stringify(extractedData)}`;
 
     const mapped = {
       regimen_name: tx.regimen_name || null,
-      treatment_intent: tx.treatment_intent || null,
+      treatment_intent: tx.intent || tx.treatment_intent || null,
       treatment_line: tx.treatment_line || null,
-      protocol: tx.protocol || null,
+      protocol: tx.type || tx.protocol || null,
       drugs: drugsList,
       start_date: tx.start_date || null,
       planned_end_date: tx.planned_end_date || null,
@@ -1054,6 +1233,8 @@ Data: ${JSON.stringify(extractedData)}`;
       }
     }
 
+    let treatmentId = null;
+
     if (!existing) {
       console.log('📝 Creating new treatment record...');
       const newTreatment = await Treatment.create(this.env, {
@@ -1062,15 +1243,66 @@ Data: ${JSON.stringify(extractedData)}`;
         data_sources: serializeDataSources(sources)
       });
       console.log('✅ Treatment created successfully:', newTreatment.id);
-      return;
+      treatmentId = newTreatment.id;
+    } else {
+      console.log('📝 Updating existing treatment:', existing.id);
+      await Treatment.update(this.env, existing.id, {
+        ...mapped,
+        data_sources: serializeDataSources(sources)
+      });
+      console.log('✅ Treatment updated successfully');
+      treatmentId = existing.id;
     }
 
-    console.log('📝 Updating existing treatment:', existing.id);
-    await Treatment.update(this.env, existing.id, {
-      ...mapped,
-      data_sources: serializeDataSources(sources)
-    });
-    console.log('✅ Treatment updated successfully');
+    // Sync treatment cycles if available (ADDITIVE - never overwrite, always add new records)
+    const cycles = tx.treatment_cycle || extractedData.treatment_cycle;
+    if (Array.isArray(cycles) && cycles.length > 0 && treatmentId) {
+      console.log(`📋 Adding ${cycles.length} treatment cycles (additive mode)...`);
+      
+      // Get document date for tracking
+      const documentDate = extractedData.document_date || 
+                           extractedData.document_info?.document_date || 
+                           new Date().toISOString().split('T')[0];
+      
+      for (const cyc of cycles) {
+        try {
+          // Check if this exact cycle from this document already exists (avoid duplicates from reprocessing)
+          const existingFromSameDoc = await this.env.DB.prepare(`
+            SELECT id FROM treatment_cycles 
+            WHERE treatment_id = ? AND cycle_number = ? AND data_sources LIKE ?
+          `).bind(treatmentId, cyc.cycle_number, `%"source":"${documentId}"%`).first();
+          
+          if (existingFromSameDoc) {
+            console.log(`⏭️ Cycle ${cyc.cycle_number} from document ${documentId} already exists - skipping`);
+            continue;
+          }
+          
+          const drugsAdministered = cyc.drugs_administered ? JSON.stringify(cyc.drugs_administered) : null;
+          
+          const cycleData = {
+            treatment_id: treatmentId,
+            patient_id: patientId,
+            cycle_number: cyc.cycle_number,
+            planned_date: cyc.start_date || null,
+            actual_date: cyc.end_date || cyc.start_date || null,
+            drugs_administered: drugsAdministered,
+            notes: cyc.notes || cyc.regimen_name || null,
+            cycle_status: 'completed',
+            data_sources: JSON.stringify({ 
+              source: documentId, 
+              document_date: documentDate,
+              extracted_at: new Date().toISOString() 
+            })
+          };
+
+          // Always create new record (additive) - doctors can see all cycle events from different documents
+          await TreatmentCycle.create(this.env, cycleData);
+          console.log(`✅ Added cycle ${cyc.cycle_number} from document ${documentId} (date: ${documentDate})`);
+        } catch (cycleError) {
+          console.warn(`⚠️ Failed to add cycle ${cyc.cycle_number}:`, cycleError.message);
+        }
+      }
+    }
   }
 
   async syncMedicationsFromExtraction(patientId, documentId, extractedData) {
@@ -1248,5 +1480,104 @@ Data: ${JSON.stringify(extractedData)}`;
 
     // Default
     return medication.category || 'supportive';
+  }
+
+  /**
+   * Sync clinical decisions from extracted data
+   */
+  async syncClinicalDecisionsFromExtraction(patientId, documentId, extractedData) {
+    console.log('🔍 syncClinicalDecisionsFromExtraction called for patient:', patientId);
+    
+    if (!extractedData) {
+      console.log('⚠️ No extractedData for clinical decisions sync');
+      return;
+    }
+
+    const decisions = extractedData.clinical_decisions;
+    if (!Array.isArray(decisions) || decisions.length === 0) {
+      console.log('⚠️ No clinical_decisions array found - skipping sync');
+      return;
+    }
+
+    console.log(`📋 Found ${decisions.length} clinical decisions to sync`);
+
+    const repo = DecisionRepository(this.env.DB);
+
+    for (const d of decisions) {
+      try {
+        const decisionData = {
+          decision_type: d.type || d.decision_type || 'clinical_decision',
+          decision_date: d.date || extractedData.document_date || extractedData.document_info?.document_date || null,
+          clinical_question: d.question || d.clinical_question || null,
+          decision_made: d.decision || d.decision_made || null,
+          rationale: d.rationale || d.details || d.notes || null,
+          implementation_status: d.status || 'pending',
+          data_sources: { source: documentId, extracted_at: new Date().toISOString() }
+        };
+
+        await repo.create(patientId, decisionData);
+        console.log(`✅ Created clinical decision: ${decisionData.decision_made?.substring(0, 50)}...`);
+      } catch (error) {
+        console.warn(`⚠️ Failed to sync clinical decision:`, error.message);
+      }
+    }
+
+    console.log(`✅ Synced ${decisions.length} clinical decisions`);
+  }
+
+  /**
+   * Re-sync patient profile from cached extracted data (no LLM call)
+   * Use when extraction was successful but profile sync failed or needs to be re-run
+   */
+  async resyncFromCache(documentId) {
+    // Query document directly by ID (don't need patientId here since route already verified ownership)
+    const doc = await this.env.DB.prepare(`
+      SELECT * FROM documents WHERE id = ?
+    `).bind(documentId).first();
+    
+    if (!doc) {
+      throw new Error(`Document ${documentId} not found`);
+    }
+    
+    if (!doc.extracted_data) {
+      throw new Error(`No cached extracted_data for document ${documentId}. Run full processing first.`);
+    }
+    
+    let extractedData;
+    try {
+      extractedData = typeof doc.extracted_data === 'string' 
+        ? JSON.parse(doc.extracted_data) 
+        : doc.extracted_data;
+    } catch (e) {
+      throw new Error(`Failed to parse cached extracted_data: ${e.message}`);
+    }
+    
+    console.log(`🔄 Re-syncing profile from cached data for document ${documentId}`);
+    console.log(`📊 Cached data keys:`, Object.keys(extractedData));
+    
+    // Re-run all the sync functions with cached data
+    await this.extractAndUpdatePatientDemographics(doc.patient_id, extractedData);
+    await this.updateClinicalSections(doc.patient_id, extractedData, doc.document_type);
+    await this.syncDiagnosisFromExtraction(doc.patient_id, documentId, extractedData);
+    await this.syncStagingFromExtraction(doc.patient_id, documentId, extractedData);
+    await this.syncTreatmentFromExtraction(doc.patient_id, documentId, extractedData);
+    await this.syncMedicationsFromExtraction(doc.patient_id, documentId, extractedData);
+    await this.syncClinicalDecisionsFromExtraction(doc.patient_id, documentId, extractedData);
+    
+    // For timeline, we need a service instance - create one just for this
+    const service = this.provider === 'gemini' 
+      ? new GeminiService(this.env)
+      : new OpenAIService(this.env);
+    await this.extractTimelineEvents(service, doc.patient_id, extractedData, documentId);
+    
+    console.log(`✅ Profile re-synced from cache for document ${documentId}`);
+    
+    return {
+      success: true,
+      document_id: documentId,
+      patient_id: doc.patient_id,
+      extracted_data: extractedData,
+      synced_from_cache: true
+    };
   }
 }

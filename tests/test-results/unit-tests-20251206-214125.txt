@@ -1,0 +1,381 @@
+
+> saarthi-clinical@1.0.0 test:unit
+> vitest run src/tests/unit
+
+
+ RUN  v1.6.1 /Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical
+
+stdout | src/tests/setup.js:6:9
+🧪 Test Environment Setup
+
+stdout | src/tests/setup.js:7:9
+API Base URL: http://localhost:8787/api/v1
+
+stdout | src/tests/setup.js:8:9
+Running tests...
+
+
+stdout | src/tests/setup.js:6:9
+🧪 Test Environment Setup
+
+stdout | src/tests/setup.js:7:9
+API Base URL: http://localhost:8787/api/v1
+
+stdout | src/tests/setup.js:8:9
+Running tests...
+
+
+stdout | src/tests/setup.js:6:9
+🧪 Test Environment Setup
+
+stdout | src/tests/setup.js:7:9
+API Base URL: http://localhost:8787/api/v1
+
+stdout | src/tests/setup.js:8:9
+Running tests...
+
+
+stdout | src/tests/setup.js:6:9
+🧪 Test Environment Setup
+
+stdout | src/tests/setup.js:7:9
+API Base URL: http://localhost:8787/api/v1
+
+stdout | src/tests/setup.js:8:9
+Running tests...
+
+
+stdout | src/tests/setup.js:6:9
+🧪 Test Environment Setup
+
+stdout | src/tests/setup.js:7:9
+API Base URL: http://localhost:8787/api/v1
+
+stdout | src/tests/setup.js:8:9
+Running tests...
+
+
+ ❯ src/tests/unit/document-categories.test.js  (8 tests | 1 failed) 6ms
+   ❯ src/tests/unit/document-categories.test.js > Document Categories Reference Data > Extraction Priorities > should have extraction_priority for all entries
+     → expected 4 to be +0 // Object.is equality
+ ❯ src/tests/unit/openai-client.test.js  (8 tests | 2 failed) 6ms
+   ❯ src/tests/unit/openai-client.test.js > OpenAIService > constructor > should initialize with correct models
+     → expected 'gpt-5' to be 'gpt-4o' // Object.is equality
+   ❯ src/tests/unit/openai-client.test.js > OpenAIService > getExtractionPrompt > should return pathology prompt
+     → expected 'You are a medical data extraction AI.…' to contain 'primary_diagnosis'
+ ❯ src/tests/unit/gemini-client.test.js  (9 tests | 1 failed) 6ms
+   ❯ src/tests/unit/gemini-client.test.js > GeminiService > getExtractionPrompt > should return pathology prompt
+     → expected 'You are a medical data extraction AI.…' to contain 'primary_diagnosis'
+ ❯ src/tests/unit/classification.test.js  (17 tests | 1 failed) 8ms
+   ❯ src/tests/unit/classification.test.js > DocumentClassifier - New Categories > normalizeFacility > should normalize TMH to Tata Memorial Hospital
+     → expected 'tata hospital' to be 'Tata Memorial Hospital' // Object.is equality
+stdout | src/tests/unit/processor.test.js > DocumentProcessor > getService > should fallback when no specific provider requested
+ℹ️  Default provider gemini unavailable, using openai
+
+ ❯ src/tests/unit/processor.test.js  (11 tests | 2 failed) 7ms
+   ❯ src/tests/unit/processor.test.js > DocumentProcessor > constructor > should default to gemini provider
+     → expected 'openai' to be 'gemini' // Object.is equality
+   ❯ src/tests/unit/processor.test.js > DocumentProcessor > getService > should return default provider if none requested
+     → expected 'openai' to be 'gemini' // Object.is equality
+stderr | src/tests/unit/processor.test.js > DocumentProcessor > processDocument > should throw if document not found
+❌ Processing failed: Document not found in database: invalid_id
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/tests/unit/classification.test.js > DocumentClassifier - New Categories > normalizeFacility > should normalize TMH to Tata Memorial Hospital
+AssertionError: expected 'tata hospital' to be 'Tata Memorial Hospital' // Object.is equality
+
+- Expected
++ Received
+
+- Tata Memorial Hospital
++ tata hospital
+
+ ❯ src/tests/unit/classification.test.js:88:61
+     86|       expect(classifier.normalizeFacility('TMH')).toBe('Tata Memorial …
+     87|       expect(classifier.normalizeFacility('Tata Memorial')).toBe('Tata…
+     88|       expect(classifier.normalizeFacility('tata hospital')).toBe('Tata…
+       |                                                             ^
+     89|     });
+     90| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  src/tests/unit/document-categories.test.js > Document Categories Reference Data > Extraction Priorities > should have extraction_priority for all entries
+AssertionError: expected 4 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 4
+
+ ❯ src/tests/unit/document-categories.test.js:133:37
+    131|       
+    132|       // All should have priority
+    133|       expect(result.results.length).toBe(0);
+       |                                     ^
+    134|     });
+    135| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  src/tests/unit/gemini-client.test.js > GeminiService > getExtractionPrompt > should return pathology prompt
+AssertionError: expected 'You are a medical data extraction AI.…' to contain 'primary_diagnosis'
+
+- Expected
++ Received
+
+- primary_diagnosis
++ You are a medical data extraction AI. Extract ALL relevant clinical information from this medical document.
++
++ DOCUMENT TYPE: pathology
++
++ SPECIFIC INSTRUCTIONS FOR PATHOLOGY REPORT:
++ - Extract specimen type and collection site
++ - Extract collection date
++ - Extract gross and microscopic descriptions
++ - Extract final diagnosis with full details
++ - Extract tumor grade and differentiation
++ - Extract margin status if surgical specimen
++ - Extract lymphovascular and perineural invasion status
++ - Extract all immunohistochemistry results
++ - Extract molecular testing results (HER2, MSI, MMR, PD-L1, etc.)
++ - Extract staging information if provided
++ - Extract any special notes or comments
++ - Pay attention to cancer type, site, and histology details
++
++ CRITICAL REQUIREMENTS:
++ 1. Return ONLY valid JSON - no markdown, no code blocks, no explanatory text
++ 2. Follow the exact schema structure provided
++ 3. Use null for missing fields, never omit fields
++ 4. Extract dates in YYYY-MM-DD format when possible
++ 5. Extract numerical values as numbers, not strings
++ 6. Be comprehensive - extract all available information
++
++ Return a JSON object with these top-level keys (use only keys that apply to this document):
++ - patient_demographics
++ - diagnosis
++ - staging
++ - treatment
++ - treatment_cycle
++ - medications
++ - alerts
++ - labs
++ - tumor_markers
++ - medical_history
++ - surgical_history
++ - family_history
++ - social_history
++ - timeline_events
++ - hospitalizations
++ - clinical_decisions
++ - imaging
++ - pathology
++ - document_info
++
++ Example structure:
++ {
++   "patient_demographics": {
++     "name": "John Doe",
++     "age": 65,
++     "sex": "male",
++     "mrn": "12345"
++   },
++   "diagnosis": {
++     "cancer_type": "Adenocarcinoma",
++     "cancer_site_primary": "Stomach"
++   },
++   "treatment": {
++     "regimen_name": "FOLFOX-6",
++     "drugs": ["5-Fluorouracil", "Leucovorin", "Oxaliplatin"],
++     "start_date": "2025-10-03"
++   },
++   "medications": [
++     {
++       "generic_name": "Pantoprazole",
++       "dose_value": 40,
++       "dose_unit": "mg",
++       "frequency": "once daily",
++       "route": "oral"
++     }
++   ],
++   "document_info": {
++     "document_type": "pathology",
++     "document_date": "2025-11-21"
++   }
++ }
++
++ Extract all relevant information from the document now:
+
+ ❯ src/tests/unit/gemini-client.test.js:25:22
+     23|       const prompt = service.getExtractionPrompt('pathology');
+     24|       expect(prompt).toContain('pathology');
+     25|       expect(prompt).toContain('primary_diagnosis');
+       |                      ^
+     26|     });
+     27| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  src/tests/unit/openai-client.test.js > OpenAIService > constructor > should initialize with correct models
+AssertionError: expected 'gpt-5' to be 'gpt-4o' // Object.is equality
+
+- Expected
++ Received
+
+- gpt-4o
++ gpt-5
+
+ ❯ src/tests/unit/openai-client.test.js:13:29
+     11|   describe('constructor', () => {
+     12|     it('should initialize with correct models', () => {
+     13|       expect(service.model).toBe('gpt-4o');
+       |                             ^
+     14|       expect(service.reasoningModel).toBe('o3-mini');
+     15|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  src/tests/unit/openai-client.test.js > OpenAIService > getExtractionPrompt > should return pathology prompt
+AssertionError: expected 'You are a medical data extraction AI.…' to contain 'primary_diagnosis'
+
+- Expected
++ Received
+
+- primary_diagnosis
++ You are a medical data extraction AI. Extract ALL relevant clinical information from this medical document.
++
++ DOCUMENT TYPE: pathology
++
++ SPECIFIC INSTRUCTIONS FOR PATHOLOGY REPORT:
++ - Extract specimen type and collection site
++ - Extract collection date
++ - Extract gross and microscopic descriptions
++ - Extract final diagnosis with full details
++ - Extract tumor grade and differentiation
++ - Extract margin status if surgical specimen
++ - Extract lymphovascular and perineural invasion status
++ - Extract all immunohistochemistry results
++ - Extract molecular testing results (HER2, MSI, MMR, PD-L1, etc.)
++ - Extract staging information if provided
++ - Extract any special notes or comments
++ - Pay attention to cancer type, site, and histology details
++
++ CRITICAL REQUIREMENTS:
++ 1. Return ONLY valid JSON - no markdown, no code blocks, no explanatory text
++ 2. Follow the exact schema structure provided
++ 3. Use null for missing fields, never omit fields
++ 4. Extract dates in YYYY-MM-DD format when possible
++ 5. Extract numerical values as numbers, not strings
++ 6. Be comprehensive - extract all available information
++
++ Return a JSON object with these top-level keys (use only keys that apply to this document):
++ - patient_demographics
++ - diagnosis
++ - staging
++ - treatment
++ - treatment_cycle
++ - medications
++ - alerts
++ - labs
++ - tumor_markers
++ - medical_history
++ - surgical_history
++ - family_history
++ - social_history
++ - timeline_events
++ - hospitalizations
++ - clinical_decisions
++ - imaging
++ - pathology
++ - document_info
++
++ Example structure:
++ {
++   "patient_demographics": {
++     "name": "John Doe",
++     "age": 65,
++     "sex": "male",
++     "mrn": "12345"
++   },
++   "diagnosis": {
++     "cancer_type": "Adenocarcinoma",
++     "cancer_site_primary": "Stomach"
++   },
++   "treatment": {
++     "regimen_name": "FOLFOX-6",
++     "drugs": ["5-Fluorouracil", "Leucovorin", "Oxaliplatin"],
++     "start_date": "2025-10-03"
++   },
++   "medications": [
++     {
++       "generic_name": "Pantoprazole",
++       "dose_value": 40,
++       "dose_unit": "mg",
++       "frequency": "once daily",
++       "route": "oral"
++     }
++   ],
++   "document_info": {
++     "document_type": "pathology",
++     "document_date": "2025-11-21"
++   }
++ }
++
++ Extract all relevant information from the document now:
+
+ ❯ src/tests/unit/openai-client.test.js:22:22
+     20|       const prompt = service.getExtractionPrompt('pathology');
+     21|       expect(prompt).toContain('pathology');
+     22|       expect(prompt).toContain('primary_diagnosis');
+       |                      ^
+     23|     });
+     24| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  src/tests/unit/processor.test.js > DocumentProcessor > constructor > should default to gemini provider
+AssertionError: expected 'openai' to be 'gemini' // Object.is equality
+
+- Expected
++ Received
+
+- gemini
++ openai
+
+ ❯ src/tests/unit/processor.test.js:40:34
+     38| 
+     39|     it('should default to gemini provider', () => {
+     40|       expect(processor.provider).toBe('gemini');
+       |                                  ^
+     41|     });
+     42| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  src/tests/unit/processor.test.js > DocumentProcessor > getService > should return default provider if none requested
+AssertionError: expected 'openai' to be 'gemini' // Object.is equality
+
+- Expected
++ Received
+
+- gemini
++ openai
+
+ ❯ src/tests/unit/processor.test.js:69:31
+     67|     it('should return default provider if none requested', () => {
+     68|       const result = processor.getService(null);
+     69|       expect(result.provider).toBe('gemini');
+       |                               ^
+     70|     });
+     71| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+ Test Files  5 failed (5)
+      Tests  7 failed | 46 passed (53)
+   Start at  21:41:26
+   Duration  378ms (transform 197ms, setup 21ms, collect 400ms, tests 33ms, environment 0ms, prepare 410ms)
+

@@ -13,8 +13,9 @@ export class Document {
     this.storage_key = data.storage_key || `${data.patient_id}/${this.id}/${data.filename}`;
 
     // Document classification (new fields)
-    this.category = data.category || null; // pathology, radiology, lab, clinical_notes, etc.
-    this.subcategory = data.subcategory || null; // biopsy, ct_scan, mri, blood_test, etc.
+    this.category = data.category || null; // pathology, imaging, laboratory, clinical, treatment, surgical, admin
+    this.subcategory = data.subcategory || null; // biopsy, ct, pet, etc.
+    this.facility = data.facility || null; // Hospital/lab name (normalized)
     this.title = data.title || null;
     this.document_date = data.document_date || null;
 
@@ -74,19 +75,12 @@ export class Document {
 
     const validCategories = [
       'pathology',
-      'radiology',
-      'scan_report',
-      'lab',
-      'lab_report',
-      'clinical_notes',
-      'doctor_notes',
-      'consultation',
       'imaging',
-      'gp_notes',
-      'prescription',
-      'discharge_summary',
-      'transcript',
-      'other'
+      'laboratory',
+      'clinical',
+      'treatment',
+      'surgical',
+      'admin'
     ];
 
     // Validate category if provided
@@ -123,6 +117,7 @@ export class Document {
       // Document classification
       category: this.category,
       subcategory: this.subcategory,
+      facility: this.facility,
       title: this.title,
       document_date: this.document_date,
 

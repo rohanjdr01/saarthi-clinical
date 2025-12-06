@@ -78,15 +78,15 @@ export class OpenAIService {
    * - Images: Uses Vision API directly
    * - PDFs: Uses Responses API with file upload
    */
-  async processDocument({ fileBuffer, mimeType, documentType, useReasoning = false }) {
+  async processDocument({ fileBuffer, mimeType, documentType, useReasoning = false, customPrompt = null, firstPageOnly = false }) {
     // Check if it's a PDF - need different approach
     if (mimeType === 'application/pdf') {
-      return await this.processPDF({ fileBuffer, documentType });
+      return await this.processPDF({ fileBuffer, documentType, customPrompt, firstPageOnly });
     }
 
     // For images, use Vision API
     if (this.supportedImageTypes.includes(mimeType)) {
-      return await this.processImage({ fileBuffer, mimeType, documentType, useReasoning });
+      return await this.processImage({ fileBuffer, mimeType, documentType, useReasoning, customPrompt, firstPageOnly });
     }
 
     throw new Error(`Unsupported file type for OpenAI: ${mimeType}. Supported: PDF, PNG, JPEG, GIF, WEBP`);
@@ -95,12 +95,14 @@ export class OpenAIService {
   /**
    * Process image with GPT-4o Vision API
    */
-  async processImage({ fileBuffer, mimeType, documentType, useReasoning = false }) {
+  async processImage({ fileBuffer, mimeType, documentType, useReasoning = false, customPrompt = null, firstPageOnly = false }) {
     const url = `${this.baseUrl}/chat/completions`;
     const base64Data = this.toBase64(fileBuffer);
     const model = useReasoning ? this.reasoningModel : this.model;
 
-    const prompt = this.getExtractionPrompt(documentType);
+    let prompt = customPrompt || this.getExtractionPrompt(documentType);
+
+    // Note: For images, first page only doesn't apply (images are single page)
 
     const content = [
       { type: 'text', text: prompt },
@@ -171,8 +173,8 @@ export class OpenAIService {
   /**
    * Process PDF using OpenAI Responses API (file upload)
    */
-  async processPDF({ fileBuffer, documentType }) {
-    console.log(`📄 OpenAI PDF processing via Responses API...`);
+  async processPDF({ fileBuffer, documentType, customPrompt = null, firstPageOnly = false }) {
+    console.log(`📄 OpenAI PDF processing via Responses API${firstPageOnly ? ' (first page only)' : ''}...`);
 
     // Step 1: Upload the PDF file
     const formData = new FormData();
@@ -198,7 +200,12 @@ export class OpenAIService {
     console.log(`📁 File uploaded: ${fileId}`);
 
     // Step 2: Use Responses API with the file
-    const prompt = this.getExtractionPrompt(documentType);
+    let prompt = customPrompt || this.getExtractionPrompt(documentType);
+
+    // Add first-page-only instruction for PDFs
+    if (firstPageOnly) {
+      prompt += '\n\nIMPORTANT: Focus only on the FIRST PAGE of this PDF for classification. You do not need to analyze subsequent pages.';
+    }
     
     const requestBody = {
       model: this.model,

@@ -142,6 +142,14 @@ CREATE TABLE documents (
     reviewed_by TEXT,
     reviewed_date INTEGER,
 
+    -- Classification (triage workflow)
+    classification TEXT, -- cancer_core, cancer_adjacent, non_cancer
+    classification_confidence REAL,
+    classification_reason TEXT,
+    document_category TEXT,
+    gp_reviewed INTEGER DEFAULT 0,
+    gp_approved_for_extraction INTEGER DEFAULT 0,
+
     -- AI processing metadata
     gemini_model TEXT,
     tokens_used INTEGER,
@@ -845,6 +853,8 @@ CREATE INDEX idx_documents_category ON documents(category);
 CREATE INDEX idx_documents_reviewed ON documents(reviewed_status);
 CREATE INDEX idx_documents_case_pack ON documents(case_pack_order);
 CREATE INDEX idx_documents_vectorize ON documents(vectorize_status);
+CREATE INDEX idx_documents_classification ON documents(classification);
+CREATE INDEX idx_documents_gp_reviewed ON documents(gp_reviewed);
 
 -- Document vectors
 CREATE INDEX idx_vectors_document ON document_vectors(document_id);

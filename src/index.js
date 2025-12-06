@@ -5,11 +5,9 @@ import auth from './routes/auth.js';
 import patients from './routes/patients.js';
 import documents from './routes/documents.js';
 import processing from './routes/processing.js';
-import views from './routes/views.js';
 import timeline from './routes/timeline.js';
 import medications from './routes/medications.js';
 import alerts from './routes/alerts.js';
-import labs from './routes/labs.js';
 import history from './routes/history.js';
 import decisions from './routes/decisions.js';
 import diagnosis from './routes/diagnosis.js';
@@ -27,11 +25,14 @@ app.use('/*', cors({
   origin: [
     'http://localhost:3000', 
     'http://localhost:5000', 
+    'http://localhost:5173', // Vite dev server
     'http://localhost:8000',
     'https://process.saarthihq.com',
     'https://saarthi-clinical-prod.jdr-rohan.workers.dev'
   ],
   credentials: true,
+  allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization'],
 }));
 
 // Root endpoint
@@ -192,12 +193,10 @@ app.route('/api/v1/patients/:patientId/processing', processing);
 app.route('/api/v1/patients/:patientId/timeline', timeline);
 app.route('/api/v1/patients/:patientId/medications', medications);
 app.route('/api/v1/patients/:patientId/alerts', alerts);
-app.route('/api/v1/patients/:patientId/labs', labs);
 app.route('/api/v1/patients/:patientId/history', history);
 app.route('/api/v1/patients/:patientId/decisions', decisions);
 app.route('/api/v1/patients', diagnosis);  // Diagnosis & Staging routes
 app.route('/api/v1/patients', treatment);  // Treatment routes
-app.route('/api/v1/patients/:patientId', views);
 
 // Catch-all 404 handler
 app.all('*', (c) => {

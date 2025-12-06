@@ -1,0 +1,2785 @@
+
+> saarthi-clinical@1.0.0 test
+> vitest run
+
+
+ RUN  v1.6.1 /Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical
+
+stdout | src/tests/setup.js:6:9
+🧪 Test Environment Setup
+
+stdout | src/tests/setup.js:7:9
+API Base URL: http://localhost:8787/api/v1
+
+stdout | src/tests/setup.js:8:9
+Running tests...
+
+
+stdout | src/tests/setup.js:6:9
+🧪 Test Environment Setup
+
+stdout | src/tests/setup.js:7:9
+API Base URL: http://localhost:8787/api/v1
+
+stdout | src/tests/setup.js:8:9
+Running tests...
+
+
+stdout | src/tests/setup.js:6:9
+🧪 Test Environment Setup
+
+stdout | src/tests/setup.js:7:9
+API Base URL: http://localhost:8787/api/v1
+
+stdout | src/tests/setup.js:6:9
+🧪 Test Environment Setup
+
+stdout | src/tests/setup.js:7:9
+API Base URL: http://localhost:8787/api/v1
+
+stdout | src/tests/setup.js:8:9
+Running tests...
+
+
+stdout | src/tests/setup.js:6:9
+🧪 Test Environment Setup
+
+stdout | src/tests/setup.js:7:9
+API Base URL: http://localhost:8787/api/v1
+
+stdout | src/tests/setup.js:8:9
+Running tests...
+
+
+stdout | src/tests/setup.js:6:9
+🧪 Test Environment Setup
+
+stdout | src/tests/setup.js:8:9
+Running tests...
+
+
+stdout | src/tests/setup.js:7:9
+API Base URL: http://localhost:8787/api/v1
+
+stdout | src/tests/setup.js:8:9
+Running tests...
+
+
+stdout | src/tests/setup.js:6:9
+🧪 Test Environment Setup
+
+stdout | src/tests/setup.js:7:9
+API Base URL: http://localhost:8787/api/v1
+
+stdout | src/tests/setup.js:8:9
+Running tests...
+
+
+ ✓ src/tests/api/documents-filter.test.js  (9 tests) 4ms
+ ✓ src/tests/api/triage-categories.test.js  (7 tests) 5ms
+ ❯ src/tests/unit/document-categories.test.js  (8 tests | 1 failed) 15ms
+   ❯ src/tests/unit/document-categories.test.js > Document Categories Reference Data > Extraction Priorities > should have extraction_priority for all entries
+     → expected 4 to be +0 // Object.is equality
+ ❯ src/tests/api.test.js  (38 tests | 32 failed) 166ms
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Health Check > should return health status
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Patients > should create a new patient with extended fields
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Patients > should list patients with filters
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Patients > should get patient by ID
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Patients > should get patient demographics only
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Patients > should update patient with new fields
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Documents > should upload documents without category (will be inferred)
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Documents > should upload documents with optional category
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Documents > should list documents with filters
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Documents > should search documents using RAG semantic search
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Diagnosis & Staging > should create diagnosis
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Diagnosis & Staging > should get diagnosis
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Diagnosis & Staging > should create staging
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Diagnosis & Staging > should get staging
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Treatment > should create treatment
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Treatment > should get treatment
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Treatment > should add treatment cycle
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Treatment > should get all cycles
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Treatment > should get specific cycle
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Treatment > should update cycle
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Medications > should list medications (public)
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Medications > should reject create medication without admin
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Alerts > should list alerts (public)
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > History > should list medical history (public)
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > History > should list surgical history (public)
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Clinical Decisions > should list decisions (public)
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Legacy Endpoints > should still support processing status
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Legacy Endpoints > should still support processing log
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Legacy Endpoints > should still support patient summary
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Legacy Endpoints > should still support timeline
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Cleanup > should delete test patient
+     → fetch failed
+   ❯ src/tests/api.test.js > Saarthi Clinical API Tests > Cleanup > should return 501 for search when vectorize not configured
+     → fetch failed
+stderr | src/tests/integration/classification-flow.test.js > Classification Flow - Integration > Error Handling > should mark document as classification_failed on error
+Error classifying document doc_test789: Error: Document not found: doc_test789
+    at DocumentClassifier.classifyDocument (/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/src/services/classification/classifier.js:114:15)
+    at /Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/src/tests/integration/classification-flow.test.js:178:7
+    at runTest (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:781:11)
+    at runSuite (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runSuite (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runSuite (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runFiles (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:958:5)
+    at startTests (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:967:3)
+    at file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/vitest/dist/chunks/runtime-runBaseTests.oAvMKtQC.js:116:7
+    at withEnv (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/vitest/dist/chunks/runtime-runBaseTests.oAvMKtQC.js:83:5)
+Failed to mark document doc_test789 as classification_failed: TypeError: this.env.DB.prepare(...).bind(...).run is not a function
+    at DocumentClassifier.classifyDocument (/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/src/services/classification/classifier.js:247:11)
+    at /Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/src/tests/integration/classification-flow.test.js:178:7
+    at runTest (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:781:11)
+    at runSuite (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runSuite (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runSuite (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runFiles (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:958:5)
+    at startTests (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:967:3)
+    at file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/vitest/dist/chunks/runtime-runBaseTests.oAvMKtQC.js:116:7
+    at withEnv (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/vitest/dist/chunks/runtime-runBaseTests.oAvMKtQC.js:83:5)
+
+ ❯ src/tests/unit/classification.test.js  (17 tests | 1 failed) 13ms
+   ❯ src/tests/unit/classification.test.js > DocumentClassifier - New Categories > normalizeFacility > should normalize TMH to Tata Memorial Hospital
+     → expected 'tata hospital' to be 'Tata Memorial Hospital' // Object.is equality
+ ✓ src/tests/integration/classification-flow.test.js  (6 tests) 11ms
+stdout | src/tests/unit/processor.test.js > DocumentProcessor > getService > should fallback when no specific provider requested
+ℹ️  Default provider gemini unavailable, using openai
+
+ ❯ src/tests/unit/processor.test.js  (11 tests | 2 failed) 9ms
+   ❯ src/tests/unit/processor.test.js > DocumentProcessor > constructor > should default to gemini provider
+     → expected 'openai' to be 'gemini' // Object.is equality
+   ❯ src/tests/unit/processor.test.js > DocumentProcessor > getService > should return default provider if none requested
+     → expected 'openai' to be 'gemini' // Object.is equality
+stderr | src/tests/unit/processor.test.js > DocumentProcessor > processDocument > should throw if document not found
+❌ Processing failed: Document not found in database: invalid_id
+
+stdout | src/tests/setup.js:6:9
+🧪 Test Environment Setup
+
+stdout | src/tests/setup.js:7:9
+API Base URL: http://localhost:8787/api/v1
+
+stdout | src/tests/setup.js:8:9
+Running tests...
+
+
+stdout | src/tests/setup.js:6:9
+🧪 Test Environment Setup
+
+stdout | src/tests/setup.js:7:9
+API Base URL: http://localhost:8787/api/v1
+
+stdout | src/tests/setup.js:8:9
+Running tests...
+
+
+ ❯ src/tests/unit/gemini-client.test.js  (9 tests | 1 failed) 5ms
+   ❯ src/tests/unit/gemini-client.test.js > GeminiService > getExtractionPrompt > should return pathology prompt
+     → expected 'You are a medical data extraction AI.…' to contain 'primary_diagnosis'
+ ❯ src/tests/unit/openai-client.test.js  (8 tests | 2 failed) 8ms
+   ❯ src/tests/unit/openai-client.test.js > OpenAIService > constructor > should initialize with correct models
+     → expected 'gpt-5' to be 'gpt-4o' // Object.is equality
+   ❯ src/tests/unit/openai-client.test.js > OpenAIService > getExtractionPrompt > should return pathology prompt
+     → expected 'You are a medical data extraction AI.…' to contain 'primary_diagnosis'
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 39 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Health Check > should return health status
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:26:24
+     24|   describe('Health Check', () => {
+     25|     it('should return health status', async () => {
+     26|       const response = await fetch(`${API_BASE}/health`);
+       |                        ^
+     27|       const data = await response.json();
+     28| 
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Patients > should create a new patient with extended fields
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:41:24
+     39|   describe('Patients', () => {
+     40|     it('should create a new patient with extended fields', async () =>…
+     41|       const response = await fetch(`${API_BASE}/patients`, {
+       |                        ^
+     42|         method: 'POST',
+     43|         headers: { 'Content-Type': 'application/json' },
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Patients > should list patients with filters
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:81:24
+     79| 
+     80|     it('should list patients with filters', async () => {
+     81|       const response = await fetch(`${API_BASE}/patients?status=active…
+       |                        ^
+     82|       const data = await response.json();
+     83| 
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Patients > should get patient by ID
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:90:24
+     88| 
+     89|     it('should get patient by ID', async () => {
+     90|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+     91|       const data = await response.json();
+     92| 
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Patients > should get patient demographics only
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:100:24
+     98| 
+     99|     it('should get patient demographics only', async () => {
+    100|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    101|       const data = await response.json();
+    102| 
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Patients > should update patient with new fields
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:111:24
+    109| 
+    110|     it('should update patient with new fields', async () => {
+    111|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    112|         method: 'PATCH',
+    113|         headers: { 'Content-Type': 'application/json' },
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Documents > should upload documents without category (will be inferred)
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:144:24
+    142|       formData.append('process_immediately', 'false');
+    143| 
+    144|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    145|         method: 'POST',
+    146|         body: formData
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Documents > should upload documents with optional category
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:171:24
+    169|       formData.append('process_immediately', 'false');
+    170| 
+    171|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    172|         method: 'POST',
+    173|         body: formData
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Documents > should list documents with filters
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:183:24
+    181| 
+    182|     it('should list documents with filters', async () => {
+    183|       const response = await fetch(
+       |                        ^
+    184|         `${API_BASE}/patients/${testPatientId}/documents?category=radi…
+    185|       );
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Documents > should search documents using RAG semantic search
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:250:24
+    248| 
+    249|     it('should search documents using RAG semantic search', async () =…
+    250|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    251|         method: 'POST',
+    252|         headers: { 'Content-Type': 'application/json' },
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Diagnosis & Staging > should create diagnosis
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:302:24
+    300|   describe('Diagnosis & Staging', () => {
+    301|     it('should create diagnosis', async () => {
+    302|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    303|         method: 'PUT',
+    304|         headers: { 'Content-Type': 'application/json' },
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Diagnosis & Staging > should get diagnosis
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:325:24
+    323| 
+    324|     it('should get diagnosis', async () => {
+    325|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    326|       const data = await response.json();
+    327| 
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Diagnosis & Staging > should create staging
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:335:24
+    333| 
+    334|     it('should create staging', async () => {
+    335|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    336|         method: 'PUT',
+    337|         headers: { 'Content-Type': 'application/json' },
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Diagnosis & Staging > should get staging
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:356:24
+    354| 
+    355|     it('should get staging', async () => {
+    356|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    357|       const data = await response.json();
+    358| 
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Treatment > should create treatment
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:370:24
+    368|   describe('Treatment', () => {
+    369|     it('should create treatment', async () => {
+    370|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    371|         method: 'PUT',
+    372|         headers: { 'Content-Type': 'application/json' },
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Treatment > should get treatment
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:393:24
+    391| 
+    392|     it('should get treatment', async () => {
+    393|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    394|       const data = await response.json();
+    395| 
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Treatment > should add treatment cycle
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:403:24
+    401| 
+    402|     it('should add treatment cycle', async () => {
+    403|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    404|         method: 'POST',
+    405|         headers: { 'Content-Type': 'application/json' },
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Treatment > should get all cycles
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:427:24
+    425| 
+    426|     it('should get all cycles', async () => {
+    427|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    428|       const data = await response.json();
+    429| 
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Treatment > should get specific cycle
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:436:24
+    434| 
+    435|     it('should get specific cycle', async () => {
+    436|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    437|       const data = await response.json();
+    438| 
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Treatment > should update cycle
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:445:24
+    443| 
+    444|     it('should update cycle', async () => {
+    445|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    446|         method: 'PUT',
+    447|         headers: { 'Content-Type': 'application/json' },
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Medications > should list medications (public)
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:468:24
+    466|   describe('Medications', () => {
+    467|     it('should list medications (public)', async () => {
+    468|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    469|       const data = await response.json();
+    470|       expect([200, 401]).toContain(response.status);
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Medications > should reject create medication without admin
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:475:24
+    473| 
+    474|     it('should reject create medication without admin', async () => {
+    475|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    476|         method: 'POST',
+    477|         headers: { 'Content-Type': 'application/json' },
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Alerts > should list alerts (public)
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:495:24
+    493|   describe('Alerts', () => {
+    494|     it('should list alerts (public)', async () => {
+    495|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    496|       const data = await response.json();
+    497|       expect([200, 401]).toContain(response.status);
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[23/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > History > should list medical history (public)
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:507:24
+    505|   describe('History', () => {
+    506|     it('should list medical history (public)', async () => {
+    507|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    508|       const data = await response.json();
+    509|       expect([200, 401]).toContain(response.status);
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[24/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > History > should list surgical history (public)
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:514:24
+    512| 
+    513|     it('should list surgical history (public)', async () => {
+    514|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    515|       const data = await response.json();
+    516|       expect([200, 401]).toContain(response.status);
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[25/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Clinical Decisions > should list decisions (public)
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:526:24
+    524|   describe('Clinical Decisions', () => {
+    525|     it('should list decisions (public)', async () => {
+    526|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    527|       const data = await response.json();
+    528|       expect([200, 401]).toContain(response.status);
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[26/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Legacy Endpoints > should still support processing status
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:538:24
+    536|   describe('Legacy Endpoints', () => {
+    537|     it('should still support processing status', async () => {
+    538|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    539|       const data = await response.json();
+    540| 
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[27/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Legacy Endpoints > should still support processing log
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:546:24
+    544| 
+    545|     it('should still support processing log', async () => {
+    546|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    547|       const data = await response.json();
+    548| 
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[28/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Legacy Endpoints > should still support patient summary
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:555:24
+    553| 
+    554|     it('should still support patient summary', async () => {
+    555|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    556|       const data = await response.json();
+    557| 
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[29/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Legacy Endpoints > should still support timeline
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:563:24
+    561| 
+    562|     it('should still support timeline', async () => {
+    563|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    564|       const data = await response.json();
+    565| 
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[30/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Cleanup > should delete test patient
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:576:24
+    574|   describe('Cleanup', () => {
+    575|     it('should delete test patient', async () => {
+    576|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    577|         method: 'DELETE'
+    578|       });
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[31/39]⎯
+
+ FAIL  src/tests/api.test.js > Saarthi Clinical API Tests > Cleanup > should return 501 for search when vectorize not configured
+TypeError: fetch failed
+ ❯ src/tests/api.test.js:600:24
+    598| 
+    599|     it('should return 501 for search when vectorize not configured', a…
+    600|       const response = await fetch(`${API_BASE}/patients/${testPatient…
+       |                        ^
+    601|         method: 'POST',
+    602|         headers: { 'Content-Type': 'application/json' },
+
+{
+  stack: 'AggregateError: \n' +
+    '    at internalConnectMultiple (node:net:1139:18)\n' +
+    '    at afterConnectMultiple (node:net:1714:7)',
+  errors: [
+    {
+      stack: 'Error: connect ECONNREFUSED ::1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED ::1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n' +
+        '    at createConnectionError (node:net:1677:14)\n' +
+        '    at afterConnectMultiple (node:net:1707:16)',
+      message: 'connect ECONNREFUSED 127.0.0.1:8787',
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8787,
+      constructor: 'Function<Error>',
+      name: 'Error',
+      toString: 'Function<toString>'
+    }
+  ],
+  code: 'ECONNREFUSED',
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'Caused by: AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'internalConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1139,
+      column: 18
+    },
+    {
+      method: 'afterConnectMultiple',
+      file: '/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node:net',
+      line: 1714,
+      column: 7
+    }
+  ]
+}
+ ❯ internalConnectMultiple node:net:1139:18
+ ❯ afterConnectMultiple node:net:1714:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errors: [ { stack: 'Error: connect ECONNREFUSED ::1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED ::1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '::1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' }, { stack: 'Error: connect ECONNREFUSED 127.0.0.1:8787\n    at createConnectionError (node:net:1677:14)\n    at afterConnectMultiple (node:net:1707:16)', message: 'connect ECONNREFUSED 127.0.0.1:8787', errno: -61, code: 'ECONNREFUSED', syscall: 'connect', address: '127.0.0.1', port: 8787, constructor: 'Function<Error>', name: 'Error', toString: 'Function<toString>' } ], code: 'ECONNREFUSED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[32/39]⎯
+
+ FAIL  src/tests/unit/classification.test.js > DocumentClassifier - New Categories > normalizeFacility > should normalize TMH to Tata Memorial Hospital
+AssertionError: expected 'tata hospital' to be 'Tata Memorial Hospital' // Object.is equality
+
+- Expected
++ Received
+
+- Tata Memorial Hospital
++ tata hospital
+
+ ❯ src/tests/unit/classification.test.js:88:61
+     86|       expect(classifier.normalizeFacility('TMH')).toBe('Tata Memorial …
+     87|       expect(classifier.normalizeFacility('Tata Memorial')).toBe('Tata…
+     88|       expect(classifier.normalizeFacility('tata hospital')).toBe('Tata…
+       |                                                             ^
+     89|     });
+     90| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[33/39]⎯
+
+ FAIL  src/tests/unit/document-categories.test.js > Document Categories Reference Data > Extraction Priorities > should have extraction_priority for all entries
+AssertionError: expected 4 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 4
+
+ ❯ src/tests/unit/document-categories.test.js:133:37
+    131|       
+    132|       // All should have priority
+    133|       expect(result.results.length).toBe(0);
+       |                                     ^
+    134|     });
+    135| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[34/39]⎯
+
+ FAIL  src/tests/unit/gemini-client.test.js > GeminiService > getExtractionPrompt > should return pathology prompt
+AssertionError: expected 'You are a medical data extraction AI.…' to contain 'primary_diagnosis'
+
+- Expected
++ Received
+
+- primary_diagnosis
++ You are a medical data extraction AI. Extract ALL relevant clinical information from this medical document.
++
++ DOCUMENT TYPE: pathology
++
++ SPECIFIC INSTRUCTIONS FOR PATHOLOGY REPORT:
++ - Extract specimen type and collection site
++ - Extract collection date
++ - Extract gross and microscopic descriptions
++ - Extract final diagnosis with full details
++ - Extract tumor grade and differentiation
++ - Extract margin status if surgical specimen
++ - Extract lymphovascular and perineural invasion status
++ - Extract all immunohistochemistry results
++ - Extract molecular testing results (HER2, MSI, MMR, PD-L1, etc.)
++ - Extract staging information if provided
++ - Extract any special notes or comments
++ - Pay attention to cancer type, site, and histology details
++
++ CRITICAL REQUIREMENTS:
++ 1. Return ONLY valid JSON - no markdown, no code blocks, no explanatory text
++ 2. Follow the exact schema structure provided
++ 3. Use null for missing fields, never omit fields
++ 4. Extract dates in YYYY-MM-DD format when possible
++ 5. Extract numerical values as numbers, not strings
++ 6. Be comprehensive - extract all available information
++
++ Return a JSON object with these top-level keys (use only keys that apply to this document):
++ - patient_demographics
++ - diagnosis
++ - staging
++ - treatment
++ - treatment_cycle
++ - medications
++ - alerts
++ - labs
++ - tumor_markers
++ - medical_history
++ - surgical_history
++ - family_history
++ - social_history
++ - timeline_events
++ - hospitalizations
++ - clinical_decisions
++ - imaging
++ - pathology
++ - document_info
++
++ Example structure:
++ {
++   "patient_demographics": {
++     "name": "John Doe",
++     "age": 65,
++     "sex": "male",
++     "mrn": "12345"
++   },
++   "diagnosis": {
++     "cancer_type": "Adenocarcinoma",
++     "cancer_site_primary": "Stomach"
++   },
++   "treatment": {
++     "regimen_name": "FOLFOX-6",
++     "drugs": ["5-Fluorouracil", "Leucovorin", "Oxaliplatin"],
++     "start_date": "2025-10-03"
++   },
++   "medications": [
++     {
++       "generic_name": "Pantoprazole",
++       "dose_value": 40,
++       "dose_unit": "mg",
++       "frequency": "once daily",
++       "route": "oral"
++     }
++   ],
++   "document_info": {
++     "document_type": "pathology",
++     "document_date": "2025-11-21"
++   }
++ }
++
++ Extract all relevant information from the document now:
+
+ ❯ src/tests/unit/gemini-client.test.js:25:22
+     23|       const prompt = service.getExtractionPrompt('pathology');
+     24|       expect(prompt).toContain('pathology');
+     25|       expect(prompt).toContain('primary_diagnosis');
+       |                      ^
+     26|     });
+     27| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[35/39]⎯
+
+ FAIL  src/tests/unit/openai-client.test.js > OpenAIService > constructor > should initialize with correct models
+AssertionError: expected 'gpt-5' to be 'gpt-4o' // Object.is equality
+
+- Expected
++ Received
+
+- gpt-4o
++ gpt-5
+
+ ❯ src/tests/unit/openai-client.test.js:13:29
+     11|   describe('constructor', () => {
+     12|     it('should initialize with correct models', () => {
+     13|       expect(service.model).toBe('gpt-4o');
+       |                             ^
+     14|       expect(service.reasoningModel).toBe('o3-mini');
+     15|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[36/39]⎯
+
+ FAIL  src/tests/unit/openai-client.test.js > OpenAIService > getExtractionPrompt > should return pathology prompt
+AssertionError: expected 'You are a medical data extraction AI.…' to contain 'primary_diagnosis'
+
+- Expected
++ Received
+
+- primary_diagnosis
++ You are a medical data extraction AI. Extract ALL relevant clinical information from this medical document.
++
++ DOCUMENT TYPE: pathology
++
++ SPECIFIC INSTRUCTIONS FOR PATHOLOGY REPORT:
++ - Extract specimen type and collection site
++ - Extract collection date
++ - Extract gross and microscopic descriptions
++ - Extract final diagnosis with full details
++ - Extract tumor grade and differentiation
++ - Extract margin status if surgical specimen
++ - Extract lymphovascular and perineural invasion status
++ - Extract all immunohistochemistry results
++ - Extract molecular testing results (HER2, MSI, MMR, PD-L1, etc.)
++ - Extract staging information if provided
++ - Extract any special notes or comments
++ - Pay attention to cancer type, site, and histology details
++
++ CRITICAL REQUIREMENTS:
++ 1. Return ONLY valid JSON - no markdown, no code blocks, no explanatory text
++ 2. Follow the exact schema structure provided
++ 3. Use null for missing fields, never omit fields
++ 4. Extract dates in YYYY-MM-DD format when possible
++ 5. Extract numerical values as numbers, not strings
++ 6. Be comprehensive - extract all available information
++
++ Return a JSON object with these top-level keys (use only keys that apply to this document):
++ - patient_demographics
++ - diagnosis
++ - staging
++ - treatment
++ - treatment_cycle
++ - medications
++ - alerts
++ - labs
++ - tumor_markers
++ - medical_history
++ - surgical_history
++ - family_history
++ - social_history
++ - timeline_events
++ - hospitalizations
++ - clinical_decisions
++ - imaging
++ - pathology
++ - document_info
++
++ Example structure:
++ {
++   "patient_demographics": {
++     "name": "John Doe",
++     "age": 65,
++     "sex": "male",
++     "mrn": "12345"
++   },
++   "diagnosis": {
++     "cancer_type": "Adenocarcinoma",
++     "cancer_site_primary": "Stomach"
++   },
++   "treatment": {
++     "regimen_name": "FOLFOX-6",
++     "drugs": ["5-Fluorouracil", "Leucovorin", "Oxaliplatin"],
++     "start_date": "2025-10-03"
++   },
++   "medications": [
++     {
++       "generic_name": "Pantoprazole",
++       "dose_value": 40,
++       "dose_unit": "mg",
++       "frequency": "once daily",
++       "route": "oral"
++     }
++   ],
++   "document_info": {
++     "document_type": "pathology",
++     "document_date": "2025-11-21"
++   }
++ }
++
++ Extract all relevant information from the document now:
+
+ ❯ src/tests/unit/openai-client.test.js:22:22
+     20|       const prompt = service.getExtractionPrompt('pathology');
+     21|       expect(prompt).toContain('pathology');
+     22|       expect(prompt).toContain('primary_diagnosis');
+       |                      ^
+     23|     });
+     24| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[37/39]⎯
+
+ FAIL  src/tests/unit/processor.test.js > DocumentProcessor > constructor > should default to gemini provider
+AssertionError: expected 'openai' to be 'gemini' // Object.is equality
+
+- Expected
++ Received
+
+- gemini
++ openai
+
+ ❯ src/tests/unit/processor.test.js:40:34
+     38| 
+     39|     it('should default to gemini provider', () => {
+     40|       expect(processor.provider).toBe('gemini');
+       |                                  ^
+     41|     });
+     42| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[38/39]⎯
+
+ FAIL  src/tests/unit/processor.test.js > DocumentProcessor > getService > should return default provider if none requested
+AssertionError: expected 'openai' to be 'gemini' // Object.is equality
+
+- Expected
++ Received
+
+- gemini
++ openai
+
+ ❯ src/tests/unit/processor.test.js:69:31
+     67|     it('should return default provider if none requested', () => {
+     68|       const result = processor.getService(null);
+     69|       expect(result.provider).toBe('gemini');
+       |                               ^
+     70|     });
+     71| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[39/39]⎯
+
+ Test Files  6 failed | 3 passed (9)
+      Tests  39 failed | 74 passed (113)
+   Start at  21:44:30
+   Duration  580ms (transform 282ms, setup 42ms, collect 890ms, tests 236ms, environment 1ms, prepare 832ms)
+

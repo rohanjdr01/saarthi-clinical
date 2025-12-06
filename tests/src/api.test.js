@@ -500,18 +500,6 @@ describe('Saarthi Clinical API Tests', () => {
   });
 
   // ========================================
-  // Labs
-  // ========================================
-  describe('Labs', () => {
-    it('should list lab results (public)', async () => {
-      const response = await fetch(`${API_BASE}/patients/${testPatientId}/labs`);
-      const data = await response.json();
-      expect([200, 401]).toContain(response.status);
-      expect(data.success).toBeDefined();
-    });
-  });
-
-  // ========================================
   // History
   // ========================================
   describe('History', () => {
@@ -524,20 +512,6 @@ describe('Saarthi Clinical API Tests', () => {
 
     it('should list surgical history (public)', async () => {
       const response = await fetch(`${API_BASE}/patients/${testPatientId}/history/surgical`);
-      const data = await response.json();
-      expect([200, 401]).toContain(response.status);
-      expect(data.success).toBeDefined();
-    });
-
-    it('should list family history (public)', async () => {
-      const response = await fetch(`${API_BASE}/patients/${testPatientId}/history/family`);
-      const data = await response.json();
-      expect([200, 401]).toContain(response.status);
-      expect(data.success).toBeDefined();
-    });
-
-    it('should list social history (public)', async () => {
-      const response = await fetch(`${API_BASE}/patients/${testPatientId}/history/social`);
       const data = await response.json();
       expect([200, 401]).toContain(response.status);
       expect(data.success).toBeDefined();

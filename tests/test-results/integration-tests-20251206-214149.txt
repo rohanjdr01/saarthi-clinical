@@ -1,0 +1,44 @@
+
+ RUN  v1.6.1 /Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical
+
+stdout | src/tests/setup.js:6:9
+🧪 Test Environment Setup
+
+stdout | src/tests/setup.js:7:9
+API Base URL: http://localhost:8787/api/v1
+
+stdout | src/tests/setup.js:8:9
+Running tests...
+
+
+ ✓ src/tests/integration/classification-flow.test.js  (6 tests) 5ms
+stderr | src/tests/integration/classification-flow.test.js > Classification Flow - Integration > Error Handling > should mark document as classification_failed on error
+Error classifying document doc_test789: Error: Document not found: doc_test789
+    at DocumentClassifier.classifyDocument (/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/src/services/classification/classifier.js:114:15)
+    at /Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/src/tests/integration/classification-flow.test.js:178:7
+    at runTest (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:781:11)
+    at runSuite (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runSuite (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runSuite (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runFiles (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:958:5)
+    at startTests (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:967:3)
+    at file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/vitest/dist/chunks/runtime-runBaseTests.oAvMKtQC.js:116:7
+    at withEnv (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/vitest/dist/chunks/runtime-runBaseTests.oAvMKtQC.js:83:5)
+Failed to mark document doc_test789 as classification_failed: TypeError: this.env.DB.prepare(...).bind(...).run is not a function
+    at DocumentClassifier.classifyDocument (/Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/src/services/classification/classifier.js:247:11)
+    at /Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/src/tests/integration/classification-flow.test.js:178:7
+    at runTest (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:781:11)
+    at runSuite (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runSuite (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runSuite (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runFiles (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:958:5)
+    at startTests (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/@vitest/runner/dist/index.js:967:3)
+    at file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/vitest/dist/chunks/runtime-runBaseTests.oAvMKtQC.js:116:7
+    at withEnv (file:///Users/rohanjdr/newPG/fastai/experiments/saarthi-monorepo/saarthi-clinical/node_modules/vitest/dist/chunks/runtime-runBaseTests.oAvMKtQC.js:83:5)
+
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  21:41:49
+   Duration  241ms (transform 34ms, setup 3ms, collect 60ms, tests 5ms, environment 0ms, prepare 34ms)
+
