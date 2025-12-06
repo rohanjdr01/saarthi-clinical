@@ -78,7 +78,8 @@ Authorization: Bearer <token>
 Content-Type: multipart/form-data
 
 files: @document.pdf
-category: pathology
+category: pathology          # Optional: AI will classify if not provided
+subcategory: biopsy           # Optional: AI will classify if not provided
 process_immediately: true
 provider: openai
 ```
@@ -92,10 +93,21 @@ provider: openai
   "data": [{
     "id": "doc_xyz789",
     "filename": "document.pdf",
+    "category": "pathology",
+    "subcategory": "biopsy",
     "processing_status": "pending"
   }]
 }
 ```
+
+**Document Categories:**
+- `pathology`: biopsy, histopathology, ihc, cytology, molecular
+- `imaging`: ct, mri, pet, xray, ultrasound, mammography
+- `laboratory`: cbc, lft, kft, tumor_markers, coagulation, serology
+- `clinical`: consultation, discharge, opd, emergency, followup
+- `treatment`: chemotherapy, radiation, immunotherapy, targeted_therapy
+- `surgical`: operative_notes, discharge_summary, postop
+- `admin`: prescription, referral, insurance, consent
 
 ### 3. Check Processing Status
 
@@ -106,7 +118,19 @@ Authorization: Bearer <token>
 
 Wait until `processing_status: "completed"` and `vectorize_status: "completed"`.
 
-### 4. Search Documents (RAG)
+### 6. Get Triage Queue (Category-Based)
+
+```bash
+GET /api/v1/patients/pt_abc123/documents/triage?status=pending
+Authorization: Bearer <token>
+```
+
+**Response includes:**
+- `summary.by_category` - Count by category (pathology, imaging, etc.)
+- `summary.by_classification` - Count by cancer relevance
+- `documents.*` - Grouped by classification, each with category/subcategory info
+
+### 7. Search Documents (RAG)
 
 ```bash
 POST /api/v1/patients/pt_abc123/documents/search
@@ -133,6 +157,26 @@ Content-Type: application/json
 }
 ```
 
+## Document Categorization
+
+The platform uses a 7-category system with 40+ subcategories:
+
+| Category | Subcategories | Priority |
+|----------|--------------|----------|
+| **pathology** | biopsy, histopathology, ihc, cytology, molecular | P0 |
+| **imaging** | ct, mri, pet, xray, ultrasound, mammography | P0-P1 |
+| **laboratory** | cbc, lft, kft, tumor_markers, coagulation, serology | P1-P2 |
+| **clinical** | consultation, discharge, opd, emergency, followup | P1 |
+| **treatment** | chemotherapy, radiation, immunotherapy, targeted_therapy | P0 |
+| **surgical** | operative_notes, discharge_summary, postop | P0 |
+| **admin** | prescription, referral, insurance, consent | P3 |
+
+**Extraction Priority:**
+- **P0**: Critical documents (pathology, treatment, surgical) - full extraction
+- **P1**: Important documents (imaging, clinical) - standard extraction
+- **P2**: Routine documents (lab reports) - basic extraction
+- **P3**: Administrative - minimal extraction
+
 ## Essential Endpoints
 
 ### Patients
@@ -148,9 +192,13 @@ Content-Type: application/json
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/v1/patients/:id/documents` | Upload documents |
-| `GET` | `/api/v1/patients/:id/documents` | List documents |
-| `GET` | `/api/v1/patients/:id/documents/:docId` | Get document metadata |
+| `POST` | `/api/v1/patients/:id/documents` | Upload documents (supports category/subcategory) |
+| `GET` | `/api/v1/patients/:id/documents` | List documents (filter by category/subcategory) |
+| `GET` | `/api/v1/patients/:id/documents/:docId` | Get document metadata (includes category/facility) |
+| `PATCH` | `/api/v1/patients/:id/documents/:docId` | Update document metadata (category, subcategory, title) |
+| `POST` | `/api/v1/patients/:id/documents/:docId/classify` | Classify document (AI categorization) |
+| `POST` | `/api/v1/patients/:id/documents/classify` | Bulk classify documents |
+| `GET` | `/api/v1/patients/:id/documents/triage` | Get triage queue (grouped by category) |
 | `POST` | `/api/v1/patients/:id/documents/search` | Semantic search (RAG) |
 | `POST` | `/api/v1/patients/:id/documents/:docId/reprocess` | Reprocess document |
 

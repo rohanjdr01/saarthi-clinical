@@ -36,6 +36,10 @@ The Saarthi Clinical Platform API provides a comprehensive REST interface for ma
 
 ### Key Features
 
+- **Document Categorization**: 7-category system (pathology, imaging, laboratory, clinical, treatment, surgical, admin) with 40+ subcategories
+- **Facility Normalization**: Automatic hospital/lab name normalization (TMH → Tata Memorial Hospital)
+- **Category-Based Filtering**: Filter documents by category/subcategory for efficient triage
+- **Extraction Priority**: P0/P1/P2/P3 priority levels control extraction depth
 - **Document Management**: Upload, classify, and process medical documents
 - **Document Triage**: AI-powered classification with GP review workflow
 - **Data Provenance**: Field-level source tracking for diagnosis and staging
@@ -311,11 +315,20 @@ Content-Type: multipart/form-data
 
 **Form Data:**
 - `files` (required) - One or more files
-- `category` (optional) - Document category (will be inferred if not provided)
-- `subcategory` (optional) - Document subcategory
+- `category` (optional) - Primary category: `pathology`, `imaging`, `laboratory`, `clinical`, `treatment`, `surgical`, `admin` (AI will classify if not provided)
+- `subcategory` (optional) - Subcategory (e.g., `biopsy`, `ct`, `pet`, `cbc`, `discharge`) - AI will classify if not provided
 - `document_date` (optional) - Date of document (YYYY-MM-DD)
 - `process_mode` (optional) - `fast` (default) or `full`
 - `provider` (optional) - AI provider: `gemini` or `openai`
+
+**Document Categories:**
+- **pathology**: `biopsy`, `histopathology`, `ihc`, `cytology`, `molecular`
+- **imaging**: `ct`, `mri`, `pet`, `xray`, `ultrasound`, `mammography`
+- **laboratory**: `cbc`, `lft`, `kft`, `tumor_markers`, `coagulation`, `serology`
+- **clinical**: `consultation`, `discharge`, `opd`, `emergency`, `followup`
+- **treatment**: `chemotherapy`, `radiation`, `immunotherapy`, `targeted_therapy`
+- **surgical**: `operative_notes`, `discharge_summary`, `postop`
+- **admin**: `prescription`, `referral`, `insurance`, `consent`
 
 **Response:** `202 Accepted`
 ```json
@@ -348,12 +361,20 @@ GET /api/v1/patients/:patientId/documents?category=pathology&start_date=2025-01-
 ```
 
 **Query Parameters:**
-- `category` - Filter by document category
+- `category` - Filter by primary category: `pathology`, `imaging`, `laboratory`, `clinical`, `treatment`, `surgical`, `admin`
+- `subcategory` - Filter by subcategory (e.g., `biopsy`, `ct`, `pet`, `cbc`, `discharge`)
 - `start_date` - Filter by start date (YYYY-MM-DD)
 - `end_date` - Filter by end date (YYYY-MM-DD)
 - `reviewed_status` - Filter by review status: `pending`, `reviewed`, `approved`
 - `sort` - Sort field: `created_at`, `document_date`, `case_pack_order`, `category`
 - `order` - Sort order: `asc` or `desc`
+
+**Response includes:**
+- `category` - Primary category
+- `subcategory` - Subcategory
+- `facility` - Normalized hospital/lab name
+- `category_display` - Human-readable category name
+- `extraction_priority` - P0/P1/P2/P3 priority level
 
 ### Get Document Metadata
 
@@ -361,7 +382,15 @@ GET /api/v1/patients/:patientId/documents?category=pathology&start_date=2025-01-
 GET /api/v1/patients/:patientId/documents/:docId
 ```
 
-Returns document metadata including processing status, classification, medical highlights, etc.
+Returns document metadata including processing status, classification, medical highlights, and categorization.
+
+**Response includes:**
+- `category` - Primary category (pathology, imaging, laboratory, clinical, treatment, surgical, admin)
+- `subcategory` - Subcategory (biopsy, ct, pet, cbc, discharge, etc.)
+- `facility` - Normalized hospital/lab name
+- `classification` - Cancer relevance (cancer_core, cancer_adjacent, non_cancer)
+- `category_display` - Human-readable category name
+- `extraction_priority` - P0/P1/P2/P3 priority level
 
 ### Update Document Metadata
 
@@ -380,6 +409,14 @@ PATCH /api/v1/patients/:patientId/documents/:docId
   "case_pack_order": 1
 }
 ```
+
+**Allowed fields:**
+- `category` - Primary category (pathology, imaging, laboratory, clinical, treatment, surgical, admin)
+- `subcategory` - Subcategory (biopsy, ct, pet, cbc, discharge, etc.)
+- `title` - Document title
+- `document_date` - Document date (YYYY-MM-DD)
+- `reviewed_status` - Review status (pending, reviewed, flagged)
+- `case_pack_order` - Order in case pack
 
 ### Download Document
 
@@ -501,6 +538,14 @@ POST /api/v1/patients/:patientId/documents/:documentId/classify
 }
 ```
 
+**Request Body (optional):**
+```json
+{
+  "force": false,
+  "provider": "openai"
+}
+```
+
 **Response:**
 ```json
 {
@@ -510,8 +555,11 @@ POST /api/v1/patients/:patientId/documents/:documentId/classify
     "classification": "cancer_core",
     "confidence": 0.92,
     "reason": "Pathology report showing adenocarcinoma diagnosis",
-    "document_category": "biopsy",
-    "document_date": "2025-09-29"
+    "category": "pathology",
+    "subcategory": "biopsy",
+    "facility": "Tata Memorial Hospital",
+    "document_date": "2025-09-29",
+    "is_handwritten": false
   }
 }
 ```
@@ -521,6 +569,15 @@ POST /api/v1/patients/:patientId/documents/:documentId/classify
 - `cancer_adjacent`: May be relevant (labs, discharge summaries)
 - `non_cancer`: Unrelated to cancer journey
 - `pending`: Not yet classified
+- `classification_failed`: Classification attempt failed (retry available)
+
+**Response includes:**
+- `classification` - Cancer relevance
+- `category` - Primary category (pathology, imaging, laboratory, clinical, treatment, surgical, admin)
+- `subcategory` - Subcategory (biopsy, ct, pet, cbc, discharge, etc.)
+- `facility` - Normalized hospital/lab name
+- `confidence` - Classification confidence (0.0-1.0)
+- `is_handwritten` - Boolean flag for handwritten documents
 
 ### Bulk Classify Documents
 
@@ -536,6 +593,15 @@ POST /api/v1/patients/:patientId/documents/classify
 }
 ```
 
+**Request Body (optional):**
+```json
+{
+  "force": false,
+  "document_ids": ["doc_xxx", "doc_yyy"],
+  "provider": "gemini"
+}
+```
+
 **Response:** `202 Accepted`
 ```json
 {
@@ -548,12 +614,21 @@ POST /api/v1/patients/:patientId/documents/classify
       {
         "document_id": "doc_xxx",
         "classification": "cancer_core",
+        "category": "pathology",
+        "subcategory": "biopsy",
+        "facility": "Tata Memorial Hospital",
         "confidence": 0.95
       }
     ]
   }
 }
 ```
+
+**Response includes for each document:**
+- `classification` - Cancer relevance
+- `category` - Primary category
+- `subcategory` - Subcategory
+- `facility` - Normalized hospital/lab name
 
 ### Get Triage Queue
 
@@ -574,12 +649,20 @@ GET /api/v1/patients/:patientId/documents/triage?status=pending
       "total": 42,
       "pending_review": 38,
       "reviewed": 4,
+      "by_category": {
+        "pathology": 8,
+        "imaging": 12,
+        "laboratory": 15,
+        "clinical": 5,
+        "treatment": 2
+      },
       "by_classification": {
         "cancer_core": 14,
         "cancer_adjacent": 18,
         "non_cancer": 10,
         "uncertain": 2,
-        "pending": 0
+        "pending": 0,
+        "classification_failed": 0
       }
     },
     "documents": {
@@ -587,7 +670,11 @@ GET /api/v1/patients/:patientId/documents/triage?status=pending
         {
           "id": "doc_xxx",
           "filename": "biopsy_report_sep2025.pdf",
-          "document_category": "biopsy",
+          "category": "pathology",
+          "subcategory": "biopsy",
+          "category_display": "Biopsy / Histopathology",
+          "extraction_priority": "P0",
+          "facility": "Tata Memorial Hospital",
           "classification_confidence": 0.95,
           "classification_reason": "Pathology report with adenocarcinoma diagnosis",
           "document_date": "2025-09-29",
@@ -601,6 +688,16 @@ GET /api/v1/patients/:patientId/documents/triage?status=pending
   }
 }
 ```
+
+**Response includes:**
+- `summary.by_category` - Count of documents by category (pathology, imaging, laboratory, etc.)
+- `summary.by_classification` - Count by cancer relevance
+- `documents.*` - Documents grouped by classification, each with:
+  - `category` - Primary category
+  - `subcategory` - Subcategory
+  - `category_display` - Human-readable name
+  - `extraction_priority` - P0/P1/P2/P3
+  - `facility` - Hospital/lab name
 
 ### Update Document Classification (GP Review)
 
@@ -2319,6 +2416,48 @@ Version history can be queried separately (endpoint TBD).
 ## Support
 
 For API support, contact: support@saarthihq.com
+
+---
+
+## Document Categorization System
+
+The platform uses a comprehensive 7-category system with 40+ subcategories specifically designed for Indian oncology documents.
+
+### Primary Categories
+
+| Category | Description | Priority | Subcategories |
+|----------|-------------|----------|---------------|
+| **pathology** | Pathology reports and tissue analysis | P0 | biopsy, histopathology, ihc, cytology, molecular |
+| **imaging** | Medical imaging studies | P0-P1 | ct, mri, pet, xray, ultrasound, mammography |
+| **laboratory** | Lab test results | P1-P2 | cbc, lft, kft, tumor_markers, coagulation, serology |
+| **clinical** | Clinical notes and summaries | P1 | consultation, discharge, opd, emergency, followup |
+| **treatment** | Treatment plans and protocols | P0 | chemotherapy, radiation, immunotherapy, targeted_therapy |
+| **surgical** | Surgical notes and reports | P0 | operative_notes, discharge_summary, postop |
+| **admin** | Administrative documents | P3 | prescription, referral, insurance, consent |
+
+### Extraction Priority Levels
+
+- **P0**: Critical documents (pathology, treatment, surgical) - Full extraction with all fields
+- **P1**: Important documents (imaging, clinical) - Standard extraction
+- **P2**: Routine documents (lab reports) - Basic extraction
+- **P3**: Administrative - Minimal extraction
+
+### Facility Normalization
+
+The system automatically normalizes hospital and lab names:
+- "TMH" → "Tata Memorial Hospital"
+- "AIIMS" → "All India Institute of Medical Sciences"
+- "Apollo" → "Apollo Hospitals"
+- Partial matches and common abbreviations are handled
+
+### Category-Based Filtering
+
+Documents can be filtered by category and subcategory:
+```
+GET /api/v1/patients/:id/documents?category=pathology&subcategory=biopsy
+```
+
+This enables efficient triage workflows where doctors can focus on specific document types.
 
 ---
 

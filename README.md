@@ -8,6 +8,10 @@ Saarthi Clinical is a Cloudflare Workers-based platform that processes medical d
 
 ## Key Features
 
+- **Document Categorization**: Intelligent 7-category system (pathology, imaging, laboratory, clinical, treatment, surgical, admin) with 40+ subcategories
+- **Facility Normalization**: Automatic hospital/lab name normalization (TMH → Tata Memorial Hospital)
+- **Category-Based Filtering**: Filter documents by category/subcategory for efficient triage
+- **Extraction Priority**: P0/P1/P2/P3 priority levels control extraction depth
 - **Document Processing**: Upload and process medical documents (PDFs, images) with AI extraction
 - **Semantic Search (RAG)**: Natural language search across all patient documents using Gemini filesearch (fall back: Cloudflare Vectorize)
 - **Structured Data Extraction**: Automatically extract diagnosis, staging, treatment, medications, labs, and more
@@ -214,6 +218,32 @@ Saarthi Clinical is a Cloudflare Workers-based platform that processes medical d
 - `extraction-schema.js` defines unified schema
 - Provider-specific adapters convert to schema
 - Validation ensures consistency
+
+#### 9. Document Categorization Framework
+
+**Decision**: 7-category system with 40+ subcategories for Indian oncology documents
+
+**Rationale**:
+- Enables category-based filtering and triage
+- Supports extraction priority (P0/P1/P2/P3)
+- Facility normalization improves data quality
+- Tailored for Indian healthcare context
+
+**Categories**:
+- **pathology**: biopsy, histopathology, ihc, cytology, molecular
+- **imaging**: ct, mri, pet, xray, ultrasound, mammography
+- **laboratory**: cbc, lft, kft, tumor_markers, coagulation, serology
+- **clinical**: consultation, discharge, opd, emergency, followup
+- **treatment**: chemotherapy, radiation, immunotherapy, targeted_therapy
+- **surgical**: operative_notes, discharge_summary, postop
+- **admin**: prescription, referral, insurance, consent
+
+**Implementation**:
+- AI classification extracts category, subcategory, facility, and document_date
+- `document_categories` reference table stores valid combinations
+- Facility names normalized (e.g., "TMH" → "Tata Memorial Hospital")
+- Extraction priority assigned based on category/subcategory
+- Triage queue groups by category for efficient review
 
 ## Project Structure
 

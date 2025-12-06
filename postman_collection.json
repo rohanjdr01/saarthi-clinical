@@ -416,10 +416,16 @@
                   "description": "Select PDF/image files to upload"
                 },
                 {
-                  "key": "document_type",
+                  "key": "category",
                   "value": "pathology",
                   "type": "text",
-                  "description": "Options: pathology, imaging, lab, consultation"
+                  "description": "Primary category: pathology, imaging, laboratory, clinical, treatment, surgical, admin (optional - AI will classify if not provided)"
+                },
+                {
+                  "key": "subcategory",
+                  "value": "biopsy",
+                  "type": "text",
+                  "description": "Subcategory (e.g., biopsy, ct, pet, cbc, discharge) - optional"
                 },
                 {
                   "key": "process_mode",
@@ -449,7 +455,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/patients/{{patientId}}/documents",
+              "raw": "{{baseUrl}}/patients/{{patientId}}/documents?category=pathology&subcategory=biopsy",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -457,9 +463,47 @@
                 "patients",
                 "{{patientId}}",
                 "documents"
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "pathology",
+                  "description": "Filter by primary category: pathology, imaging, laboratory, clinical, treatment, surgical, admin",
+                  "disabled": true
+                },
+                {
+                  "key": "subcategory",
+                  "value": "biopsy",
+                  "description": "Filter by subcategory (biopsy, ct, pet, cbc, discharge, etc.)",
+                  "disabled": true
+                },
+                {
+                  "key": "start_date",
+                  "value": "2025-01-01",
+                  "description": "Filter by document date (YYYY-MM-DD)",
+                  "disabled": true
+                },
+                {
+                  "key": "end_date",
+                  "value": "2025-12-31",
+                  "description": "Filter by document date (YYYY-MM-DD)",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "created_at",
+                  "description": "Sort field: created_at, document_date, category",
+                  "disabled": true
+                },
+                {
+                  "key": "order",
+                  "value": "desc",
+                  "description": "Sort order: asc, desc",
+                  "disabled": true
+                }
               ]
             },
-            "description": "List all documents for a patient"
+            "description": "List all documents for a patient. Supports filtering by category and subcategory.\n\n**Query Parameters:**\n- `category` - Filter by primary category (pathology, imaging, laboratory, clinical, treatment, surgical, admin)\n- `subcategory` - Filter by subcategory (biopsy, ct, pet, cbc, discharge, etc.)\n- `start_date` - Filter by document date (YYYY-MM-DD)\n- `end_date` - Filter by document date (YYYY-MM-DD)\n- `sort` - Sort field (created_at, document_date, category)\n- `order` - Sort order (asc, desc)\n\n**Response includes:**\n- `category` - Primary category\n- `subcategory` - Subcategory\n- `facility` - Normalized hospital/lab name\n- `category_display` - Human-readable category name\n- `extraction_priority` - P0/P1/P2/P3 priority level"
           }
         },
         {
@@ -479,7 +523,36 @@
                 "{{documentId}}"
               ]
             },
-            "description": "Get document details including extracted data"
+            "description": "Get document details including extracted data and categorization.\n\n**Response includes:**\n- `category` - Primary category (pathology, imaging, laboratory, clinical, treatment, surgical, admin)\n- `subcategory` - Subcategory (biopsy, ct, pet, cbc, discharge, etc.)\n- `facility` - Normalized hospital/lab name\n- `classification` - Cancer relevance (cancer_core, cancer_adjacent, non_cancer)\n- `category_display` - Human-readable category name\n- `extraction_priority` - P0/P1/P2/P3 priority level"
+          }
+        },
+        {
+          "name": "Update Document Metadata",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"pathology\",\n  \"subcategory\": \"biopsy\",\n  \"title\": \"Biopsy Report - Stomach\",\n  \"document_date\": \"2025-11-02\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/documents/{{documentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "{{patientId}}",
+                "documents",
+                "{{documentId}}"
+              ]
+            },
+            "description": "Update document metadata including category, subcategory, title, and document_date.\n\n**Allowed fields:**\n- `category` - Primary category (pathology, imaging, laboratory, clinical, treatment, surgical, admin)\n- `subcategory` - Subcategory (biopsy, ct, pet, cbc, discharge, etc.)\n- `title` - Document title\n- `document_date` - Document date (YYYY-MM-DD)\n- `reviewed_status` - Review status (pending, reviewed, flagged)\n- `case_pack_order` - Order in case pack"
           }
         },
         {
@@ -668,7 +741,7 @@
                 "classify"
               ]
             },
-            "description": "Classify a single document using AI (cancer_core, cancer_adjacent, non_cancer)"
+            "description": "Classify a single document using AI. Returns category, subcategory, facility, and cancer relevance.\n\n**Response includes:**\n- `classification` - Cancer relevance (cancer_core, cancer_adjacent, non_cancer)\n- `category` - Primary category (pathology, imaging, laboratory, clinical, treatment, surgical, admin)\n- `subcategory` - Subcategory (biopsy, ct, pet, cbc, discharge, etc.)\n- `facility` - Normalized hospital/lab name\n- `confidence` - Classification confidence (0.0-1.0)\n- `is_handwritten` - Boolean flag for handwritten documents\n\n**Query Parameters:**\n- `provider` - AI provider (openai, gemini)\n\n**Body Parameters:**\n- `force` - Force re-classification even if already classified (default: false)"
           }
         },
         {
@@ -697,7 +770,7 @@
                 "classify"
               ]
             },
-            "description": "Classify all unclassified documents for a patient (or specific documents if document_ids provided)"
+            "description": "Bulk classify documents for a patient. Classifies all unclassified documents or specific documents if IDs provided.\n\n**Response includes for each document:**\n- `classification` - Cancer relevance\n- `category` - Primary category\n- `subcategory` - Subcategory\n- `facility` - Normalized hospital/lab name\n\n**Body Parameters:**\n- `force` - Force re-classification (default: false)\n- `document_ids` - Array of specific document IDs to classify (optional)\n- `provider` - AI provider (openai, gemini)"
           }
         },
         {
@@ -724,7 +797,7 @@
                 }
               ]
             },
-            "description": "Get documents pending GP review, grouped by classification (cancer_core, cancer_adjacent, non_cancer, uncertain)"
+            "description": "Get documents pending GP review, grouped by classification and category.\n\n**Response includes:**\n- `summary.by_category` - Count of documents by category (pathology, imaging, laboratory, etc.)\n- `summary.by_classification` - Count by cancer relevance\n- `documents.*` - Documents grouped by classification, each with:\n  - `category` - Primary category\n  - `subcategory` - Subcategory\n  - `category_display` - Human-readable name\n  - `extraction_priority` - P0/P1/P2/P3\n  - `facility` - Hospital/lab name\n\n**Query Parameters:**\n- `status` - Filter by review status (pending, reviewed, all)"
           }
         },
         {
